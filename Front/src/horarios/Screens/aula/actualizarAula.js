@@ -1,59 +1,41 @@
 import React, { useState } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'; // Para redirigir después de la actualización
 
-const ActualizarAula = ({ aulaId }) => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    tipo_aula: ''
-  });
-
-  const [errors, setErrors] = useState({
-    nombre: '',
-    tipo_aula: ''
-  });
-
-  const [submitError, setSubmitError] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
+const ActualizarAula = () => {
+  const [nombre, setNombre] = useState('');
+  const [tipoAula, setTipoAula] = useState('');
+  const [capacidad, setCapacidad] = useState('');
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const { routes } = useOutletContext();
+  const { aulaId } = useParams();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Reiniciar errores
-    setErrors({
-      nombre: '',
-      tipo_aula: ''
-    });
-    setSubmitError(null);
+    setErrors({});
 
     try {
-      const response = await fetch(`/api/actualizarAula/${aulaId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/aulas/actualizar/${aulaId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad })
+        }
+      );
 
-      if (!response.ok) {
+      if (response.ok) {
+        navigate(`${routes.base}/${routes.aulas.main}`); // Redirigir a la lista de aulas después de actualizar con éxito
+      } else {
         const data = await response.json();
         if (data.errors) {
           setErrors(data.errors); // Manejar errores de validación
-        } else {
-          setSubmitError('Ocurrió un error al actualizar el aula.');
         }
-      } else {
-        // Manejar el éxito de la actualización, como redirigir a otra página
-        console.log('Aula actualizada con éxito');
       }
     } catch (error) {
-      setSubmitError('Ocurrió un error al enviar la solicitud.');
+      console.error('Error actualizando aula:', error);
     }
   };
 
@@ -64,23 +46,37 @@ const ActualizarAula = ({ aulaId }) => {
           <form onSubmit={handleSubmit}>
             <label htmlFor="nombre">Ingrese el nombre</label>
             <br />
-            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} />
+            <input
+              type="text"
+              name="nombre"
+              value={nombre} // Vincular el estado del nombre al input
+              onChange={(e) => setNombre(e.target.value)}
+            />
             <br />
             <br />
             {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
-
             <label htmlFor="tipo_aula">Ingrese el tipo de aula</label>
             <br />
             <input
               type="text"
               name="tipo_aula"
-              value={formData.tipo_aula}
-              onChange={handleChange}
+              value={tipoAula} // Vincular el estado del tipo de aula al input
+              onChange={(e) => setTipoAula(e.target.value)}
             />
             <br />
             <br />
             {errors.tipo_aula && <div className="text-danger">{errors.tipo_aula}</div>}
-
+            <label htmlFor="capacidad">Ingrese la capacidad</label>
+            <br />
+            <input
+              type="number"
+              name="capacidad"
+              value={capacidad} // Vincular el estado de capacidad al input
+              onChange={(e) => setCapacidad(e.target.value)}
+            />
+            <br />
+            <br />
+            {errors.capacidad && <div className="text-danger">{errors.capacidad}</div>}
             <button type="submit" className="btn btn-primary me-2">
               Actualizar
             </button>
@@ -88,9 +84,15 @@ const ActualizarAula = ({ aulaId }) => {
         </div>
       </div>
 
-      {submitError && (
+      {Object.keys(errors).length > 0 && (
         <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">{submitError}</div>
+          <div className="alert alert-danger">
+            <ul>
+              {Object.values(errors).map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>

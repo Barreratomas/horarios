@@ -9,7 +9,6 @@ class AulaMapper
     public static function toAula($aulaData)
     {
         return new Aula([
-            'id_aula' => $aulaData['id_aula'],
             'nombre' => $aulaData['nombre'],
             'capacidad' => $aulaData['capacidad'],
             'tipo_aula' => $aulaData['tipo_aula']

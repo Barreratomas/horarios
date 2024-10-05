@@ -5,22 +5,22 @@ export const getRoutes = () => ({
   aulas: {
     main: 'aulas',
     crear: 'aulas/crear',
-    actualizar: (aulaId) => `aulas/${aulaId}/actualizar`
+    actualizar: (aulaId) => `aulas/actualizar/${aulaId}` // ID al final
   },
   materias: {
     main: 'materias',
     crear: 'materias/crear',
-    actualizar: (materiaId) => `materias/${materiaId}/actualizar`
+    actualizar: (materiaId) => `materias/actualizar/${materiaId}` // ID al final
   },
   carreras: {
     main: 'carreras',
     crear: 'carreras/crear',
-    actualizar: (carreraId) => `carreras/${carreraId}/actualizar`
+    actualizar: (carreraId) => `carreras/actualizar/${carreraId}` // ID al final
   },
   comisiones: {
     main: 'comisiones',
     crear: 'comisiones/crear',
-    actualizar: (comisionId) => `comisiones/${comisionId}/actualizar`
+    actualizar: (comisionId) => `comisiones/actualizar/${comisionId}` // ID al final
   },
   asignaciones: 'asignaciones',
   crearHorarioPrevio: (dni) => `crear-horario-previo/${dni}`,
