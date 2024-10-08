@@ -5,88 +5,91 @@ namespace App\Http\Controllers\horarios;
 use App\Http\Requests\AulaRequest;
 use App\Models\horarios\Aula;
 use App\Services\horarios\AulaService;
+use App\DTO\AulaDTO;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\DTO;
 
 class AulaController extends Controller
 {
     protected $aulaService;
 
-    public function __construct(AulaService $aulaService){
+    public function __construct(AulaService $aulaService)
+    {
         $this->aulaService = $aulaService;
-       
+
     }
 
-   /*
-    public function index(){
-        $aulas = $this->aulaService->obtenerTodasAulas();
-        return view('aula.index', compact('aulas'));
-    }
+    /*
+     public function index(){
+         $aulas = $this->aulaService->obtenerTodasAulas();
+         return view('aula.index', compact('aulas'));
+     }
 
-
-   
-   
-    public function obtenerAula(Request $request){
-        $id = $request->input('id');
-        $aula = $this->aulaService->obtenerAula($id);
-        return view('aula.show', compact('aula'));
-    }
 
     
-
-
-    public function crear(){
-        return view('aula.crearAula');
-    }
-  
-    public function guardarAula(AulaRequest $request){
-
-        $nombre = $request->input('nombre');
-        $tipo_aula = $request->input('tipo_aula');
-
-        $response=$this->aulaService->guardarAula($nombre,$tipo_aula);
-        if (isset($response['success'])) {
-            return redirect()->route('indexAula')->with('success', $response['success']);
-        } else {
-            return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
-        };
-    }
-
-
-    public function formularioActualizar(Aula $aula){
-        return view('aula.actualizarAula', compact('aula'));
-    }
-
-    public function actualizarAula(AulaRequest $request, Aula $aula){
-        
-        $nombre = $request->input('nombre');
-        $tipo_aula = $request->input('tipo_aula');
-        $response=$this->aulaService->actualizarAula($nombre,$tipo_aula,$aula);
-        if (isset($response['success'])) {
-            return redirect()->route('indexAula')->with('success', $response['success']);
-        } else {
-            return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
-        };    }
-
-
-    public function eliminarAula(Aula $aula){
-        $response=$this->aulaService->eliminarAula($aula);
-        if (isset($response['success'])) {
-            return redirect()->route('indexAula')->with('success', $response['success']);
-        } else {
-            return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
-        };
-    }
-        
     
-*/
+     public function obtenerAula(Request $request){
+         $id = $request->input('id');
+         $aula = $this->aulaService->obtenerAula($id);
+         return view('aula.show', compact('aula'));
+     }
 
-//-------------------------------------------------------------------------------------------------------------
+     
+
+
+     public function crear(){
+         return view('aula.crearAula');
+     }
+   
+     public function guardarAula(AulaRequest $request){
+
+         $nombre = $request->input('nombre');
+         $tipo_aula = $request->input('tipo_aula');
+
+         $response=$this->aulaService->guardarAula($nombre,$tipo_aula);
+         if (isset($response['success'])) {
+             return redirect()->route('indexAula')->with('success', $response['success']);
+         } else {
+             return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
+         };
+     }
+
+
+     public function formularioActualizar(Aula $aula){
+         return view('aula.actualizarAula', compact('aula'));
+     }
+
+     public function actualizarAula(AulaRequest $request, Aula $aula){
+         
+         $nombre = $request->input('nombre');
+         $tipo_aula = $request->input('tipo_aula');
+         $response=$this->aulaService->actualizarAula($nombre,$tipo_aula,$aula);
+         if (isset($response['success'])) {
+             return redirect()->route('indexAula')->with('success', $response['success']);
+         } else {
+             return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
+         };    }
+
+
+     public function eliminarAula(Aula $aula){
+         $response=$this->aulaService->eliminarAula($aula);
+         if (isset($response['success'])) {
+             return redirect()->route('indexAula')->with('success', $response['success']);
+         } else {
+             return redirect()->route('indexAula')->withErrors(['error' => $response['error']]);
+         };
+     }
+         
+     
+ */
+
+    //-------------------------------------------------------------------------------------------------------------
     // Swagger Documentation
 
     /**
      * @OA\Get(
-     *      path="/api/aulas",
+     *      path="/api/horarios/aulas",
      *     summary="Obtener todas las aulas",
      *     description="Devuelve todas las aulas",
      *     operationId="getAulas",
@@ -105,14 +108,15 @@ class AulaController extends Controller
      *      )
      * )
      */
-    public function index(){
+    public function index()
+    {
         return $this->aulaService->obtenerAulas();
     }
 
 
     /**
      * @OA\Get(
-     *     path="/api/aulas/{id}",
+     *     path="/api/horarios/aulas/{id}",
      *     summary="Obtener un aula por id",
      *     description="Obtener un aula por id",
      *     operationId="obtenerAulaPorId",
@@ -141,60 +145,67 @@ class AulaController extends Controller
      *   )
      * )
      */
-    public function show($id){
+    public function show($id)
+    {
         return $this->aulaService->obtenerAulaPorId($id);
     }
 
 
+
     /**
      * @OA\Post(
-     *     path="/api/aulas",
+     *     path="/api/horarios/aulas/guardar",
      *     summary="Guardar un aula",
      *     description="Guardar un aula",
      *     operationId="guardarAula",
      *     tags={"Aula"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Aula")
+     *         @OA\JsonContent(ref="#/components/schemas/AulaDTO")
      *     ),
      *     @OA\Response(
-     *     response=200,
-     *     description="Aula guardada correctamente"
-     *  ),
+     *     response=201,
+     *     description="Aula guardada correctamente",
+     *     @OA\JsonContent(ref="#/components/schemas/AulaDTO")
+     *     ),
      *     @OA\Response(
      *     response=400,
      *     description="Error al guardar el aula"
-     *  )
+     *     )
      * )
      */
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         return $this->aulaService->guardarAulas($request);
     }
 
 
+
+
     /**
      * @OA\Put(
-     *     path="/api/aulas/actualizar/{id}",
+     *     path="/api/horarios/aulas/actualizar/{id}",
      *     summary="Actualizar un aula",
      *     description="Actualizar un aula",
      *     operationId="actualizarAula",
      *     tags={"Aula"},
-     *     @OA\Parameter(
-     *          name="id",
-     *          in="path",
-     *          description="Id del aula",
-     *          required=true,
-     *          @OA\Schema(
-     *              type="integer"
-     *          )
+     *    @OA\Parameter(
+     *      name="id",
+     *      in="path",
+     *      description="Id del aula",
+     *      required=true,
+     *      @OA\Schema(
+     *          type="integer"
+     *      ) 
      *     ),
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/AulaData")
+     *          @OA\JsonContent(ref="#/components/schemas/AulaDTO")
      *     ),
      *     @OA\Response(
      *          response=200,
-     *          description="Aula actualizada correctamente"
+     *          description="Aula actualizada correctamente",
+     *          @OA\JsonContent(ref="#/components/schemas/Aula")
      *     ),
      *     @OA\Response(
      *          response=500,
@@ -202,14 +213,15 @@ class AulaController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         return $this->aulaService->actualizarAulas($request, $id);
     }
 
 
     /**
      * @OA\Delete(
-     *     path="/api/aulas/eliminar/{id}",
+     *     path="/api/horarios/aulas/eliminar/{id}",
      *     summary="Eliminar un aula",
      *     description="Eliminar un aula",
      *     operationId="eliminarAula",
@@ -233,7 +245,8 @@ class AulaController extends Controller
      * )
      * )
      */
-    public function destroy($id){
+    public function destroy($id)
+    {
         return $this->aulaService->eliminarAulas($id);
     }
 

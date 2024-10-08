@@ -2,7 +2,7 @@
 
 namespace App\Mappers\horarios;
 
-use App\Models\CambioDocente;
+use App\Models\horarios\CambioDocente;
 
 class CambioDocenteMapper
 {

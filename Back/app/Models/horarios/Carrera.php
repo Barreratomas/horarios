@@ -2,6 +2,8 @@
 
 namespace App\Models\horarios;
 
+use App\Models\AlumnoCarrera;
+use App\Models\CarreraUC;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,10 +38,12 @@ class Carrera extends Model
     protected $table = 'carrera';
     protected $primaryKey = 'Id_Carrera';
 
+    /*
     // Una carrera tiene uno o muchos cupos
     public function cupos():HasMany{
         return $this->hasMany(Cupo::class, 'Id_Carrera', 'Id_Carrera');
     }
+    
 
     // Una carrera tiene uno o muchos inscripciones aspirantes
     public function inscripcion_aspirante():HasMany{
@@ -56,24 +60,26 @@ class Carrera extends Model
         return $this->hasMany(Nota::class, 'Id_Carrera', 'Id_Carrera');
     }
 
-    // Una carrera tiene uno o muchos carrera_uc
-    public function carrera_uc():HasMany{
-        return $this->hasMany(carrera_uc::class, 'Id_Carrera', 'Id_Carrera');
-    }
-
     // Una carrera tiene uno o muchos carrera_plan
     public function carrera_plan():HasMany{
         return $this->hasMany(carrera_plan::class, 'Id_Carrera', 'Id_Carrera');
     }
-
-    // Una carrera tiene uno o muchos alumno_carrera
-    public function alumno_carrera():HasMany{
-        return $this->hasMany(alumno_carrera::class, 'Id_Carrera', 'Id_Carrera');
-    }
-
+    
+    
     // Una carrera tiene uno o muchos correlatividades
     public function correlatividades():HasMany{
         return $this->hasMany(Correlatividad::class, 'Id_Carrera', 'Id_Carrera');
+    }
+    */
+
+    // Una carrera tiene uno o muchos alumno_carrera
+    public function alumno_carrera():HasMany{
+        return $this->hasMany(AlumnoCarrera::class, 'Id_Carrera', 'Id_Carrera');
+    }
+
+     // Una carrera tiene uno o muchos carrera_uc
+     public function carrera_uc():HasMany{
+        return $this->hasMany(CarreraUC::class, 'Id_Carrera', 'Id_Carrera');
     }
 
 }

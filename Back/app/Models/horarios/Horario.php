@@ -7,6 +7,58 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
+/**
+ * @OA\Schema(
+ *     schema="Horario",
+ *     title="Horario",
+ *     description="Esquema del objeto Horario",
+ *     @OA\Property(
+ *         property="id_horario",
+ *         type="integer",
+ *         description="ID del horario"
+ *     ),
+ *     @OA\Property(
+ *         property="dia",
+ *         type="string",
+ *         description="Dia del horario"
+ *     ),
+ *     @OA\Property(
+ *         property="modulo_inicio",
+ *         type="string",
+ *         description="Modulo de inicio del horario"
+ *     ),
+ *     @OA\Property(
+ *         property="modulo_fin",
+ *         type="string",
+ *         description="Modulo de fin del horario"
+ *     ),
+ *     @OA\Property(
+ *         property="modalidad",
+ *         type="string",
+ *         description="Modalidad del horario"
+ *     ),
+ *     @OA\Property(
+ *         property="id_disp",
+ *         type="integer",
+ *         description="ID de la disponibilidad"
+ *     ),
+ *     @OA\Property(
+ *         property="id_uc",
+ *         type="integer",
+ *         description="ID de la unidad curricular"
+ *     ),
+ *     @OA\Property(
+ *         property="id_aula",
+ *         type="integer",
+ *         description="ID del aula"
+ *     ),
+ *     @OA\Property(
+ *         property="id_grado",
+ *         type="integer",
+ *         description="ID del grado"
+ *     )
+ * )
+ */
 class Horario extends Model
 {
     use HasFactory;

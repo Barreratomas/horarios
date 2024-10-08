@@ -7,6 +7,7 @@ use App\Mappers\horarios\AulaMapper;
 use App\Models\horarios\Aula;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use App\DTO\AulaDTO;
 
 class AulaService implements AulaRepository
 {
@@ -18,7 +19,8 @@ class AulaService implements AulaRepository
     }
 
 
-    public function obtenerAulas(){
+    public function obtenerAulas()
+    {
         try {
             $aulas = Aula::all();
             return response()->json($aulas, 200);
@@ -28,7 +30,8 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function obtenerAulaPorId($id){
+    public function obtenerAulaPorId($id)
+    {
         $aula = Aula::find($id);
         if (!$aula) {
             return response()->json(['error' => 'Aula no encontrada'], 404);
@@ -41,7 +44,8 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function obtenerAulaPorNombre($nombre){
+    public function obtenerAulaPorNombre($nombre)
+    {
         $aula = Aula::where('nombre', $nombre)->first();
         if (!$aula) {
             return response()->json(['error' => 'Aula no encontrada'], 404);
@@ -54,7 +58,8 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function obtenerAulaMayorCapacidad(){
+    public function obtenerAulaMayorCapacidad()
+    {
         try {
             $aula = Aula::orderBy('capacidad', 'desc')->first();
             return response()->json($aula, 200);
@@ -64,7 +69,8 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function obtenerAulaMenorCapacidad(){
+    public function obtenerAulaMenorCapacidad()
+    {
         try {
             $aula = Aula::orderBy('capacidad', 'asc')->first();
             return response()->json($aula, 200);
@@ -73,25 +79,38 @@ class AulaService implements AulaRepository
             return response()->json(['error' => 'Hubo un error al obtener el aula'], 500);
         }
     }
-
-    public function guardarAulas($aula){
-        try {
-            $aula = $this->aulaMapper->toAula($aula);
-            $aula->save();
-            return response()->json($aula, 201);
-        } catch (Exception $e) {
-            Log::error('Error al guardar el aula: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al guardar el aula'], 500);
+    /*
+        public function guardarAulas($request)
+        {
+            try {
+                $aula = $this->aulaMapper->toAula($request);
+                $aula->save();
+                return response()->json($aula, 201);
+            } catch (Exception $e) {
+                Log::error('Error al guardar el aula: ' . $e->getMessage());
+                return response()->json(['error' => 'Hubo un error al guardar el aula'], 500);
+            }
         }
+            */
+
+    // En AulaService.php
+    public function guardarAulas($request)
+    {
+        $aulaData = $request->all(); 
+        $aula = new Aula($aulaData); 
+        $aulaModel = $this->aulaMapper->toAula($aula);
+        $aulaModel->save();
     }
 
-    public function actualizarAulas($request, $id){
+
+    public function actualizarAulas($request, $id)
+    {
         $aula = Aula::find($id);
         if (!$aula) {
             return response()->json(['error' => 'Aula no encontrada'], 404);
         }
         try {
-            $aula->update($this->aulaMapper->toAulaData($request));
+            $aula->update($request->all());
             return response()->json($aula, 200);
         } catch (Exception $e) {
             Log::error('Error al actualizar el aula: ' . $e->getMessage());
@@ -99,7 +118,10 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function eliminarAulas($id){
+
+
+    public function eliminarAulas($id)
+    {
         try {
             $aula = Aula::find($id);
             if ($aula) {
@@ -114,7 +136,8 @@ class AulaService implements AulaRepository
         }
     }
 
-    public function eliminarAulasPorNombre($nombre){
+    public function eliminarAulasPorNombre($nombre)
+    {
         try {
             $aula = Aula::where('nombre', $nombre)->first();
             if ($aula) {

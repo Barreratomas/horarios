@@ -43,7 +43,7 @@ class Aula extends Model
     protected $table = 'aula';
     protected $primaryKey = 'id_aula';
 
-    public $incrementing = false;
+    public $incrementing = true;
 
     public $timestamps = false;
 

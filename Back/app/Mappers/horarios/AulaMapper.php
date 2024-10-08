@@ -2,11 +2,12 @@
 
 namespace App\Mappers\horarios;
 
+use App\DTO\AulaDTO;
 use App\Models\horarios\Aula;
 
 class AulaMapper
 {
-    public static function toAula($aulaData)
+    public static function toAula(Aula $aulaData)
     {
         return new Aula([
             'id_aula' => $aulaData['id_aula'],
@@ -16,14 +17,13 @@ class AulaMapper
         ]);
     }
 
-    public static function toAulaData($aula)
+    public static function toAulaDTO(AulaDTO $aula)
     {
-        return [
-            'id_aula' => $aula->id_aula,
-            'nombre' => $aula->nombre,
-            'capacidad' => $aula->capacidad,
-            'tipo_aula' => $aula->tipo_aula
-        ];
+        return new AulaDTO(
+            $aula->nombre,
+            $aula->capacidad,
+            $aula->tipo_aula
+        );
     }
 
 }

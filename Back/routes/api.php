@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\horarios\CambioDocenteController;
+use App\Models\horarios\CambioDocente;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\horarios\AulaController;
@@ -39,11 +41,17 @@ Route::post('/auth/google/callback', [AuthController::class, 'googleCallback']);
 // Swagger
 
 // Aulas
-Route::get('/aulas', [AulaController::class, 'index']);
-Route::get('/aulas/{id}', [AulaController::class, 'show']);
-Route::post('/aulas', [AulaController::class, 'store']);
-Route::put('/aulas/actualizar/{id}', [AulaController::class, 'update']);
-Route::delete('/aulas/eliminar/{id}', [AulaController::class, 'destroy']);
+Route::get('/horarios/aulas', [AulaController::class, 'index']);
+Route::get('/horarios/aulas/{id}', [AulaController::class, 'show']);
+Route::post('/horarios/aulas/guardar', [AulaController::class, 'store']);
+Route::put('/horarios/aulas/actualizar/{id}', [AulaController::class, 'update']);
+Route::delete('/horarios/aulas/eliminar/{id}', [AulaController::class, 'destroy']);
 
+// CambioDocente
+Route::get('/horarios/cambioDocente', [CambioDocenteController::class,'index']);
+Route::get('/horarios/cambioDocente/{id}', [CambioDocenteController::class,'show']);
+Route::post('/horarios/cambioDocente/guardar', [CambioDocenteController::class,'store']);
+Route::put('/horarios/cambioDocente/actualizar/{id}', [CambioDocenteController::class,'update']);
+Route::delete('/horarios/cambioDocente/eliminar/{id}', [CambioDocenteController::class,'destroy']);
 
 

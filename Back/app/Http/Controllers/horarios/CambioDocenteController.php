@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\horarios;
 
-use App\Services\CambioDocenteService;
+use App\Services\horarios\CambioDocenteService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -79,7 +79,7 @@ class CambioDocenteController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/cambioDocente",
+     *     path="/api/horarios/cambioDocente",
      *     tags={"CambioDocente"},
      *     summary="Obtener todos los cambios de docente",
      *     description="Retorna un array de cambios de docente",
@@ -93,14 +93,14 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function obtenerTodosCambiosDocente()
+    public function index()
     {
         return $this->cambioDocenteService->obtenerTodosCambiosDocente();
     }
 
     /**
      * @OA\Get(
-     *     path="/api/cambioDocente/{id}",
+     *     path="/api/horarios/cambioDocente/{id}",
      *     tags={"CambioDocente"},
      *     summary="Obtener cambio de docente por id",
      *     description="Retorna un cambio de docente",
@@ -123,14 +123,14 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function obtenerCambioDocentePorId($id)
+    public function show($id)
     {
         return $this->cambioDocenteService->obtenerCambioDocentePorId($id);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/cambioDocente/guardar",
+     *     path="/api/horarios/cambioDocente/guardar",
      *     tags={"CambioDocente"},
      *     summary="Guardar cambio de docente",
      *     description="Guardar un cambio de docente",
@@ -147,14 +147,14 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function guardarCambioDocente(Request $request)
+    public function store(Request $request)
     {
         return $this->cambioDocenteService->guardarCambioDocente($request);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/cambioDocente/actualizar/{id}",
+     *     path="/api/horarios/cambioDocente/actualizar/{id}",
      *     tags={"CambioDocente"},
      *     summary="Actualizar cambio de docente",
      *     description="Actualizar un cambio de docente",
@@ -180,14 +180,14 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function actualizarCambioDocente(Request $request, $id)
+    public function update(Request $request, $id)
     {
         return $this->cambioDocenteService->actualizarCambioDocente($request, $id);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/cambioDocente/eliminar/{id}",
+     *     path="/api/horarios/cambioDocente/eliminar/{id}",
      *     tags={"CambioDocente"},
      *     summary="Eliminar cambio de docente por id",
      *     description="Eliminar un cambio de docente",
@@ -210,7 +210,7 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function eliminarCambioDocentePorId($id)
+    public function destroy($id)
     {
         return $this->cambioDocenteService->eliminarCambioDocentePorId($id);
     }

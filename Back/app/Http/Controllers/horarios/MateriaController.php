@@ -24,23 +24,25 @@ class MateriaController extends Controller
     }
 
     public function mostrarMateria(Request $request)
-    {   $id=$request->input("id"); 
+    {
+        $id = $request->input("id");
         $materia = $this->materiaService->obtenerMateriaPorId($id);
         return view('#', compact('materia'));
     }
 
-    
-    public function crear(){
+
+    public function crear()
+    {
         return view('materia.crearMateria');
     }
-    
+
 
     public function store(MateriaRequest $request)
-    {   
-        $nombre=$request->input('nombre');
-        $modulos_semanales=$request->input('modulos_semanales');
+    {
+        $nombre = $request->input('nombre');
+        $modulos_semanales = $request->input('modulos_semanales');
 
-        $response = $this->materiaService->guardarMateria($nombre,$modulos_semanales);
+        $response = $this->materiaService->guardarMateria($nombre, $modulos_semanales);
         if (isset($response['success'])) {
             return redirect()->route('indexMateria')->with('success', $response['success']);
         } else {
@@ -50,15 +52,15 @@ class MateriaController extends Controller
 
     public function formularioActualizar(Materia $materia)
     {
-        return view('materia.actualizarMateria',compact('materia'));
+        return view('materia.actualizarMateria', compact('materia'));
     }
-   
+
     public function actualizar(MateriaRequest $request, Materia $materia)
     {
-        $nombre=$request->input('nombre');
-        $modulos_semanales=$request->input('modulos_semanales');
+        $nombre = $request->input('nombre');
+        $modulos_semanales = $request->input('modulos_semanales');
 
-        $response = $this->materiaService->actualizarMateria($nombre,$modulos_semanales,$materia);
+        $response = $this->materiaService->actualizarMateria($nombre, $modulos_semanales, $materia);
         if (isset($response['success'])) {
             return redirect()->route('indexMateria')->with('success', $response['success']);
         } else {
@@ -67,9 +69,9 @@ class MateriaController extends Controller
     }
 
     public function eliminar(Materia $materia)
-    {        
-        
- 
+    {
+
+
 
         $response = $this->materiaService->eliminarMateriaPorId($materia);
         if (isset($response['success'])) {
@@ -78,7 +80,7 @@ class MateriaController extends Controller
             return redirect()->route('indexMateria')->withErrors(['error' => $response['error']]);
         }
     }
-    
+
     //---------------------------------------------------------------------------------------------------------------------
     // Swagger
 
@@ -98,7 +100,8 @@ class MateriaController extends Controller
      *     )
      * )
      */
-    public function obtenerTodasMateriasSwagger(){
+    public function obtenerTodasMateriasSwagger()
+    {
         return $this->materiaService->obtenerTodasMateriasSwagger();
     }
 
@@ -131,7 +134,8 @@ class MateriaController extends Controller
      *     )
      * )
      */
-    public function obtenerMateriaPorIdSwagger($id){
+    public function obtenerMateriaPorIdSwagger($id)
+    {
         return $this->materiaService->obtenerMateriaPorIdSwagger($id);
 
     }
@@ -165,8 +169,9 @@ class MateriaController extends Controller
      *     )
      * )
      */
-    public function guardarMateriaSwagger($nombre,$modulos_semanales){
-        return $this->materiaService->guardarMateriaSwagger($nombre,$modulos_semanales);
+    public function guardarMateriaSwagger($nombre, $modulos_semanales)
+    {
+        return $this->materiaService->guardarMateriaSwagger($nombre, $modulos_semanales);
     }
 
     /**
@@ -211,8 +216,9 @@ class MateriaController extends Controller
      *     )
      * )
      */
-    public function actualizarMateriaSwagger($id,$nombre,$modulos_semanales){
-        return $this->materiaService->actualizarMateriaSwagger($id,$nombre,$modulos_semanales);
+    public function actualizarMateriaSwagger($id, $nombre, $modulos_semanales)
+    {
+        return $this->materiaService->actualizarMateriaSwagger($id, $nombre, $modulos_semanales);
     }
 
     /**
@@ -244,7 +250,8 @@ class MateriaController extends Controller
      *     )
      * )
      */
-    public function eliminarMateriaPorIdSwagger($id){
+    public function eliminarMateriaPorIdSwagger($id)
+    {
         return $this->materiaService->eliminarMateriaPorIdSwagger($id);
     }
 }

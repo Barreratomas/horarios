@@ -2,6 +2,7 @@
 
 namespace App\Models\horarios;
 
+use App\Models\Docente;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,20 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 
 /**
- * 
+ * @OA\Schema(
+ *     title="DocenteUC",
+ *    description="DocenteUC model",
+ *   @OA\Property(
+ *         property="id_docente",
+ *        type="integer",
+ *      description="ID del docente"
+ *    ),
+ *   @OA\Property(
+ *        property="id_uc",
+ *       type="integer",
+ *     description="ID de la unidad curricular"
+ *  )
+ * )
  */
 class DocenteUC extends Model
 {
