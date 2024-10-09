@@ -1,7 +1,6 @@
 import React from 'react';
-import '../css/home.css'; // Import your CSS file
+import '../css/home.css';
 
-// Import images
 import logoUrquiza from '../images/home/logoUrquiza.png';
 import AF from '../images/home/AF.png';
 import DS from '../images/home/DS.png';
@@ -70,7 +69,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section 1 */}
+      {/* Seccion 1 */}
       <section className="section1">
         <div className="title-paragraph-button">
           <div className="frame-parent">
@@ -98,7 +97,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section 2 */}
+      {/* Seccion 2 */}
       <section className="section2">
         <div className="inner">
           <div className="titulo-group">
@@ -124,7 +123,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section 3 */}
+      {/* Seccion 3 */}
       <section className="section3">
         <div className="pantalla2">
           <div className="barra2">
@@ -156,7 +155,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section 4 */}
+      {/* Seccion 4 */}
       <section className="section4">
         <div className="transparencia">
           <div className="titulo-frame">

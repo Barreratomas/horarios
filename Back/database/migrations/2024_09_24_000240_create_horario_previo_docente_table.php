@@ -14,7 +14,7 @@ class CreateHorarioPrevioDocenteTable extends Migration
     public function up()
     {
         Schema::create('horario_previo_docente', function (Blueprint $table) {
-            $table->integer('id_h_p_d')->primary();
+            $table->integer('id_h_p_d')->autoIncrement(); 
             $table->integer('id_docente')->nullable();
             $table->string('dia', 50)->nullable();
             $table->time('hora')->nullable();

@@ -1,15 +1,16 @@
 // import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom'; // Importa Outlet y useNavigate
-// import { useNavigate } from 'react-router-dom'; // Si usas React Router para manejo de rutas
-import Menu from './parcials/menu'; // Componente de menú
+import { Outlet } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+import Menu from './parcials/menu';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/index.css';
 import '../../css/notificacion.css';
 import { useEffect } from 'react';
-
+import { getRoutes } from '../../Routes';
 // Componente principal
 const Base = ({ hideMenu }) => {
-  // const navigate = useNavigate(); // Manejo de rutas con React Router
+  const routes = getRoutes(); // Llamada a la función para obtener las rutas
+  // const navigate = useNavigate();
 
   useEffect(() => {
     sessionStorage.setItem('userType', 'admin');
@@ -40,13 +41,13 @@ const Base = ({ hideMenu }) => {
   //     });
   //   }, 3500);
 
-  //   return () => clearTimeout(timer); // Limpiar el timer al desmontar el componente
+  //   return () => clearTimeout(timer); // Limpiar el timer
   // }, [navigate]);
 
   return (
     <div>
       {!hideMenu && <Menu />} {/* Muestra el menú si hideMenu no está definido */}
-      <Outlet /> {/* renderiza las rutas hijas, */}
+      <Outlet context={{ routes }} />
     </div>
   );
 };

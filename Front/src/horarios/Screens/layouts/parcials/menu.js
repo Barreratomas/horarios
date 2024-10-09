@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-// import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.min.css'; // Asegúrate de importar Bootstrap
-import '../../../css/menu.css'; // Importa tu archivo de estilos CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../../../css/menu.css';
+import { getRoutes } from '../../../Routes';
 
 const Menu = () => {
+  const routes = getRoutes(); // Llamada a la función para obtener las rutas
+
   const [isCollapsed, setIsCollapsed] = useState(true);
-  // const [buttonEnabled, setButtonEnabled] = useState(true);
+  const navigate = useNavigate();
 
   // Maneja el toggle del menú
   const handleToggle = () => {
@@ -44,29 +47,36 @@ const Menu = () => {
         </button>
       </div>
 
-      {/* Sidebar con transición */}
       <div className={`sidebar ${isCollapsed ? '' : 'show'}`} id="sidebar">
         <nav className="col-md-3 col-lg-2 d-md-block bg-light vh-100 navElemento">
           <div className="position-sticky cont-nav">
             <ul className="nav flex-column">
               <li className="nav-item">
-                <a className="nav-link" href="/home">
+                <button
+                  className="nav-link"
+                  onClick={() => navigate(`${routes.base}/${routes.home}`)}
+                >
                   Home
-                </a>
+                </button>
               </li>
-              {/* Condiciones para el tipo de usuario */}
               {sessionStorage.getItem('userType') === 'estudiante' && (
                 <li className="nav-item">
-                  <a className="nav-link" href="/horarios-estudiante">
+                  <button
+                    className="nav-link"
+                    onClick={() => navigate(`${routes.base}/${routes.planilla.alumnos}`)}
+                  >
                     Horarios
-                  </a>
+                  </button>
                 </li>
               )}
               {sessionStorage.getItem('userType') === 'docente' && (
                 <li className="nav-item">
-                  <a className="nav-link" href="/horarios-docente">
+                  <button
+                    className="nav-link"
+                    onClick={() => navigate(`${routes.base}/${routes.planilla.docente}`)}
+                  >
                     Horarios
-                  </a>
+                  </button>
                 </li>
               )}
               {(sessionStorage.getItem('userType') === 'bedelia' ||
@@ -75,56 +85,75 @@ const Menu = () => {
                   {sessionStorage.getItem('userType') === 'admin' && (
                     <>
                       <li className="nav-item">
-                        <a className="nav-link" href="/horarios-estudiante">
-                          Horarios Estudiante
-                        </a>
+                        <button
+                          className="nav-link"
+                          onClick={() => navigate(`${routes.base}/${routes.planilla.alumnos}`)}
+                        >
+                          Horarios alumno
+                        </button>
                       </li>
                       <li className="nav-item">
-                        <a className="nav-link" href="/horarios-docente">
-                          Horarios Docentes
-                        </a>
+                        <button
+                          className="nav-link"
+                          onClick={() => navigate(`${routes.base}/${routes.planilla.docente}`)}
+                        >
+                          Horarios docente
+                        </button>
                       </li>
                     </>
                   )}
                   <li className="nav-item">
-                    <a className="nav-link" href="/horarios-bedelia">
-                      Horarios Bedelia
-                    </a>
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.planilla.bedelia}`)}
+                    >
+                      Horarios bedelia
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="/aulas">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.aulas.main}`)}
+                    >
                       Aulas
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="/materias">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.materias.main}`)}
+                    >
                       Materias
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="/carreras">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.carreras.main}`)}
+                    >
                       Carreras
-                    </a>
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="/comisiones">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
+                    >
                       Comisiones
-                    </a>
+                    </button>
                   </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/usuarios">
-                      Usuarios
-                    </a>
-                  </li>
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <a className="nav-link" href="/docentes">
                       Docentes
                     </a>
-                  </li>
+                  </li> */}
                   <li className="nav-item">
-                    <a className="nav-link" href="/asignacion-docente">
-                      Asignación Docente
-                    </a>
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.asignaciones}`)}
+                    >
+                      Asignacion docentes
+                    </button>
                   </li>
                 </>
               )}

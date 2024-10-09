@@ -14,7 +14,7 @@ class CreateHorarioTable extends Migration
     public function up()
     {
         Schema::create('horario', function (Blueprint $table) {
-            $table->integer('id_horario')->primary();
+            $table->integer('id_horario')->autoIncrement(); 
             $table->string('dia', 50)->nullable();
             $table->time('modulo_inicio')->nullable();
             $table->time('modulo_fin')->nullable();

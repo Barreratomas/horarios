@@ -18,10 +18,28 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Base from '../horarios/Screens/layouts/base';
 import Home from '../horarios/Screens/home';
-import Aulas from '../horarios/Screens/aulas';
-
+import Aulas from '../horarios/Screens/aula';
+import CrearAula from '../horarios/Screens/aula/crearAula';
+import ActualizarAula from '../horarios/Screens/aula/actualizarAula';
+import Materias from '../horarios/Screens/materia';
+import CrearMateria from '../horarios/Screens/materia/crearMateria';
+import ActualizarMateria from '../horarios/Screens/materia/actualizarMateria';
+import Comisiones from '../horarios/Screens/comision';
+import CrearComision from '../horarios/Screens/comision/crearComision';
+import ActualizarComision from '../horarios/Screens/comision/actualizarComision';
+import Asignaciones from '../horarios/Screens/asignacion';
+import CrearHorarioPrevio from '../horarios/Screens/horarioPrevioDocente/crearHorarioPrevio';
+import ActualizarHorarioPrevio from '../horarios/Screens/horarioPrevioDocente/actualizarHorarioPrevioDocente';
+import Horario from '../horarios/Screens/horario/index';
+import HorarioBedelia from '../horarios/Screens/horario/indexBedelia';
+import HorarioDocente from '../horarios/Screens/horario/indexDocente';
+import Carreras from '../horarios/Screens/carrera';
+import CrearCarrera from '../horarios/Screens/carrera/crearCarrera';
+import ActualizarCarrera from '../horarios/Screens/carrera/actualizarCarrera';
+import { getRoutes } from '../horarios/Routes';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
+  const routes = getRoutes(); // Llamada a la función para obtener las rutas
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -54,10 +72,41 @@ const RoutesLanding = () => {
       </Route> */}
 
       {/* <Route path="*" element={<Error404 />} /> */}
-      {/*  */}
-      <Route path="/horarios" element={<Base hideMenu={false} />}>
+
+      {/*horarios  */}
+      <Route path={routes.base} element={<Base hideMenu={false} />}>
         <Route index element={<Home />} />
-        <Route path="aulas" element={<Aulas />} />
+        {/* Aulas */}
+        <Route path={routes.aulas.main} element={<Aulas />} />
+        <Route path={routes.aulas.crear} element={<CrearAula />} />
+        <Route path={routes.aulas.actualizar(':aulaId')} element={<ActualizarAula />} />
+        {/* Materias */}
+        <Route path={routes.materias.main} element={<Materias />} />
+        <Route path={routes.materias.crear} element={<CrearMateria />} />
+        <Route path={routes.materias.actualizar(':materiaId')} element={<ActualizarMateria />} />
+        {/* Carreras */}
+        <Route path={routes.carreras.main} element={<Carreras />} />
+        <Route path={routes.carreras.crear} element={<CrearCarrera />} />
+        <Route path={routes.carreras.actualizar(':carreraId')} element={<ActualizarCarrera />} />
+        {/* Comisiones */}
+        <Route path={routes.comisiones.main} element={<Comisiones />} />
+        <Route path={routes.comisiones.crear} element={<CrearComision />} />
+        <Route
+          path={routes.comisiones.actualizar(':comisionId')}
+          element={<ActualizarComision />}
+        />
+        {/* Asignaciones */}
+        <Route path={routes.asignaciones} element={<Asignaciones />} />
+        {/* Horario previo docente */}
+        <Route path={routes.crearHorarioPrevio(':dni')} element={<CrearHorarioPrevio />} />
+        <Route
+          path={routes.actualizarHorarioPrevio(':hpdId', ':dmId')}
+          element={<ActualizarHorarioPrevio />}
+        />
+        {/* Planilla */}
+        <Route path={routes.planilla.alumnos} element={<Horario />} />
+        <Route path={routes.planilla.bedelia} element={<HorarioBedelia />} />
+        <Route path={routes.planilla.docente} element={<HorarioDocente />} />
       </Route>
     </Routes>
   );
