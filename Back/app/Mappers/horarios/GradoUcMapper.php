@@ -2,24 +2,24 @@
 
 namespace App\Mappers\horarios;
 
-use App\Models\horarios\GradoUc;
+use App\Models\horarios\GradoUC;
 
-class GradoUcMapper
+class GradoUCMapper
 {
-    public static function toGradoUc($gradoUcData)
+    public static function toGradoUC($gradoUCData)
     {
-        return new GradoUc([
-            'id_grado' => $gradoUcData['id_grado'],
-            'id_uc' => $gradoUcData['id_uc'],
+        return new GradoUC([
+            'id_grado' => $gradoUCData['id_grado'],
+            'id_UC' => $gradoUCData['id_UC'],
         ]);
     }
 
    
-    public static function toGradoUcData($gradoUc)
+    public static function toGradoUCData($gradoUC)
     {
         return [
-            'id_grado' => $gradoUc->id_grado,
-            'id_uc' => $gradoUc->id_uc,
+            'id_grado' => $gradoUC->id_grado,
+            'id_UC' => $gradoUC->id_UC,
         ];
     }
 }
