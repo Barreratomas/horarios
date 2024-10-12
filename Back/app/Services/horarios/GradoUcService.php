@@ -3,11 +3,18 @@
 namespace App\Services\horarios;
 
 use App\Models\horarios\GradoUC;
-use App\Repositories\horarios\GradoUCRepository;
+use App\Repositories\horarios\GradoUcRepository;
+use App\Mappers\horarios\GradoUcMapper;
 use Illuminate\Support\Facades\Log;
 
-class GradoUCService implements GradoUCRepository
+class GradoUcService implements GradoUcRepository
 {
+    protected $gradoUCMapper;
+    public function __construct(GradoUcMapper $gradoUCMapper)
+    {
+        $this->gradoUCMapper = $gradoUCMapper;
+    }
+
     public function obtenerTodosGradoUC()
     {
         try {
@@ -18,10 +25,10 @@ class GradoUCService implements GradoUCRepository
         }
     }
 
-    public function obtenerGradoUCPorId($id_grado, $id_UC)
+    public function obtenerGradoUcPorIdGrado($id_grado)
     {
         try {
-            $gradoUC = GradoUC::where('id_grado', $id_grado)->where('id_uc', $id_UC)->first();
+            $gradoUC = GradoUC::where('id_grado', $id_grado)->get();
             if (!$gradoUC) {
                 return response()->json(['error' => 'Registro no encontrado'], 404);
             }
@@ -32,11 +39,27 @@ class GradoUCService implements GradoUCRepository
         }
     }
 
-    public function guardarGradoUC($gradoUCData)
+    public function obtenerGradoUcPorIdUC($id_uc)
     {
         try {
+            $gradoUC = GradoUC::where('id_uc', $id_uc)->get();
+            if (!$gradoUC) {
+                return response()->json(['error' => 'Registro no encontrado'], 404);
+            }
+            return $gradoUC;
+        } catch (\Exception $e) {
+            Log::error("Error al obtener el registro GradoUC: " . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el registro'], 500);
+        }
+    }
+
+    public function guardarGradoUC($request)
+    {
+        try {
+            $gradoUCData = $request->all();
             $gradoUC = new GradoUC($gradoUCData);
-            $gradoUC->save();
+            $gradoUCModel = $this->gradoUCMapper->toGradoUC($gradoUC);
+            $gradoUCModel->save();
             return response()->json($gradoUC, 201);
         } catch (\Exception $e) {
             Log::error("Error al guardar el registro GradoUC: " . $e->getMessage());
@@ -44,10 +67,25 @@ class GradoUCService implements GradoUCRepository
         }
     }
 
-    public function eliminarGradoUC($id_grado, $id_UC)
+    public function eliminarGradoUcPorIdGrado($id_grado)
     {
         try {
-            $gradoUC = GradoUC::where('id_grado', $id_grado)->where('id_UC', $id_UC)->first();
+            $gradoUC = GradoUC::where('id_grado', $id_grado)->first();
+            if (!$gradoUC) {
+                return response()->json(['error' => 'Registro no encontrado'], 404);
+            }
+            $gradoUC->delete();
+            return response()->json(['message' => 'Registro eliminado con éxito'], 200);
+        } catch (\Exception $e) {
+            Log::error("Error al eliminar el registro GradoUC: " . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al eliminar el registro'], 500);
+        }
+    }
+
+    public function eliminarGradoUcPorIdUC($id_uc)
+    {
+        try {
+            $gradoUC = GradoUC::where('id_uc', $id_uc)->first();
             if (!$gradoUC) {
                 return response()->json(['error' => 'Registro no encontrado'], 404);
             }

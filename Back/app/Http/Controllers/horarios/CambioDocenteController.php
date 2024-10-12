@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\horarios;
 
+use App\Http\Requests\horarios\CambioDocenteRequest;
 use App\Services\horarios\CambioDocenteService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -115,12 +116,17 @@ class CambioDocenteController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Operación exitosa"
+     *         description="Operación exitosa",
+     *        @OA\JsonContent(ref="#/components/schemas/CambioDocente")
      *     ),
      *     @OA\Response(
      *         response=404,
      *         description="No se encontró el cambio de docente"
-     *     )
+     *     ),
+     *    @OA\Response(
+     *        response=500,
+     *       description="Error al obtener el cambio de docente"
+     *   )
      * )
      */
     public function show($id)
@@ -135,11 +141,12 @@ class CambioDocenteController extends Controller
      *     summary="Guardar cambio de docente",
      *     description="Guardar un cambio de docente",
      *     @OA\RequestBody(
-     *         @OA\JsonContent(ref="#/components/schemas/CambioDocente")
+     *         @OA\JsonContent(ref="#/components/schemas/CambioDocenteDTO")
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Cambio de docente guardado"
+     *         description="Cambio de docente guardado",
+     *        @OA\JsonContent(ref="#/components/schemas/CambioDocente")
      *     ),
      *     @OA\Response(
      *         response=500,
@@ -147,7 +154,7 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
+    public function store(CambioDocenteRequest $request)
     {
         return $this->cambioDocenteService->guardarCambioDocente($request);
     }
@@ -168,7 +175,7 @@ class CambioDocenteController extends Controller
      *         )
      *     ),
      *     @OA\RequestBody(
-     *         @OA\JsonContent(ref="#/components/schemas/CambioDocente")
+     *         @OA\JsonContent(ref="#/components/schemas/CambioDocenteDTO")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -180,7 +187,7 @@ class CambioDocenteController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $id)
+    public function update(CambioDocenteRequest $request, $id)
     {
         return $this->cambioDocenteService->actualizarCambioDocente($request, $id);
     }

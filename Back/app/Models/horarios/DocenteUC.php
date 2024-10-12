@@ -31,6 +31,7 @@ class DocenteUC extends Model
     use HasFactory;
     protected $fillable = ['id_docente','id_uc'];
     protected $table = 'docente_uc';
+    public $timestamps = false;
 
     // Un docente_uc pertenece a una unidad curricular
     public function unidadCurricular():BelongsTo{

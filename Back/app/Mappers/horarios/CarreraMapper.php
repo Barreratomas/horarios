@@ -2,21 +2,15 @@
 
 namespace App\Mappers\horarios;
 
-use App\Models\Carrera;
+use App\Models\horarios\Carrera;
 
 class CarreraMapper
 {
-    public static function toCarrera($carreraData)
+    public static function toCarrera($carrera)
     {
         return new Carrera([
-            'nombre' => $carreraData->nombre
+            'carrera' => $carrera->carrera,
+            'cupo' => $carrera->cupo
         ]);
-    }
-
-    public static function toCarreraData($carrera)
-    {
-        return [
-            'nombre' => $carrera->nombre
-        ];
     }
 }

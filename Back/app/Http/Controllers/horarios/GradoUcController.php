@@ -3,99 +3,200 @@
 namespace App\Http\Controllers\horarios;
 
 use App\Http\Controllers\Controller;
-use App\Services\horarios\GradoUCService;
+use App\Services\horarios\GradoUcService;
 use Illuminate\Http\Request;
 
-class GradoUCController extends Controller
+class GradoUcController extends Controller
 {
     protected $gradoUCService;
 
-    public function __construct(GradoUCService $gradoUCService)
+    public function __construct(GradoUcService $gradoUCService)
     {
         $this->gradoUCService = $gradoUCService;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/grado_uc",
-     *     summary="Obtener todos los registros de GradoUC",
-     *     tags={"GradoUC"},
-     *     @OA\Response(response=200, description="Éxito")6
-     * )
-     */
+
+    /** 
+        * @OA\Get(
+        *     path="/api/horarios/gradoUC",
+        *     tags={"GradoUC"},
+        *     summary="Obtener todos los gradosUC",
+        *     description="Retorna un array de gradosUC",
+        *     @OA\Response(
+        *         response=200,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al obtener los gradosUC"
+        *     )
+        * )
+    */
     public function index()
     {
-        $gradoUC = $this->gradoUCService->obtenerTodosGradoUC();
-        return response()->json($gradoUC, 200);
+        return $this->gradoUCService->obtenerTodosGradoUC();
+    }
+    
+    /**
+        * @OA\Get(
+        *     path="/api/horarios/gradoUC/idGrado/{id}",
+        *     tags={"GradoUC"},
+        *     summary="Obtener un gradoUC por ID de grado",
+        *     description="Retorna un gradoUC",
+        *     @OA\Parameter(
+        *         name="id",
+        *         in="path",
+        *         description="ID del grado",
+        *         required=true,
+        *         @OA\Schema(
+        *             type="integer",
+        *             format="int64"
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=404,
+        *         description="No se encontró el gradoUC"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al obtener el gradoUC"
+        *     )
+        * )
+    */
+    public function obtenerGradoUcPorIdGrado($id_grado){
+        return $this->gradoUCService->obtenerGradoUcPorIdGrado($id_grado);
     }
 
     /**
-     * @OA\Get(
-     *     path="/api/grado_uc/{id_grado}/{id_UC}",
-     *     summary="Obtener un registro de GradoUC por ID",
-     *     tags={"GradoUC"},
-     *     @OA\Parameter(name="id_grado", in="path", required=true),
-     *     @OA\Parameter(name="id_UC", in="path", required=true),
-     *     @OA\Response(response=200, description="Éxito")
-     * )
-     */
-    public function show($id_grado, $id_UC)
-    {
-        $gradoUC = $this->gradoUCService->obtenerGradoUCPorId($id_grado, $id_UC);
-        if ($gradoUC) {
-            return response()->json($gradoUC, 200);
-        } else {
-            return response()->json(['message' => 'Registro no encontrado'], 404);
-        }
+        * @OA\Get(
+        *     path="/api/horarios/gradoUC/idUC/{id}",
+        *     tags={"GradoUC"},
+        *     summary="Obtener un gradoUC por ID de UC",
+        *     description="Retorna un gradoUC",
+        *     @OA\Parameter(
+        *         name="id",
+        *         in="path",
+        *         description="ID de la UC",
+        *         required=true,
+        *         @OA\Schema(
+        *             type="integer",
+        *             format="int64"
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=404,
+        *         description="No se encontró el gradoUC"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al obtener el gradoUC"
+        *     )
+        * )
+    */
+    public function obtenerGradoUcPorIdUC($id_UC){
+        return $this->gradoUCService->obtenerGradoUcPorIdUC($id_UC);
     }
 
     /**
-     * @OA\Post(
-     *     path="/api/grado_uc",
-     *     summary="Crear un nuevo registro de GradoUC",
-     *     tags={"GradoUC"},
-     *     @OA\RequestBody(
-     *         description="Datos del nuevo GradoUC",
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id_grado", type="integer"),
-     *             @OA\Property(property="id_UC", type="integer")
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Creado con éxito")
-     * )
-     */
+        * @OA\Post(
+        *     path="/api/horarios/gradoUC/guardar",
+        *     tags={"GradoUC"},
+        *     summary="Guardar un gradoUC",
+        *     description="Guardar un gradoUC",
+        *     @OA\RequestBody(
+        *         required=true,
+        *         @OA\JsonContent(ref="#/components/schemas/GradoUC")
+        *     ),
+        *     @OA\Response(
+        *         response=201,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al guardar el gradoUC"
+        *     )
+        * )
+    */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'id_grado' => 'required|integer',
-            'id_UC' => 'required|integer'
-        ]);
-
-        $gradoUCData = $request->only(['id_grado', 'id_UC']);
-        $gradoUC = $this->gradoUCService->guardarGradoUC($gradoUCData);
-
-        return response()->json($gradoUC, 201);
+        return $this->gradoUCService->guardarGradoUC($request);
     }
 
     /**
-     * @OA\Delete(
-     *     path="/api/grado_uc/{id_grado}/{id_UC}",
-     *     summary="Eliminar un registro de GradoUC",
-     *     tags={"GradoUC"},
-     *     @OA\Parameter(name="id_grado", in="path", required=true),
-     *     @OA\Parameter(name="id_UC", in="path", required=true),
-     *     @OA\Response(response=200, description="Eliminado con éxito")
-     * )
-     */
-    public function destroy($id_grado, $id_UC)
+        * @OA\Delete(
+        *     path="/api/horarios/gradoUC/idGrado/{id}",
+        *     tags={"GradoUC"},
+        *     summary="Eliminar un gradoUC por ID de grado",
+        *     description="Eliminar un gradoUC",
+        *     @OA\Parameter(
+        *         name="id",
+        *         in="path",
+        *         description="ID del grado",
+        *         required=true,
+        *         @OA\Schema(
+        *             type="integer",
+        *             format="int64"
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=404,
+        *         description="No se encontró el gradoUC"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al eliminar el gradoUC"
+        *     )
+        * )
+    */
+    public function eliminarGradoUcPorIdGrado($id_grado)
     {
-        $eliminado = $this->gradoUCService->eliminarGradoUC($id_grado, $id_UC);
-        if ($eliminado) {
-            return response()->json(['message' => 'Registro eliminado con éxito'], 200);
-        } else {
-            return response()->json(['message' => 'Registro no encontrado'], 404);
-        }
+        return $this->gradoUCService->eliminarGradoUcPorIdGrado($id_grado);
+    }
+
+    /**
+        * @OA\Delete(
+        *     path="/api/horarios/gradoUC/idUC/{id}",
+        *     tags={"GradoUC"},
+        *     summary="Eliminar un gradoUC por ID de UC",
+        *     description="Eliminar un gradoUC",
+        *     @OA\Parameter(
+        *         name="id",
+        *         in="path",
+        *         description="ID de la UC",
+        *         required=true,
+        *         @OA\Schema(
+        *             type="integer",
+        *             format="int64"
+        *         )
+        *     ),
+        *     @OA\Response(
+        *         response=200,
+        *         description="Operación exitosa"
+        *     ),
+        *     @OA\Response(
+        *         response=404,
+        *         description="No se encontró el gradoUC"
+        *     ),
+        *     @OA\Response(
+        *         response=500,
+        *         description="Error al eliminar el gradoUC"
+        *     )
+        * )
+    */
+    public function eliminarGradoUcPorIdUC($id_UC)
+    {
+        return $this->gradoUCService->eliminarGradoUcPorIdUC($id_UC);
     }
 }

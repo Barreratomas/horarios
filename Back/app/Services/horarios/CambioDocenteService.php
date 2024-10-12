@@ -114,23 +114,25 @@ class CambioDocenteService implements CambioDocenteRepository
             return response()->json(['error' => 'Hubo un error al obtener el cambio de docente'], 500);
         }
     }
-    public function guardarCambioDocente($Request){
+    public function guardarCambioDocente($request){
         try {
-            $cambioDocente = $this->cambioDocenteMapper->toCambioDocente($Request);
-            $cambioDocente->save();
+            $cambioDocenteData = $request->all();
+            $cambioDocente = new CambioDocente($cambioDocenteData);
+            $cambioDocenteModel = $this->cambioDocenteMapper->toCambioDocente($cambioDocente);
+            $cambioDocenteModel->save();
             return response()->json($cambioDocente, 201);
         } catch (Exception $e) {
             Log::error('Error al guardar el cambio de docente: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el cambio de docente'], 500);
         }
     }
-    public function actualizarCambioDocente($Request, $id){
+    public function actualizarCambioDocente($request, $id){
         $cambioDocente = CambioDocente::find($id);
         if (!$cambioDocente) {
             return response()->json(['error' => 'No existe el cambio de docente'], 404);
         }
         try {
-            $cambioDocente->update($this->cambioDocenteMapper->toCambioDocenteData($Request));
+            $cambioDocente->update($request->all());
             return response()->json($cambioDocente, 200);
         } catch (Exception $e) {
             Log::error('Error al actualizar el cambio de docente: ' . $e->getMessage());

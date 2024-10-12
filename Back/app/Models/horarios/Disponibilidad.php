@@ -51,15 +51,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *          description="Dia de la disponibilidad"
  *      ),
  *      @OA\Property(
- *          property="modulo_inicio",
- *          type="integer",
- *          description="Modulo de inicio de la disponibilidad"
- *       ),
- *       @OA\Property(
- *          property="modulo_fin",
- *          type="integer",
- *          description="Modulo de fin de la disponibilidad"
- *       )
+ *         property="modulo_inicio",
+ *         type="string",
+ *         format="time",
+ *         description="Modulo de inicio en formato HH:mm:ss"
+ *     ),
+ *     @OA\Property(
+ *         property="modulo_fin",
+ *         type="string",
+ *         format="time",
+ *         description="Modulo de fin en formato HH:mm:ss"
+ *     )
  * )
  */
 class Disponibilidad extends Model
@@ -69,6 +71,10 @@ class Disponibilidad extends Model
     protected $fillable = ['id_uc', 'id_docente', 'id_h_p_d', 'id_aula', 'id_grado', 'dia', 'modulo_inicio', 'modulo_fin'];
     protected $table = 'disponibilidad';
     protected $primaryKey = 'id_disp';
+
+    public $incrementing = true;
+
+    public $timestamps = false;
 
     // Una disponibilidad pertenece a una unidad curricular
     public function unidadCurricular(): BelongsTo

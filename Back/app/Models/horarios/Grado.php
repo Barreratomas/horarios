@@ -2,9 +2,12 @@
 
 namespace App\Models\horarios;
 
+use App\Models\horarios\Disponibilidad;
+use App\Models\horarios\Horario;
 use App\Models\AlumnoGrado;
-use App\Models\GradoUC;
-use App\Models\Inscripcion;
+use App\Models\horarios\GradoUC;
+
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,42 +17,52 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @OA\Schema(
+ *     schema="Grado",
  *     title="Grado",
  *     description="Grado model",
  *     @OA\Property(
- *         property="Id_Grado",
+ *         property="id_grado",
  *         type="integer",
  *         description="ID del grado"
  *     ),
  *     @OA\Property(
- *         property="Grado",
+ *         property="grado",
  *         type="string",
  *         description="Grado"
  *     ),
  *     @OA\Property(
- *         property="Division",
+ *         property="division",
  *         type="string",
  *         description="Division"
  *     ),
  *     @OA\Property(
- *         property="Detalle",
+ *         property="detalle",
  *         type="string",
  *         description="Detalle"
  *     ),
  *     @OA\Property(
- *         property="Capacidad",
+ *         property="capacidad",
  *         type="integer",
  *         description="Capacidad"
- *     )
+ *     ),
+ *    @OA\Property(
+ *      property="carrera_id",
+ *      type="integer",
+ *      description="ID de la carrera"
+ *    )
  * )
  */
 class Grado extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['Grado', 'Division', 'Detalle', 'Capacidad'];
+    protected $fillable = ['grado', 'division', 'detalle', 'capacidad', 'carrera_id'];
     protected $table = 'grado';
-    protected $primaryKey = 'Id_Grado';
+    protected $primaryKey = 'id_grado';
+
+    public $incrementing = true;
+
+    public $timestamps = false;
 
     /*
     // Un grado tiene uno o muchos inscripciones
@@ -82,7 +95,12 @@ class Grado extends Model
 
     // Un grado tiene uno o muchos grado_uc
     public function grado_uc():HasMany{
-        return $this->hasMany(gradoUC::class, 'Id_Grado', 'Id_Grado');
+        return $this->hasMany(GradoUC::class, 'Id_Grado', 'Id_Grado');
+    }
+
+    // Un grado pertenece a una carrera
+    public function carrera():BelongsTo{
+        return $this->belongsTo(Carrera::class, 'carrera_id', 'Id_Carrera');
     }
 
 /*

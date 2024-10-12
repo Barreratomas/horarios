@@ -70,12 +70,14 @@ class GradoService implements GradoRepository
         }
     }
 
-    public function guardarGrados($grado)
+    public function guardarGrados($request)
     {
         try {
-            $grado = $this->gradoMapper->toGrado($grado);
-            $grado->save();
-            return response()->json($grado, 201);
+            $gradoData = $request->all();
+            $grado = new Grado($gradoData);
+            $gradoModel = $this->gradoMapper->toGrado($grado);
+            $gradoModel->save();
+            return response()->json($gradoModel, 201);
         } catch (Exception $e) {
             Log::error('Error al guardar el grado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el grado'], 500);
@@ -89,7 +91,7 @@ class GradoService implements GradoRepository
             return response()->json(['error' => 'Grado no encontrado'], 404);
         }
         try {
-            $grado->update($this->gradoMapper->toGradoData($request));
+            $grado->update($request->all());
             return response()->json($grado, 200);
         } catch (Exception $e) {
             Log::error('Error al actualizar el grado: ' . $e->getMessage());

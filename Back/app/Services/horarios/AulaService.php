@@ -93,13 +93,18 @@ class AulaService implements AulaRepository
         }
             */
 
-    // En AulaService.php
     public function guardarAulas($request)
     {
-        $aulaData = $request->all(); 
-        $aula = new Aula($aulaData); 
-        $aulaModel = $this->aulaMapper->toAula($aula);
-        $aulaModel->save();
+        try {
+            $aulaData = $request->all(); 
+            $aula = new Aula($aulaData); 
+            $aulaModel = $this->aulaMapper->toAula($aula);
+            $aulaModel->save();
+            return response()->json($aulaModel, 201);
+        } catch (Exception $e) {
+            Log::error('Error al guardar el aula: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al guardar el aula'], 500);
+        }
     }
 
 

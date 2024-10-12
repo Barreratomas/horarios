@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\horarios;
 
 use App\Models\horarios\Aula;
-use App\Models\horarios\Comision;
 use App\Models\horarios\Disponibilidad;
-use App\Models\horarios\DocenteMateria;
+use App\Models\horarios\DocenteUC;
 use App\Models\Horario;
+use App\Models\horarios\Grado;
 use App\Models\horarios\HorarioPrevioDocente;
 use App\Models\horarios\Materia;
+use App\Models\horarios\UnidadCurricular;
 use App\Services\horarios\DisponibilidadService;
+use App\Http\Requests\horarios\DisponibilidadRequest;
 use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
@@ -42,23 +44,21 @@ class DisponibilidadController extends Controller
         return view('disponibilidad.show', compact('disponibilidad'));
     }
 
-   
+   */
 
 
    
-
-
-    public function store()
+    public function guardar()
     {   
 
 
         // Obtener los modulos_semanales directamente desde la tabla Materias usando el id_dm
-        $DocenteMateria = DocenteMateria::orderBy('id_dm', 'desc')->first();
-        $id_dm=$DocenteMateria->id_dm;
-        $modulos_semanales = Materia::where('id_materia', $DocenteMateria->id_materia)->value('modulos_semanales');
+        $DocenteUC = DocenteUC::orderBy('id_dm', 'desc')->first();
+        $id_dm=$DocenteUC->id_dm;
+        $modulos_semanales = UnidadCurricular::where('id_materia', $DocenteUC->id_materia)->value('modulos_semanales');
 
-        $id_aula = Aula::where("id_aula",$DocenteMateria->id_aula)->value('id_aula');
-        $id_comision = Comision::where("id_comision",$DocenteMateria->id_comision)->value('id_comision');
+        $id_aula = Aula::where("id_aula",$DocenteUC->id_aula)->value('id_aula');
+        $id_grado = Grado::where("id_grado",$DocenteUC->id_grado)->value('id_grado');
 
             
 
@@ -70,9 +70,9 @@ class DisponibilidadController extends Controller
         $moduloPrevio=$this->disponibilidadService->horaPrevia($id_h_p_d);
 
         
-        $distribucion=$this->disponibilidadService->modulosRepartidos($modulos_semanales,$moduloPrevio,$id_dm,$id_comision,$id_aula,$diaInstituto);
+        $distribucion=$this->disponibilidadService->modulosRepartidos($modulos_semanales,$moduloPrevio,$id_dm,$id_grado,$id_aula,$diaInstituto);
         if (empty($distribucion)) {
-            $DocenteMateria->delete();
+            $DocenteUC->delete();
             $h_p_d->delete();
             return redirect()->route('indexAsignacion');
         }
@@ -101,7 +101,7 @@ class DisponibilidadController extends Controller
 
             return redirect()->route('storeHorario')->with('success', $response['success']);
         }else{
-            $DocenteMateria->delete();
+            $DocenteUC->delete();
             $h_p_d->delete();
             return redirect()->route('indexAsignacion')->withErrors(['error' => $response['error']]);
 
@@ -117,7 +117,7 @@ class DisponibilidadController extends Controller
 
 
     
-    public function actualizar( HorarioPrevioDocente $h_p_d,DocenteMateria $dm)
+    public function actualizar( HorarioPrevioDocente $h_p_d,DocenteUC $dm)
     {   
         $id_dm = $dm->id_dm;
         // Buscar registros en la tabla disponibilidades que tengan el mismo id_dm
@@ -129,15 +129,15 @@ class DisponibilidadController extends Controller
             }
         }
 
-        $modulos_semanales = Materia::where('id_materia', $dm->id_materia)->value('modulos_semanales');
+        $modulos_semanales = UnidadCurricular::where('id_materia', $dm->id_materia)->value('modulos_semanales');
         $id_aula = Aula::where("id_aula",$dm->id_aula)->value('id_aula');
-        $id_comision = Comision::where("id_comision",$dm->id_comision)->value('id_comision');
+        $id_grado = Grado::where("id_grado",$dm->id_grado)->value('id_grado');
         $id_h_p_d = $h_p_d->id_h_p_d;
         $diaInstituto = $h_p_d->dia;
         $moduloPrevio=$this->disponibilidadService->horaPrevia($id_h_p_d);
         
 
-        $distribucion=$this->disponibilidadService->modulosRepartidos($modulos_semanales,$moduloPrevio,$id_dm,$id_comision,$id_aula,$diaInstituto);
+        $distribucion=$this->disponibilidadService->modulosRepartidos($modulos_semanales,$moduloPrevio,$id_dm,$id_grado,$id_aula,$diaInstituto);
         if (empty($distribucion)) {
             $dm->delete();
             $h_p_d->delete();
@@ -175,21 +175,18 @@ class DisponibilidadController extends Controller
         }
         
 
-
-        
-
-
-       
-
-        
+/*
         $response = $this->disponibilidadService->actualizarDisponibilidad($params);
         if (isset($response['success'])) {
             return redirect()->route('disponibilidades.index')->with('success', $response['success']);
         }else{
             return redirect()->route('disponibilidades.index')->withErrors(['error' => $response['error']]);
         }
+            */
     
     }
+
+    /*
 
     public function eliminar(Request $request)
     {
@@ -209,7 +206,7 @@ class DisponibilidadController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/disponibilidad",
+     *     path="/api/horarios/disponibilidad",
      *     tags={"Disponibilidad"},
      *     summary="Obtener todas las disponibilidades",
      *     @OA\Response(
@@ -222,14 +219,14 @@ class DisponibilidadController extends Controller
      *     )
      * )
      */
-    public function obtenerTodasDisponibilidadesswagger()
+    public function index()
     {
-        return $this->disponibilidadService->obtenerTodasDisponibilidadesswagger();
+        return $this->disponibilidadService->obtenerTodasDisponibilidades();
     }
 
     /**
      * @OA\Get(
-     *     path="/api/disponibilidad/{id}",
+     *     path="/api/horarios/disponibilidad/{id}",
      *     tags={"Disponibilidad"},
      *     summary="Obtener disponibilidad por id",
      *     @OA\Parameter(
@@ -251,18 +248,18 @@ class DisponibilidadController extends Controller
      *     )
      * )
      */
-    public function obtenerDisponibilidadPorIdswagger($id)
+    public function show($id)
     {
-        return $this->disponibilidadService->obtenerDisponibilidadPorIdswagger($id);
+        return $this->disponibilidadService->obtenerDisponibilidadPorId($id);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/disponibilidad/guardar",
+     *     path="/api/horarios/disponibilidad/store",
      *     tags={"Disponibilidad"},
      *     summary="Guardar disponibilidad",
      *     @OA\RequestBody(
-     *         @OA\JsonContent(ref="#/components/schemas/Disponibilidad")
+     *         @OA\JsonContent(ref="#/components/schemas/DisponibilidadDTO")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -274,14 +271,14 @@ class DisponibilidadController extends Controller
      *     )
      * )
      */
-    public function guardarDisponibilidadswagger(Request $request)
+    public function store(DisponibilidadRequest $request)
     {
-        return $this->disponibilidadService->guardarDisponibilidadswagger($request);
+        return $this->disponibilidadService->guardarDisponibilidadSwagger($request);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/disponibilidad/actualizar/{id}",
+     *     path="/api/horarios/disponibilidad/update/{id}",
      *     tags={"Disponibilidad"},
      *     summary="Actualizar disponibilidad",
      *     @OA\Parameter(
@@ -294,7 +291,7 @@ class DisponibilidadController extends Controller
      *         )
      *     ),
      *     @OA\RequestBody(
-     *         @OA\JsonContent(ref="#/components/schemas/Disponibilidad")
+     *         @OA\JsonContent(ref="#/components/schemas/DisponibilidadDTO")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -306,14 +303,14 @@ class DisponibilidadController extends Controller
      *     )
      * )
      */
-    public function actualizarDisponibilidadswagger(Request $request, $id)
+    public function update(DisponibilidadRequest $request, $id)
     {
-        return $this->disponibilidadService->actualizarDisponibilidadswagger($request, $id);
+        return $this->disponibilidadService->actualizarDisponibilidadSwagger($request, $id);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/disponibilidad/eliminar/{id}",
+     *     path="/api/horarios/disponibilidad/eliminar/{id}",
      *     tags={"Disponibilidad"},
      *     summary="Eliminar disponibilidad por id",
      *     @OA\Parameter(
@@ -335,8 +332,8 @@ class DisponibilidadController extends Controller
      *     )
      * )
      */
-    public function  eliminarDisponibilidadPorIdswagger($id)
+    public function destroy($id)
     {
-        return $this->disponibilidadService->eliminarDisponibilidadPorIdswagger($id);
+        return $this->disponibilidadService->eliminarDisponibilidadPorId($id);
     }
 }

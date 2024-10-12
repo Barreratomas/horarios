@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\horarios;
 
-use App\Http\Requests\GradoRequest;
+use App\Http\Requests\horarios\GradoRequest;
 use App\Models\horarios\Grado;
 use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
@@ -12,7 +12,8 @@ class GradoController extends Controller
 {
     protected $gradoService;
 
-    public function __construct(GradoService $gradoService){
+    public function __construct(GradoService $gradoService)
+    {
         $this->gradoService = $gradoService;
     }
 
@@ -21,7 +22,7 @@ class GradoController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/api/grados",
+     *      path="/api/horarios/grados",
      *     summary="Obtener todos los grados",
      *     description="Devuelve todos los grados",
      *     operationId="getGrados",
@@ -40,13 +41,14 @@ class GradoController extends Controller
      *      )
      * )
      */
-    public function index(){
+    public function index()
+    {
         return $this->gradoService->obtenerGrados();
     }
 
     /**
      * @OA\Get(
-     *     path="/api/grados/{id}",
+     *     path="/api/horarios/grados/{id}",
      *     summary="Obtener un grado por id",
      *     description="Obtener un grado por id",
      *     operationId="obtenerGradoPorId",
@@ -75,20 +77,21 @@ class GradoController extends Controller
      *   )
      * )
      */
-    public function show($id){
+    public function show($id)
+    {
         return $this->gradoService->obtenerGradoPorId($id);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/grados",
+     *     path="/api/horarios/grados/guardar",
      *     summary="Guardar un grado",
      *     description="Guardar un grado",
      *     operationId="guardarGrado",
      *     tags={"Grado"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Grado")
+     *         @OA\JsonContent(ref="#/components/schemas/GradoDTO")
      *     ),
      *     @OA\Response(
      *     response=200,
@@ -100,13 +103,14 @@ class GradoController extends Controller
      *  )
      * )
      */
-    public function store(Request $request){
+    public function store(GradoRequest $request)
+    {
         return $this->gradoService->guardarGrados($request);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/grados/actualizar/{id}",
+     *     path="/api/horarios/grados/actualizar/{id}",
      *     summary="Actualizar un grado",
      *     description="Actualizar un grado",
      *     operationId="actualizarGrado",
@@ -122,7 +126,7 @@ class GradoController extends Controller
      *     ),
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/GradoData")
+     *          @OA\JsonContent(ref="#/components/schemas/GradoDTO")
      *     ),
      *     @OA\Response(
      *          response=200,
@@ -134,13 +138,14 @@ class GradoController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $id){
+    public function update(GradoRequest $request, $id)
+    {
         return $this->gradoService->actualizarGrados($request, $id);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/grados/eliminar/{id}",
+     *     path="/api/horarios/grados/eliminar/{id}",
      *     summary="Eliminar un grado",
      *     description="Eliminar un grado",
      *     operationId="eliminarGrado",
@@ -164,7 +169,8 @@ class GradoController extends Controller
      * )
      * )
      */
-    public function destroy($id){
+    public function destroy($id)
+    {
         return $this->gradoService->eliminarGrados($id);
     }
 }

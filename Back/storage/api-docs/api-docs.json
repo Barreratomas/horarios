@@ -226,10 +226,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Operación exitosa"
+                        "description": "Operación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CambioDocente"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "No se encontró el cambio de docente"
+                    },
+                    "500": {
+                        "description": "Error al obtener el cambio de docente"
                     }
                 }
             }
@@ -246,14 +256,21 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CambioDocente"
+                                "$ref": "#/components/schemas/CambioDocenteDTO"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Cambio de docente guardado"
+                        "description": "Cambio de docente guardado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CambioDocente"
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error al guardar el cambio de docente"
@@ -284,7 +301,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CambioDocente"
+                                "$ref": "#/components/schemas/CambioDocenteDTO"
                             }
                         }
                     }
@@ -328,7 +345,7 @@
                 }
             }
         },
-        "/api/carreras": {
+        "/api/horarios/carreras": {
             "get": {
                 "tags": [
                     "Carrera"
@@ -356,7 +373,7 @@
                 }
             }
         },
-        "/api/carreras/{id}": {
+        "/api/horarios/carreras/{id}": {
             "get": {
                 "tags": [
                     "Carrera"
@@ -395,7 +412,7 @@
                 }
             }
         },
-        "/api/carreras/guardar": {
+        "/api/horarios/carreras/guardar": {
             "post": {
                 "tags": [
                     "Carrera"
@@ -404,11 +421,10 @@
                 "description": "Guardar una carrera",
                 "operationId": "guardarCambioDocente",
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Carrera"
+                                "$ref": "#/components/schemas/CarreraDTO"
                             }
                         }
                     }
@@ -430,14 +446,14 @@
                 }
             }
         },
-        "/api/carreras/actualizar/{id}": {
+        "/api/horarios/carreras/actualizar/{id}": {
             "put": {
                 "tags": [
                     "Carrera"
                 ],
                 "summary": "Actualizar una carrera",
                 "description": "Actualizar una carrera",
-                "operationId": "actualizarCambioDocente",
+                "operationId": "75b1c1e9fcc5e362c8820d68bb7e43e4",
                 "parameters": [
                     {
                         "name": "id",
@@ -454,7 +470,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Carrera"
+                                "$ref": "#/components/schemas/CarreraDTO"
                             }
                         }
                     }
@@ -472,14 +488,11 @@
                     },
                     "404": {
                         "description": "No existe la carrera"
-                    },
-                    "500": {
-                        "description": "Error al actualizar la carrera"
                     }
                 }
             }
         },
-        "/api/carreras/eliminar/{id}": {
+        "/api/horarios/carreras/eliminar/{id}": {
             "delete": {
                 "tags": [
                     "Carrera"
@@ -511,13 +524,13 @@
                 }
             }
         },
-        "/api/disponibilidad": {
+        "/api/horarios/disponibilidad": {
             "get": {
                 "tags": [
                     "Disponibilidad"
                 ],
                 "summary": "Obtener todas las disponibilidades",
-                "operationId": "981c66318481a50cdbe711006c311e06",
+                "operationId": "4591fb6007f80bcc6b75b41b6945a26e",
                 "responses": {
                     "200": {
                         "description": "Devuelve todas las disponibilidades"
@@ -528,13 +541,13 @@
                 }
             }
         },
-        "/api/disponibilidad/{id}": {
+        "/api/horarios/disponibilidad/{id}": {
             "get": {
                 "tags": [
                     "Disponibilidad"
                 ],
                 "summary": "Obtener disponibilidad por id",
-                "operationId": "a59ba92022fdafea5acea4499878e2bb",
+                "operationId": "d44f1bc1ba73b7f21de131ae05b30200",
                 "parameters": [
                     {
                         "name": "id",
@@ -556,18 +569,18 @@
                 }
             }
         },
-        "/api/disponibilidad/guardar": {
+        "/api/horarios/disponibilidad/store": {
             "post": {
                 "tags": [
                     "Disponibilidad"
                 ],
                 "summary": "Guardar disponibilidad",
-                "operationId": "bea0fee71ceedaef1b06aa9633958fe4",
+                "operationId": "d8503ca654802e7592ed29e225a69d7a",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Disponibilidad"
+                                "$ref": "#/components/schemas/DisponibilidadDTO"
                             }
                         }
                     }
@@ -582,13 +595,13 @@
                 }
             }
         },
-        "/api/disponibilidad/actualizar/{id}": {
+        "/api/horarios/disponibilidad/update/{id}": {
             "put": {
                 "tags": [
                     "Disponibilidad"
                 ],
                 "summary": "Actualizar disponibilidad",
-                "operationId": "ec0fd1a05c828838009c5a8c3d09d92f",
+                "operationId": "c797737ceaae1e746b597b322ce5725a",
                 "parameters": [
                     {
                         "name": "id",
@@ -604,7 +617,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Disponibilidad"
+                                "$ref": "#/components/schemas/DisponibilidadDTO"
                             }
                         }
                     }
@@ -619,13 +632,13 @@
                 }
             }
         },
-        "/api/disponibilidad/eliminar/{id}": {
+        "/api/horarios/disponibilidad/eliminar/{id}": {
             "delete": {
                 "tags": [
                     "Disponibilidad"
                 ],
                 "summary": "Eliminar disponibilidad por id",
-                "operationId": "f7b1bdcd56a8331bb684042d69c82558",
+                "operationId": "e94afb685ab94bfb2c6822d2f48e5831",
                 "parameters": [
                     {
                         "name": "id",
@@ -812,6 +825,604 @@
                     },
                     "500": {
                         "description": "Error al eliminar el docente"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC": {
+            "get": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Obtener todos los docentesUC",
+                "description": "Retorna un array de docentesUC",
+                "operationId": "1ba38e75372eed6b80ca14f730156d5e",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener los docentesUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/idDocente/{id}": {
+            "get": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Obtener un docenteUC por ID de docente",
+                "description": "Retorna un docenteUC",
+                "operationId": "ab3ed336800a3088b0c7f42e8dfe5624",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al obtener el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/idUC/{id}": {
+            "get": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Obtener un docenteUC por ID de UC",
+                "description": "Retorna un docenteUC",
+                "operationId": "ac9c32d6b68caf88f0290c7b85982beb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al obtener el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/guardar": {
+            "post": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Guardar un docenteUC",
+                "description": "Retorna el docenteUC guardado",
+                "operationId": "8ed81c96c7b5888e2bc0ba9615191db9",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocenteUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/actualizar/idDocente/{id}": {
+            "put": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Actualizar un docenteUC por ID de docente",
+                "description": "Retorna el docenteUC actualizado",
+                "operationId": "5895e5bf937d3efabcd879221bd39007",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocenteUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/actualizar/idUC/{id}": {
+            "put": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Actualizar un docenteUC por ID de UC",
+                "description": "Retorna el docenteUC actualizado",
+                "operationId": "310d5febfc61b06231a2a48729c94ded",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocenteUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/eliminar/idDocente/{id}": {
+            "delete": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Eliminar un docenteUC por ID de docente",
+                "description": "Retorna el docenteUC eliminado",
+                "operationId": "f48eb7414f4c06e1b4c556ec524e5676",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/docenteUC/eliminar/idUC/{id}": {
+            "delete": {
+                "tags": [
+                    "DocenteUC"
+                ],
+                "summary": "Eliminar un docenteUC por ID de UC",
+                "description": "Retorna el docenteUC eliminado",
+                "operationId": "111da21d868dbfc352872239506adbe5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "DocenteUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el docenteUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/grados": {
+            "get": {
+                "tags": [
+                    "Grado"
+                ],
+                "summary": "Obtener todos los grados",
+                "description": "Devuelve todos los grados",
+                "operationId": "getGrados",
+                "responses": {
+                    "200": {
+                        "description": "Grados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Grado"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los grados"
+                    }
+                }
+            }
+        },
+        "/api/horarios/grados/{id}": {
+            "get": {
+                "tags": [
+                    "Grado"
+                ],
+                "summary": "Obtener un grado por id",
+                "description": "Obtener un grado por id",
+                "operationId": "obtenerGradoPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grado obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Grado"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontró el grado"
+                    },
+                    "500": {
+                        "description": "Error al obtener el grado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/grados/guardar": {
+            "post": {
+                "tags": [
+                    "Grado"
+                ],
+                "summary": "Guardar un grado",
+                "description": "Guardar un grado",
+                "operationId": "guardarGrado",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GradoDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Grado guardado correctamente"
+                    },
+                    "400": {
+                        "description": "Error al guardar el grado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/grados/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Grado"
+                ],
+                "summary": "Actualizar un grado",
+                "description": "Actualizar un grado",
+                "operationId": "actualizarGrado",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GradoDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Grado actualizado correctamente"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el grado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/grados/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Grado"
+                ],
+                "summary": "Eliminar un grado",
+                "description": "Eliminar un grado",
+                "operationId": "eliminarGrado",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grado eliminado correctamente"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el grado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/gradoUC": {
+            "get": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Obtener todos los gradosUC",
+                "description": "Retorna un array de gradosUC",
+                "operationId": "3361b74a7775ecd1b68862c20b619eb6",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener los gradosUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/gradoUC/idGrado/{id}": {
+            "get": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Obtener un gradoUC por ID de grado",
+                "description": "Retorna un gradoUC",
+                "operationId": "df7eea4931a4396fdb7d0aef3bb19433",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el gradoUC"
+                    },
+                    "500": {
+                        "description": "Error al obtener el gradoUC"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Eliminar un gradoUC por ID de grado",
+                "description": "Eliminar un gradoUC",
+                "operationId": "33bd649ba0a04241e13e51d83f1f9461",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el gradoUC"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el gradoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/gradoUC/idUC/{id}": {
+            "get": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Obtener un gradoUC por ID de UC",
+                "description": "Retorna un gradoUC",
+                "operationId": "71409768c13345516ded85be23e3eadd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el gradoUC"
+                    },
+                    "500": {
+                        "description": "Error al obtener el gradoUC"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Eliminar un gradoUC por ID de UC",
+                "description": "Eliminar un gradoUC",
+                "operationId": "6fda0027904abfefb9318fc1554e377f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el gradoUC"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el gradoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/gradoUC/guardar": {
+            "post": {
+                "tags": [
+                    "GradoUC"
+                ],
+                "summary": "Guardar un gradoUC",
+                "description": "Guardar un gradoUC",
+                "operationId": "03aedc1f8fa4b0fe37a465a236c69ea4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GradoUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar el gradoUC"
                     }
                 }
             }
@@ -1161,6 +1772,104 @@
                 },
                 "type": "object"
             },
+            "CambioDocenteDTO": {
+                "title": "CambioDocenteDTO",
+                "description": "DTO para un cambio de docente",
+                "properties": {
+                    "id_docente_anterior": {
+                        "description": "DNI del docente anterior",
+                        "type": "integer"
+                    },
+                    "id_docente_nuevo": {
+                        "description": "DNI del docente nuevo",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "CarreraDTO": {
+                "title": "CarreraDTO",
+                "description": "DTO para una carrera",
+                "properties": {
+                    "carrera": {
+                        "description": "Nombre de la carrera",
+                        "type": "string"
+                    },
+                    "cupo": {
+                        "description": "Cupo de la carrera",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "DisponibilidadDTO": {
+                "title": "DisponibilidadDTO",
+                "description": "DTO para una disponibilidad",
+                "properties": {
+                    "id_uc": {
+                        "description": "Id de la unidad curricular",
+                        "type": "integer"
+                    },
+                    "id_docente": {
+                        "description": "Id del docente",
+                        "type": "integer"
+                    },
+                    "id_h_p_d": {
+                        "description": "Id de la hora por dia",
+                        "type": "integer"
+                    },
+                    "id_aula": {
+                        "description": "Id del aula",
+                        "type": "integer"
+                    },
+                    "id_grado": {
+                        "description": "Id del grado",
+                        "type": "integer"
+                    },
+                    "dia": {
+                        "description": "Dia de la semana",
+                        "type": "string"
+                    },
+                    "modulo_inicio": {
+                        "description": "Modulo de inicio en formato HH:mm:ss",
+                        "type": "string",
+                        "format": "time"
+                    },
+                    "modulo_fin": {
+                        "description": "Modulo de fin en formato HH:mm:ss",
+                        "type": "string",
+                        "format": "time"
+                    }
+                },
+                "type": "object"
+            },
+            "GradoDTO": {
+                "title": "GradoDTO",
+                "description": "GradoDTO model",
+                "properties": {
+                    "Grado": {
+                        "description": "Grado",
+                        "type": "string"
+                    },
+                    "Division": {
+                        "description": "Division",
+                        "type": "string"
+                    },
+                    "Detalle": {
+                        "description": "Detalle",
+                        "type": "string"
+                    },
+                    "Capacidad": {
+                        "description": "Capacidad",
+                        "type": "integer"
+                    },
+                    "carrera_id": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "Administrador": {
                 "title": "Administrador",
                 "description": "Esquema del objeto Administrador",
@@ -1360,15 +2069,15 @@
                 "title": "Carrera",
                 "description": "Esquema del objeto Carrera",
                 "properties": {
-                    "Id_Carrera": {
+                    "id_carrera": {
                         "description": "ID de la carrera",
                         "type": "integer"
                     },
-                    "Carrera": {
+                    "carrera": {
                         "description": "Nombre de la carrera",
                         "type": "string"
                     },
-                    "Cupo": {
+                    "cupo": {
                         "description": "Cupo de la carrera",
                         "type": "integer"
                     }
@@ -1408,12 +2117,14 @@
                         "type": "string"
                     },
                     "modulo_inicio": {
-                        "description": "Modulo de inicio de la disponibilidad",
-                        "type": "integer"
+                        "description": "Modulo de inicio en formato HH:mm:ss",
+                        "type": "string",
+                        "format": "time"
                     },
                     "modulo_fin": {
-                        "description": "Modulo de fin de la disponibilidad",
-                        "type": "integer"
+                        "description": "Modulo de fin en formato HH:mm:ss",
+                        "type": "string",
+                        "format": "time"
                     }
                 },
                 "type": "object"
@@ -1437,24 +2148,43 @@
                 "title": "Grado",
                 "description": "Grado model",
                 "properties": {
-                    "Id_Grado": {
+                    "id_grado": {
                         "description": "ID del grado",
                         "type": "integer"
                     },
-                    "Grado": {
+                    "grado": {
                         "description": "Grado",
                         "type": "string"
                     },
-                    "Division": {
+                    "division": {
                         "description": "Division",
                         "type": "string"
                     },
-                    "Detalle": {
+                    "detalle": {
                         "description": "Detalle",
                         "type": "string"
                     },
-                    "Capacidad": {
+                    "capacidad": {
                         "description": "Capacidad",
+                        "type": "integer"
+                    },
+                    "carrera_id": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "GradoUC": {
+                "title": "GradoUC",
+                "description": "GradoUC model",
+                "properties": {
+                    "id_grado": {
+                        "description": "ID del grado",
+                        "type": "integer"
+                    },
+                    "id_uc": {
+                        "description": "ID de la unidad curricular",
                         "type": "integer"
                     }
                 },
@@ -1579,6 +2309,18 @@
         {
             "name": "Docente",
             "description": "Docente"
+        },
+        {
+            "name": "DocenteUC",
+            "description": "DocenteUC"
+        },
+        {
+            "name": "Grado",
+            "description": "Grado"
+        },
+        {
+            "name": "GradoUC",
+            "description": "GradoUC"
         },
         {
             "name": "Horarios",

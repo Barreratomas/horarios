@@ -14,17 +14,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *      title="Carrera",
  *      description="Esquema del objeto Carrera",
  *      @OA\Property(
- *          property="Id_Carrera",
+ *          property="id_carrera",
  *          type="integer",
  *          description="ID de la carrera"
  *      ),
  *      @OA\Property(
- *          property="Carrera",
+ *          property="carrera",
  *          type="string",
  *          description="Nombre de la carrera"
  *      ),
  *      @OA\Property(
- *          property="Cupo",
+ *          property="cupo",
  *          type="integer",
  *          description="Cupo de la carrera"
  *      )
@@ -34,9 +34,13 @@ class Carrera extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['Carrera', 'Cupo'];
+    protected $fillable = ['carrera', 'cupo'];
     protected $table = 'carrera';
-    protected $primaryKey = 'Id_Carrera';
+    protected $primaryKey = 'id_carrera';
+
+    public $incrementing = true;
+
+    public $timestamps = false;
 
     /*
     // Una carrera tiene uno o muchos cupos
@@ -80,6 +84,11 @@ class Carrera extends Model
      // Una carrera tiene uno o muchos carrera_uc
      public function carrera_uc():HasMany{
         return $this->hasMany(CarreraUC::class, 'Id_Carrera', 'Id_Carrera');
+    }
+
+    // Una carrera pertenece a un grado
+    public function grado(){
+        return $this->belongsTo(Grado::class, 'Id_Grado', 'Id_Grado');
     }
 
 }

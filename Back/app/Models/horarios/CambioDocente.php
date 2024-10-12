@@ -39,6 +39,11 @@ class CambioDocente extends Model
     protected $table = 'cambio_docente';
     protected $primaryKey = 'id_cambio';
 
+    public $incrementing = true;
+
+    public $timestamps = false;
+
+
 
 
     // Un cambio de docente pertenece a un docente anterior y a un docente nuevo

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\horarios;
 
-use App\Http\Requests\carreraRequest;
+use App\Http\Requests\horarios\CarreraRequest;
 use App\Models\Carrera;
-use App\Services\CarreraService;
+use App\Services\horarios\CarreraService;
 use App\Http\Controllers\Controller;
 
 
@@ -84,12 +84,12 @@ class CarreraController extends Controller
 
     */
 
-     //---------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------
     // Swagger
 
     /**
      * @OA\Get(
-     *     path="/api/carreras",
+     *     path="/api/horarios/carreras",
      *     summary="Obtener todas las carreras",
      *     description="Devuelve todas las carreras",
      *     operationId="getCambiosDocente",
@@ -108,13 +108,14 @@ class CarreraController extends Controller
      * )
      * )
      */
-    public function obtenerTodosCarrera(){
+    public function index()
+    {
         return $this->carreraService->obtenerTodosCarrera();
     }
 
     /**
      * @OA\Get(
-     *     path="/api/carreras/{id}",
+     *     path="/api/horarios/carreras/{id}",
      *     summary="Obtener una carrera por id",
      *     description="Devuelve una carrera",
      *     operationId="getCambioDocentePorId",
@@ -143,20 +144,20 @@ class CarreraController extends Controller
      * )
      * )
      */
-    public function obtenerCarreraPorId($id){
+    public function show($id)
+    {
         return $this->carreraService->obtenerCarreraPorId($id);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/carreras/guardar",
+     *     path="/api/horarios/carreras/guardar",
      *     summary="Guardar una carrera",
      *     description="Guardar una carrera",
      *     operationId="guardarCambioDocente",
      *     tags={"Carrera"},
      *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Carrera")
+     *         @OA\JsonContent(ref="#/components/schemas/CarreraDTO")
      *     ),
      *     @OA\Response(
      *     response=200,
@@ -169,16 +170,16 @@ class CarreraController extends Controller
      * )
      * )
      */
-    public function guardarCarrera($Request){
-        return $this->carreraService->guardarCarrera($Request);
+    public function store(CarreraRequest $request)
+    {
+        return $this->carreraService->guardarCarrera($request);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/carreras/actualizar/{id}",
+     *     path="/api/horarios/carreras/actualizar/{id}",
      *     summary="Actualizar una carrera",
      *     description="Actualizar una carrera",
-     *     operationId="actualizarCambioDocente",
      *     tags={"Carrera"},
      *     @OA\Parameter(
      *         name="id",
@@ -191,30 +192,27 @@ class CarreraController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Carrera")
+     *         @OA\JsonContent(ref="#/components/schemas/CarreraDTO")
      *     ),
      *     @OA\Response(
      *     response=200,
      *     description="Carrera actualizada correctamente",
      *     @OA\JsonContent(ref="#/components/schemas/Carrera")
-     * ),
+     *     ),
      *     @OA\Response(
      *     response=404,
      *     description="No existe la carrera"
-     * ),
-     *     @OA\Response(
-     *     response=500,
-     *     description="Error al actualizar la carrera"
-     * )
+     *     )
      * )
      */
-    public function actualizarCarrera($Request, $id){
-        return $this->carreraService->actualizarCarrera($Request, $id);
+    public function update(CarreraRequest $request, $id)
+    {
+        return $this->carreraService->actualizarCarrera($request, $id);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/carreras/eliminar/{id}",
+     *     path="/api/horarios/carreras/eliminar/{id}",
      *     summary="Eliminar una carrera",
      *     description="Eliminar una carrera",
      *     operationId="eliminarCambioDocentePorId",
@@ -242,7 +240,8 @@ class CarreraController extends Controller
      * )
      * )
      */
-    public function eliminarCarreraPorId($id){
+    public function destroy($id)
+    {
         return $this->carreraService->eliminarCarreraPorId($id);
     }
 }

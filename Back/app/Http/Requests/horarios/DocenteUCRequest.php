@@ -5,7 +5,7 @@ namespace App\Http\Requests\horarios;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class CarreraRequest extends FormRequest
+class DocenteUCRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,16 +23,14 @@ class CarreraRequest extends FormRequest
     public function rules(): array
     {
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/carrera/crear-carrera';
+        $esCreacion = $this->url() == 'http://127.0.0.1:8000/docenteUC/crear-docenteUC';
 
-
-        $carreraRules = $esCreacion ? ['required', 'string', 'max:70', Rule::unique('carrera')] : ['nullable', 'string', 'max:70', Rule::unique('carrera')];
-        $cupoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-
+        $id_docenteRules = $esCreacion ? ['required', 'integer', 'min:1', Rule::unique('docente_uc', 'id_docente')] : [];
+        $id_ucRules=$esCreacion ? ['required', 'integer', 'min:1', Rule::unique('docente_uc', 'id_uc')] : [];
 
         return [
-            'carrera' => $carreraRules,
-            'cupo' => $cupoRules
+            'id_docente' =>$id_docenteRules,
+            'id_uc' => $id_ucRules
         ];
     }
 }

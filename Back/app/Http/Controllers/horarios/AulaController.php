@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\horarios;
 
-use App\Http\Requests\AulaRequest;
+use App\Http\Requests\horarios\AulaRequest;
 use App\Models\horarios\Aula;
 use App\Services\horarios\AulaService;
 use App\DTO\AulaDTO;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\DTO;
+ 
 
 class AulaController extends Controller
 {
@@ -174,7 +175,7 @@ class AulaController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
+    public function store(AulaRequest $request)
     {
         return $this->aulaService->guardarAulas($request);
     }

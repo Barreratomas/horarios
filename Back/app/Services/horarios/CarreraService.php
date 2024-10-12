@@ -84,57 +84,62 @@ class CarreraService implements CarreraRepository
 
     */
 
-     //---------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------------
     // Swagger
 
-    public function obtenerTodosCarrera(){
-        try{
+    public function obtenerTodosCarrera()
+    {
+        try {
             $carerras = Carrera::all();
             return $carerras;
-        }catch (Exception $e){
+        } catch (Exception $e) {
             Log::error('Error al obtener las carreras: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener las carreras'], 500);
         }
     }
-    public function obtenerCarreraPorId($id){
-        try{
+    public function obtenerCarreraPorId($id)
+    {
+        try {
             $carrera = Carrera::find($id);
             if ($carrera) {
                 return $carrera;
             }
             return response()->json(['error' => 'No existe la carrera'], 404);
-        }catch (Exception $e){
+        } catch (Exception $e) {
             Log::error('Error al obtener la carrera: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener la carrera'], 500);
         }
     }
-    public function guardarCarrera($Request){
-        try{
-            $carrera = new Carrera();
-            $carrera->nombre=$Request->input('nombre');
-            $carrera->save();
-            return $carrera;
-        }catch (Exception $e){
+    public function guardarCarrera($request)
+    {
+        try {
+            $carreraData = $request->all();
+            $carrera = new Carrera($carreraData);
+            $carreraModel = $this->carreraMapper->toCarrera($carrera);
+            $carreraModel->save();
+            return response()->json($carrera, 201);
+        } catch (Exception $e) {
             Log::error('Error al guardar la carrera: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar la carrera'], 500);
         }
     }
-    public function actualizarCarrera($Request, $id){
-        try{
-            $carrera = Carrera::find($id);
-            if (!$carrera) {
-                return response()->json(['error' => 'No existe la carrera'], 404);
-            }
-            $carrera->nombre=$Request->input('nombre');
-            $carrera->save();
-            return $carrera;
-        }catch (Exception $e){
+    public function actualizarCarrera($request, $id)
+    {
+        $carerra = Carrera::find($id);
+        if (!$carerra) {
+            return response()->json(['error' => 'No existe la carrera'], 404);
+        }
+        try {
+            $carerra->update($request->all());
+            return response()->json($carerra, 200);
+        } catch (Exception $e) {
             Log::error('Error al actualizar la carrera: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al actualizar la carrera'], 500);
         }
     }
-    public function eliminarCarreraPorId($id){
-        try{
+    public function eliminarCarreraPorId($id)
+    {
+        try {
             $carrera = Carrera::find($id);
             if ($carrera) {
                 $carrera->delete();
@@ -142,7 +147,7 @@ class CarreraService implements CarreraRepository
             } else {
                 return response()->json(['error' => 'No existe la carrera'], 404);
             }
-        }catch (Exception $e){
+        } catch (Exception $e) {
             Log::error('Error al eliminar la carrera: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al eliminar la carrera'], 500);
         }
