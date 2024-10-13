@@ -16,6 +16,8 @@ use App\Http\Controllers\horarios\HorarioController;
 use App\Http\Controllers\horarios\HorarioPrevioDocenteController;
 use App\Http\Controllers\horarios\PlanEstudioController;
 use App\Http\Controllers\horarios\UCPlanController;
+use App\Http\Controllers\horarios\UnidadCurricularController;
+use App\Http\Controllers\CarreraUCController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -149,17 +151,17 @@ Route::put('/horarios/uCPlan/actualizar/{id}', [UCPlanController::class, 'update
 Route::delete('/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destroy']);
 
 // UnidadCurricular
-Route::get('/horarios/unidadCurricular', [UCPlanController::class, 'index']);
-Route::get('/horarios/unidadCurricular/{id}', [UCPlanController::class, 'show']);
-Route::post('/horarios/unidadCurricular/guardar', [UCPlanController::class, 'store']);
-Route::put('/horarios/unidadCurricular/actualizar/{id}', [UCPlanController::class, 'update']);
-Route::delete('/horarios/unidadCurricular/eliminar/{id}', [UCPlanController::class, 'destroy']);
+Route::get('/horarios/unidadCurricular', [UnidadCurricularController::class, 'index']);
+Route::get('/horarios/unidadCurricular/{id}', [UnidadCurricularController::class, 'show']);
+Route::post('/horarios/unidadCurricular/guardar', [UnidadCurricularController::class, 'store']);
+Route::put('/horarios/unidadCurricular/actualizar/{id}', [UnidadCurricularController::class, 'update']);
+Route::delete('/horarios/unidadCurricular/eliminar/{id}', [UnidadCurricularController::class, 'destroy']);
 
 // CarreraUC
-Route::get('/horarios/carreraUC', [UCPlanController::class, 'index']);
-Route::get('/horarios/carreraUC/idCarrera/{id}', [UCPlanController::class, 'show']);
-Route::get('/horarios/carreraUC/idUC/{id}', [UCPlanController::class, 'show']);
-Route::post('/horarios/carreraUC/guardar', [UCPlanController::class, 'store']);
-Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [UCPlanController::class, 'destroy']);
-Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [UCPlanController::class, 'destroy']);
+Route::get('/horarios/carreraUC', [CarreraUCController::class, 'index']);
+Route::get('/horarios/carreraUC/idCarrera/{id}', [CarreraUCController::class, 'show']);
+Route::get('/horarios/carreraUC/idUC/{id}', [CarreraUCController::class, 'show']);
+Route::post('/horarios/carreraUC/guardar', [CarreraUCController::class, 'store']);
+Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [CarreraUCController::class, 'destroy']);
+Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [CarreraUCController::class, 'destroy']);
 
