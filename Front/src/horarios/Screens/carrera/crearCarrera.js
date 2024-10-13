@@ -1,41 +1,41 @@
 import React, { useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom'; // Para redirigir después de la creación
 
 const CrearCarrera = () => {
-  const [nombre, setNombre] = useState('');
+  const [carrera, setCarrera] = useState('');
+  const [cupo, setCupo] = useState('');
   const [errors, setErrors] = useState([]);
+
+  const navigate = useNavigate();
+  const { routes } = useOutletContext();
 
   // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({}); // Reiniciar los errores antes de la validacion
 
-    // Reiniciar errores
-    setErrors([]);
-
-    // Enviar solicitud POST a la API
     try {
-      const response = await fetch('/api/carreras', {
+      const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras/guardar', {
+        // Actualiza la URL aquí
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nombre })
+        body: JSON.stringify({ carrera, cupo }) // Incluir capacidad aquí
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        // Redirigir o mostrar mensaje de éxito
-        alert('Carrera creada con éxito');
-        setNombre(''); // Limpiar el campo del formulario
+        navigate(`${routes.base}/${routes.carreras.main}`, {
+          state: { successMessage: 'Carrera creada con éxito' }
+        });
       } else {
-        // Manejar errores de validación
+        const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors);
+          setErrors(data.errors); // Manejar errores de validación
         }
       }
     } catch (error) {
-      console.error('Error al crear la carrera:', error);
+      console.error('Error creando carrera:', error);
     }
   };
 
@@ -44,17 +44,28 @@ const CrearCarrera = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            <label htmlFor="nombre">Ingrese el nombre</label>
+            <label htmlFor="carrera">Ingrese el nombre de la carrera</label>
             <br />
             <input
               type="text"
-              name="nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              name="carrera"
+              value={carrera}
+              onChange={(e) => setCarrera(e.target.value)}
             />
             <br />
             <br />
-            {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
+            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
+            <label htmlFor="cupo">Ingrese el cupo de la carrera</label>
+            <br />
+            <input
+              type="number"
+              name="cupo"
+              value={cupo}
+              onChange={(e) => setCupo(e.target.value)}
+            />
+            <br />
+            <br />
+            {errors.cupo && <div className="text-danger">{errors.cupo}</div>}
             <br />
             <button type="submit" className="btn btn-primary me-2">
               Crear

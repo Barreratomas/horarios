@@ -25,12 +25,12 @@ class AulaRequest extends FormRequest
     {
         
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/aula/crear-aula';
+        $esCreacion = $this->url() == 'http://127.0.0.1:8000/api/horarios/aulas/guardar';
 
         
 
 
-        $nombreRules = $esCreacion ? ['required','string','max:255',Rule::unique('aula')] : ['nullable','string','max:255',Rule::unique('aulas')];
+        $nombreRules = $esCreacion ? ['required','string','max:255',Rule::unique('aula')] : ['nullable','string','max:255',Rule::unique('aula')];
         $tipoAulaRules = $esCreacion ? ['required ',' string' ]:[ 'nullable ',' string'];
         $capacidadRules = $esCreacion ? ['required ',' integer' ]:[ 'nullable ',' integer'];
 

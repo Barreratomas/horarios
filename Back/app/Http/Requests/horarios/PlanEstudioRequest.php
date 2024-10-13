@@ -30,13 +30,15 @@ class PlanEstudioRequest extends FormRequest
         
 
 
-        $detalleRules = $esCreacion ? ['required','string','max:255',Rule::unique('plan_estudio')] : ['nullable','string','max:255',Rule::unique('plan_estudios')];
+        $detalleRules = $esCreacion ? ['required','string','max:255',Rule::unique('plan_estudio')] : ['nullable','string','max:255',Rule::unique('plan_estudio')];
         $fechaInicioRules = $esCreacion ? ['required ',' date' ]:[ 'nullable ',' date'];
         $fechaFinRules = $esCreacion ? ['required ',' date' ]:[ 'nullable ',' date'];
 
 
         return [
-
+            'detalle' => $detalleRules,
+            'fecha_inicio' => $fechaInicioRules,
+            'fecha_fin' => $fechaFinRules
         ];
     }
 }
