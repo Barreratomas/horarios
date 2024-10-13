@@ -14,6 +14,8 @@ use App\Http\Controllers\horarios\GradoController;
 use App\Http\Controllers\horarios\GradoUcController;
 use App\Http\Controllers\horarios\HorarioController;
 use App\Http\Controllers\horarios\HorarioPrevioDocenteController;
+use App\Http\Controllers\horarios\PlanEstudioController;
+use App\Http\Controllers\horarios\UCPlanController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -115,23 +117,33 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 
 
 // horario
-Route::get('/horario',[HorarioController::class,'mostrarFormularioPartial'])->name('mostrarFormularioHorario');
-Route::post('/horario', [HorarioController::class,'mostrarHorario'])->name('mostrarHorario');
+Route::get('/horario', [HorarioController::class, 'mostrarFormularioPartial'])->name('mostrarFormularioHorario');
+Route::post('/horario', [HorarioController::class, 'mostrarHorario'])->name('mostrarHorario');
 
-Route::get('/horario/docente',[HorarioController::class,'mostrarFormularioDocentePartial'])->name('formularioHorarioDocente');
-Route::post('/horario/docente',[HorarioController::class,'mostrarHorarioDocente'])->name('mostrarHorarioDocente');
+Route::get('/horario/docente', [HorarioController::class, 'mostrarFormularioDocentePartial'])->name('formularioHorarioDocente');
+Route::post('/horario/docente', [HorarioController::class, 'mostrarHorarioDocente'])->name('mostrarHorarioDocente');
 
-Route::get('/horario/bedelia',[HorarioController::class,'mostrarHorarioBedelia'])->name('mostrarHorarioBedelia');
+Route::get('/horario/bedelia', [HorarioController::class, 'mostrarHorarioBedelia'])->name('mostrarHorarioBedelia');
 
 // Route::get('horario/crear-horario',[HorarioController::class,'crear'])->name('crearHorario');
-Route::get('/horario/crear-horario',[HorarioController::class,'store'])->name('storeHorario');
+Route::get('/horario/crear-horario', [HorarioController::class, 'store'])->name('storeHorario');
 
 // HorarioPrevioDocente
-Route::get('/docente/crear-h-p-d/{docente}',[HorarioPrevioDocenteController::class,'crear'])->name('mostrarFormularioHPD');
-Route::post('/docente/crear-h-p-d/{docente}',[HorarioPrevioDocenteController::class,'store'])->name('storeHPD');
-Route::get('/docente/actualizar-h_p_d/{h_p_d}/{dUC}',[HorarioPrevioDocenteController::class,'formularioActualizar'])->name('mostrarActualizarHPD');
-Route::put('/docente/actualizar-h_p_d/{h_p_d}/{dUC}',[HorarioPrevioDocenteController::class,'actualizar'])->name('actualizarHPD');
+Route::get('/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'crear'])->name('mostrarFormularioHPD');
+Route::post('/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'store'])->name('storeHPD');
+Route::get('/docente/actualizar-h_p_d/{h_p_d}/{dUC}', [HorarioPrevioDocenteController::class, 'formularioActualizar'])->name('mostrarActualizarHPD');
+Route::put('/docente/actualizar-h_p_d/{h_p_d}/{dUC}', [HorarioPrevioDocenteController::class, 'actualizar'])->name('actualizarHPD');
 
+// PlanEstudio
+Route::get('/api/horarios/planEstudio', [PlanEstudioController::class, 'index']);
+Route::get('/api/horarios/planEstudio/{id}', [PlanEstudioController::class, 'show']);
+Route::post('/api/horarios/planEstudio/guardar', [PlanEstudioController::class, 'store']);
+Route::put('/api/horarios/planEstudio/actualizar/{id}', [PlanEstudioController::class, 'update']);
+Route::delete('/api/horarios/planEstudio/eliminar/{id}', [PlanEstudioController::class, 'destroy']);
 
-
-
+// UCPlan
+Route::get('/api/horarios/uCPlan', [UCPlanController::class, 'index']);
+Route::get('/api/horarios/uCPlan/{id}', [UCPlanController::class, 'show']);
+Route::post('/api/horarios/uCPlan/guardar', [UCPlanController::class, 'store']);
+Route::put('/api/horarios/uCPlan/actualizar/{id}', [UCPlanController::class, 'update']);
+Route::delete('/api/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destroy']);

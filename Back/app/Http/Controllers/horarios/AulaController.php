@@ -123,13 +123,13 @@ class AulaController extends Controller
      *     operationId="obtenerAulaPorId",
      *     tags={"Aula"},
      *     @OA\Parameter(
-     *     name="id",
-     *     in="path",
-     *     description="Id del aula",
-     *     required=true,
-     *     @OA\Schema(
-     *         type="integer"
-     *     )
+     *          name="id",
+     *          in="path",
+     *          description="Id del aula",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
      *     ),
      *     @OA\Response(
      *     response=200,

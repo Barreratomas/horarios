@@ -42,7 +42,7 @@ class PlanEstudio extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['detalle',  'fecha_inicio', 'fecha_fin'];
+    protected $fillable = ['detalle', 'fecha_inicio', 'fecha_fin'];
     protected $table = 'plan_estudio';
     protected $primaryKey = 'id_plan';
 
