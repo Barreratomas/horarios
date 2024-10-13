@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\horarios;
 
-use App\Http\Requests\HorarioDocenteRequest;
-use App\Http\Requests\HorarioRequest;
+use App\Http\Requests\horarios\HorarioDocenteRequest;
+use App\Http\Requests\horarios\HorarioRequest;
 use App\Models\Carrera;
-use App\Models\Comision;
-use App\Models\Disponibilidad;
-use App\Models\DocenteMateria;
-use App\Models\Horario;
+use App\Models\horarios\Disponibilidad;
+use App\Models\horarios\Horario;
+use App\Models\horarios\Grado;
 use Illuminate\Http\Request;
-use App\Services\HorarioService;
+use App\Services\horarios\HorarioService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -32,21 +31,21 @@ class HorarioController extends Controller
             return redirect()->route('home');
         }
 
-        $comisiones = Comision::all();
-        $carreras = Carrera::all();
+        $grados = Grado::all();
+        $carreras = Grado::all();
 
 
-        return view('layouts.parcials.formularioHorario', compact('comisiones','carreras'))->render();
+        return view('layouts.parcials.formularioHorario', compact('grados','carreras'))->render();
     }
 
 
     // mostrarHorario
     public function mostrarHorario(HorarioRequest $request): View
 {        
-    $id_comision = $request->input('comision');
+    $id_grado = $request->input('grado');
 
-    $horarios = Horario::whereHas('disponibilidad.docenteMateria.comision', function ($query) use ($id_comision) {
-        $query->where('id_comision', $id_comision);
+    $horarios = Horario::whereHas('disponibilidad.docenteUC.grado', function ($query) use ($id_grado) {
+        $query->where('id_grado', $id_grado);
     })->orderByRaw("CASE WHEN dia = 'lunes' THEN 1 
     WHEN dia = 'martes' THEN 2 
     WHEN dia = 'miercoles' THEN 3 
@@ -54,11 +53,11 @@ class HorarioController extends Controller
     WHEN dia = 'viernes' THEN 5 
     ELSE 6 END")->orderBy('modulo_inicio')->get();
 
-    // Importar comisiones
+    // Importar grados
     $formularioHorarioPartial = $this->mostrarFormularioPartial();
 
     // Retornar la vista con la comisión y los horarios
-    return view('horario.index', compact('horarios', 'id_comision', 'formularioHorarioPartial'));
+    return view('horario.index', compact('horarios', 'id_grado', 'formularioHorarioPartial'));
 }
 
 
@@ -75,18 +74,18 @@ class HorarioController extends Controller
     public function mostrarHorarioDocente(HorarioDocenteRequest $request){
         $dni_docente=$request->input('dni');
         // Obtener todos los horarios asociados al docente con el DNI especificado
-        $horarios = Horario::whereHas('disponibilidad.docenteMateria.docente', function ($query) use ($dni_docente) {
-            $query->where('dni_docente', $dni_docente);
-        })->orderBy('anio')->orderBy('division')->orderByRaw("CASE WHEN dia = 'lunes' THEN 1 
+        $horarios = Horario::whereHas('disponibilidad.docenteUC.docente', function ($query) use ($dni_docente) {
+            $query->where('DNI', $dni_docente);
+        })->orderBy('grado')->orderBy('division')->orderByRaw("CASE WHEN dia = 'lunes' THEN 1 
         WHEN dia = 'martes' THEN 2 
         WHEN dia = 'miercoles' THEN 3 
         WHEN dia = 'jueves' THEN 4 
         WHEN dia = 'viernes' THEN 5 
         ELSE 6 END")->orderBy('modulo_inicio')->get();
         // Agrupar los horarios por año y división
-        $horariosAgrupados = $horarios->groupBy(['anio', 'division']);
+        $horariosAgrupados = $horarios->groupBy(['grado', 'division']);
     
-        // Importar comisiones y carreras si es necesario
+        // Importar grados y carreras si es necesario
         $formularioHorarioDocentePartial = $this->mostrarFormularioDocentePartial();
     
         // Retornar la vista con los horarios del docente
@@ -102,10 +101,10 @@ class HorarioController extends Controller
             return redirect()->route('home');
         }
           
-        // Obtener todos los horarios de la base de datos, unidos con las carreras
-        $horarios = Horario::join('carreras', 'horarios.id_carrera', '=', 'carreras.id_carrera')
+        // Obtener todos los horarios de la base de datos, unidos con los grados
+        $horarios = Horario::join('carreras', 'horarios.id_grado.id_carrera', '=', 'carreras.id_carrera')
             ->orderBy('carreras.nombre')
-            ->orderBy('anio')
+            ->orderBy('grado')
             ->orderByRaw("CASE WHEN dia = 'lunes' THEN 1
                             WHEN dia = 'martes' THEN 2
                             WHEN dia = 'miercoles' THEN 3
@@ -137,14 +136,14 @@ class HorarioController extends Controller
 
         $registros[]=$ultimoRegistro;
 
-        // // Buscar el penúltimo registro de disponibilidad con el mismo id_comision
+        // // Buscar el penúltimo registro de disponibilidad con el mismo id_grado
         $penultimoRegistro = Disponibilidad::orderBy('id_disponibilidad', 'desc')
         ->skip(1) // Saltar el último registro y obtener el siguiente
         ->take(1) // Tomar solo un registro
         ->first(); // Obtener el primer registro de la consulta
 
 
-        if ($penultimoRegistro !== null && $penultimoRegistro->docenteMateria !== null && $ultimoRegistro->docenteMateria->id_comision == $penultimoRegistro->docenteMateria->id_comision) {
+        if ($penultimoRegistro !== null && $penultimoRegistro->docenteUC !== null && $ultimoRegistro->docenteUC->id_grado == $penultimoRegistro->docenteUC->id_grado) {
             $registros[] = $penultimoRegistro;
         }
 
@@ -159,12 +158,12 @@ class HorarioController extends Controller
                 'modulo_inicio' => $registro->modulo_inicio,
                 'modulo_fin' => $registro->modulo_fin,
                 'v_p' => $v_p, // Asignar el valor aleatorio
-                'id_disponibilidad' => $registro->id_disponibilidad,
-                'materia' => $registro->docenteMateria->materia->nombre,
-                'aula' => $registro->docenteMateria->aula->nombre,
-                'anio' => $registro->docenteMateria->comision->anio,
-                'division' => $registro->docenteMateria->comision->division,
-                'id_carrera'=>$registro->docenteMateria->comision->id_carrera
+                'id_disponibilidad' => $registro->id_disp,
+                'materia' => $registro->unidad_curricular->Unidad_Curricular,
+                'aula' => $registro->aula->nombre,
+                'grado' => $registro->grado->grado,
+                'division' => $registro->grado->division,
+                'id_carrera'=>$registro->grado->carrera->id_carrera
             ];
             // dd($params);
             // Hacemos una copia de $params
@@ -202,10 +201,10 @@ class HorarioController extends Controller
             'modulo_inicio' =>  $request->input('modulo_inicio'),
             'modulo_fin' =>  $request->input('modulo_fin'),
             'v_p' =>  $request->input('v_p'),
-            'id_disponibilidad' =>  $request->input('id_disponibilidad'),
+            'id_disponibilidad' =>  $request->input('id_disp'),
             'materia' =>  $request->input('materia'),
             'aula' =>  $request->input('aula'),
-            'comision' =>  $request->input('comision')
+            'grado' =>  $request->input('grado')
     ];
         $response=$this->horarioService->actualizarHorario($id,$params);
         if (isset($response['success'])) {

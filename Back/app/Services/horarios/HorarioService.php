@@ -99,23 +99,25 @@ class HorarioService implements HorarioRepository
             return response()->json(['error' => 'Hubo un error al obtener el horario'], 500);
         }
     }
-    public function guardarHorariosSwagger($horario){
+    public function guardarHorariosSwagger($request){
         try {
-            $horario = $this->horarioMapper->toHorario($horario);
-            $horario->save();
-            return response()->json($horario, 201);
+            $horarioData = $request->all();
+            $horario = new Horario($horarioData);
+            $horarioModel = $this->horarioMapper->toHorario($horario);
+            $horarioModel->save();
+            return response()->json($horarioModel, 201);
         } catch (Exception $e) {
             Log::error('Error al guardar el horario: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el horario'], 500);
         }
     }
-    public function actualizarHorariosSwagger($horario, $id){
+    public function actualizarHorariosSwagger($request, $id){
         $horario = Horario::find($id);
         if (!$horario) {
             return response()->json(['error' => 'No existe el horario'], 404);
         }
         try {
-            $horario->update($this->horarioMapper->toHorarioData($horario));
+            $horario->update($request->all());
             return response()->json($horario, 200);
         } catch (Exception $e) {
             Log::error('Error al actualizar el horario: ' . $e->getMessage());

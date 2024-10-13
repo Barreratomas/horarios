@@ -2204,11 +2204,13 @@
                     },
                     "modulo_inicio": {
                         "description": "Modulo de inicio del horario",
-                        "type": "string"
+                        "type": "string",
+                        "format": "time"
                     },
                     "modulo_fin": {
                         "description": "Modulo de fin del horario",
-                        "type": "string"
+                        "type": "string",
+                        "format": "time"
                     },
                     "modalidad": {
                         "description": "Modalidad del horario",
@@ -2256,11 +2258,26 @@
                 },
                 "type": "object"
             },
+            "UCPlan": {
+                "title": "UCPlan",
+                "description": "UCPlan model",
+                "properties": {
+                    "id_uc": {
+                        "description": "ID de la unidad curricular",
+                        "type": "integer"
+                    },
+                    "id_plan": {
+                        "description": "ID del plan de estudio",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "UnidadCurricular": {
                 "title": "UnidadCurricular",
                 "description": "Esquema del objeto UnidadCurricular",
                 "properties": {
-                    "Id_UC": {
+                    "id_uc": {
                         "description": "ID de la unidad curricular",
                         "type": "integer"
                     },

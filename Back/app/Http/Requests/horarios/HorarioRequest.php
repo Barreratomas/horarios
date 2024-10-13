@@ -4,6 +4,7 @@ namespace App\Http\Requests\horarios;
 
 use App\Models\Carrera;
 use App\Models\Comision;
+use App\Models\horarios\Grado;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -24,18 +25,18 @@ class HorarioRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id_primer_comision = Comision::orderBy('id_comision')->first()->id_comision;
-        $id_ultimo_comision = Comision::orderBy('id_comision', 'desc')->first()->id_comision;
+        $id_primer_grado = Grado::orderBy('id_grado')->first()->id_grado;
+        $id_ultimo_grado = Grado::orderBy('id_grado', 'desc')->first()->id_grado;
         
        
 
         return [
-            'comision' => [
+            'grado' => [
                 'required',
                 'integer',
-                Rule::exists('comisiones', 'id_comision'), // Utiliza la regla exists para validar que el valor proporcionado para 'comision' existe en la columna 'id_comision' de la tabla 'comisiones'
-                'min:' . $id_primer_comision,
-                'max:' . $id_ultimo_comision
+                Rule::exists('grado', 'id_grado'), // Utiliza la regla exists para validar que el valor proporcionado para 'grado' existe en la columna 'id_grado' de la tabla 'grado'
+                'min:' . $id_primer_grado,
+                'max:' . $id_ultimo_grado
                 
                 
             ],

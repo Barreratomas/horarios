@@ -12,6 +12,7 @@ use App\Http\Controllers\horarios\AulaController;
 use App\Http\Controllers\horarios\DocenteUCController;
 use App\Http\Controllers\horarios\GradoController;
 use App\Http\Controllers\horarios\GradoUcController;
+use App\Http\Controllers\horarios\HorarioController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -110,6 +111,21 @@ Route::get('/disponibilidad/guardar', [DisponibilidadController::class, 'guardar
 //Route::get('/disponibilidad/disponibilidad-index',[DisponibilidadController::class,'redireccionar'])->name('redireccionarDisponibilidad');
 Route::get('/disponibilidad/actualizar-disponibilidad/{h_p_d}/{dm}', [DisponibilidadController::class, 'actualizar'])->name('actualizarDisponibilidad');
 Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadController::class, 'redireccionarError'])->name('redireccionarDisponibilidadError');
+
+
+// horario
+Route::get('/horario',[HorarioController::class,'mostrarFormularioPartial'])->name('mostrarFormularioHorario');
+Route::post('/horario', [HorarioController::class,'mostrarHorario'])->name('mostrarHorario');
+
+Route::get('/horario/docente',[HorarioController::class,'mostrarFormularioDocentePartial'])->name('formularioHorarioDocente');
+Route::post('/horario/docente',[HorarioController::class,'mostrarHorarioDocente'])->name('mostrarHorarioDocente');
+
+Route::get('/horario/bedelia',[HorarioController::class,'mostrarHorarioBedelia'])->name('mostrarHorarioBedelia');
+
+// Route::get('horario/crear-horario',[HorarioController::class,'crear'])->name('crearHorario');
+Route::get('/horario/crear-horario',[HorarioController::class,'store'])->name('storeHorario');
+
+// HorarioPrevioDocente
 
 
 

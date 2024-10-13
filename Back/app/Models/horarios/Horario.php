@@ -25,11 +25,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *     @OA\Property(
  *         property="modulo_inicio",
  *         type="string",
+ *         format="time",
  *         description="Modulo de inicio del horario"
  *     ),
  *     @OA\Property(
  *         property="modulo_fin",
  *         type="string",
+ *         format="time",
  *         description="Modulo de fin del horario"
  *     ),
  *     @OA\Property(

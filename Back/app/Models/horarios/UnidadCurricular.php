@@ -4,9 +4,9 @@ namespace App\Models\horarios;
 
 use App\Models\AlumnoUC;
 use App\Models\CarreraUC;
-use App\Models\GradoUC;
+use App\Models\horarios\GradoUC;
 use App\Models\InscripcionesUC;
-use App\Models\UCPlan;
+use App\Models\horarios\UCPlan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *     title="UnidadCurricular",
  *     description="Esquema del objeto UnidadCurricular",
  *     @OA\Property(
- *         property="Id_UC",
+ *         property="id_uc",
  *         type="integer",
  *         description="ID de la unidad curricular"
  *     ),
@@ -55,7 +55,10 @@ class UnidadCurricular extends Model
     use HasFactory;
     protected $fillable = ['Unidad_Curricular','Tipo', 'HorasSem', 'HorasAnual', 'Formato'];
     protected $table = 'unidad_curricular';
-    protected $primaryKey = 'Id_UC';
+    protected $primaryKey = 'id_uc';
+
+    public $incrementing = true;
+    public $timestamps = false;
 
     /*
     // Una unidad curricular tiene uno o muchas notas
@@ -81,42 +84,42 @@ class UnidadCurricular extends Model
 
     // Una unidad curricular tiene uno o muchas carrera_uc
     public function carrera_uc():HasMany{
-        return $this->hasMany(CarreraUC::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(CarreraUC::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas inscripciones_uc
     public function inscripciones_uc():HasMany{
-        return $this->hasMany(InscripcionesUC::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(InscripcionesUC::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas uc_plan
     public function uc_plan():HasMany{
-        return $this->hasMany(UCPlan::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(UCPlan::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas docente_uc
     public function docente_uc():HasMany{
-        return $this->hasMany(DocenteUC::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(DocenteUC::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas grado_uc
     public function grado_uc():HasMany{
-        return $this->hasMany(GradoUC::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(GradoUC::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas alumno_uc
     public function alumno_uc():HasMany{
-        return $this->hasMany(AlumnoUC::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(AlumnoUC::class, 'id_uc', 'id_uc');
     }
     
     // Una unidad curricular tiene uno o muchas disponibilidad
     public function disponibilidad():HasMany{
-        return $this->hasMany(Disponibilidad::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(Disponibilidad::class, 'id_uc', 'id_uc');
     }
 
     // Una unidad curricular tiene uno o muchas horarios
     public function horarios():HasMany{
-        return $this->hasMany(Horario::class, 'Id_UC', 'Id_UC');
+        return $this->hasMany(Horario::class, 'id_uc', 'id_uc');
     }
     
 

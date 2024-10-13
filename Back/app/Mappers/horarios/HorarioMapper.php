@@ -2,33 +2,21 @@
 
 namespace App\Mappers\horarios;
 
-use App\Models\Horario;
+use App\Models\horarios\Horario;
 
 class HorarioMapper
 {
     public static function toHorario($horarioData)
     {
         return new Horario([
-            'id' => $horarioData['id'],
             'dia' => $horarioData['dia'],
-            'hora_inicio' => $horarioData['hora_inicio'],
-            'hora_fin' => $horarioData['hora_fin'],
+            'modulo_inicio' => $horarioData['modulo_inicio'],
+            'modulo_fin' => $horarioData['modulo_fin'],
+            'modalidad' => $horarioData['modalidad'],
+            'id_disp' => $horarioData['id_disp'],
+            'id_uc' => $horarioData['id_uc'],
             'id_aula' => $horarioData['id_aula'],
-            'id_materia' => $horarioData['id_materia'],
-            'id_docente' => $horarioData['id_docente']
+            'id_grado' => $horarioData['id_grado']
         ]);
-    }
-
-    public static function toHorarioData($horario)
-    {
-        return [
-            'id' => $horario->id,
-            'dia' => $horario->dia,
-            'hora_inicio' => $horario->hora_inicio,
-            'hora_fin' => $horario->hora_fin,
-            'id_aula' => $horario->id_aula,
-            'id_materia' => $horario->id_materia,
-            'id_docente' => $horario->id_docente
-        ];
     }
 }
