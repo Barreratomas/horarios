@@ -30,15 +30,15 @@ class HorarioPrevioDocenteService implements HorarioPrevioDocenteRepository
     }
     
 
-    public function guardarHorarioPrevioDocente($dni_docente,$dia,$hora)
+    public function guardarHorarioPrevioDocente($id_docente,$dia,$hora)
     {
         try {
             $horarioPrevioDocente = new HorarioPrevioDocente();
        
         
-            // Verificar si el dni_docente no es null antes de asignarlo
-            if ($dni_docente !== null) {
-                $horarioPrevioDocente->dni_docente = $dni_docente;
+            // Verificar si el id_docente no es null antes de asignarlo
+            if ($id_docente !== null) {
+                $horarioPrevioDocente->id_docente = $id_docente;
             }
 
             // Verificar si el día no es null antes de asignarlo

@@ -18,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *          description="ID del horario previo del docente"
  *     ),
  *     @OA\Property(
- *          property="dni_docente",
- *          type="string",
- *          description="DNI del docente"
+ *          property="id_docente",
+ *          type="integer",
+ *          description="id del docente"
  *     ),
  *     @OA\Property(
  *          property="dia",
@@ -29,8 +29,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *     ),
  *     @OA\Property(
  *          property="hora",
- *          type="time",
- *          description="Hora del horario"
+ *          type="string",
+ *          format="time",
+ *         description="Hora del dia"
  *     )
  * )
  */

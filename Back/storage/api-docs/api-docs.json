@@ -2243,17 +2243,18 @@
                         "description": "ID del horario previo del docente",
                         "type": "integer"
                     },
-                    "dni_docente": {
-                        "description": "DNI del docente",
-                        "type": "string"
+                    "id_docente": {
+                        "description": "id del docente",
+                        "type": "integer"
                     },
                     "dia": {
                         "description": "Dia de la semana",
                         "type": "string"
                     },
                     "hora": {
-                        "description": "Hora del horario",
-                        "type": "time"
+                        "description": "Hora del dia",
+                        "type": "string",
+                        "format": "time"
                     }
                 },
                 "type": "object"

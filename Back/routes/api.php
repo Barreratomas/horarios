@@ -13,6 +13,7 @@ use App\Http\Controllers\horarios\DocenteUCController;
 use App\Http\Controllers\horarios\GradoController;
 use App\Http\Controllers\horarios\GradoUcController;
 use App\Http\Controllers\horarios\HorarioController;
+use App\Http\Controllers\horarios\HorarioPrevioDocenteController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -126,6 +127,11 @@ Route::get('/horario/bedelia',[HorarioController::class,'mostrarHorarioBedelia']
 Route::get('/horario/crear-horario',[HorarioController::class,'store'])->name('storeHorario');
 
 // HorarioPrevioDocente
+Route::get('/docente/crear-h-p-d/{docente}',[HorarioPrevioDocenteController::class,'crear'])->name('mostrarFormularioHPD');
+Route::post('/docente/crear-h-p-d/{docente}',[HorarioPrevioDocenteController::class,'store'])->name('storeHPD');
+Route::get('/docente/actualizar-h_p_d/{h_p_d}/{dUC}',[HorarioPrevioDocenteController::class,'formularioActualizar'])->name('mostrarActualizarHPD');
+Route::put('/docente/actualizar-h_p_d/{h_p_d}/{dUC}',[HorarioPrevioDocenteController::class,'actualizar'])->name('actualizarHPD');
+
 
 
 
