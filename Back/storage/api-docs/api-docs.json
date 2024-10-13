@@ -10,6 +10,202 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/horarios/carreraUC": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get list of carreraUC",
+                "description": "Returns list of carreraUC",
+                "operationId": "getCarreraUCList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CarreraUC"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/idCarrera/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get carreraUC information",
+                "description": "Returns carreraUC data",
+                "operationId": "getCarreraUCByIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del Carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/idUC/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get carreraUC information",
+                "description": "Returns carreraUC data",
+                "operationId": "getCarreraUCByIdUC",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/guardar": {
+            "post": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Almacenar carreraUC",
+                "description": "Guardar nueva carreraUC",
+                "operationId": "guardarCarreraUC",
+                "requestBody": {
+                    "description": "CarreraUC a ser guardada",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarreraUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC guardada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar la carreraUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/eliminar/idCarrera/{id}": {
+            "delete": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Eliminar carreraUC",
+                "description": "Eliminar carreraUC por ID",
+                "operationId": "eliminarCarreraUCPorIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carreraUC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "CarreraUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la carreraUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/eliminar/idUC/{id}": {
+            "delete": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Eliminar carreraUC",
+                "description": "Eliminar carreraUC por ID",
+                "operationId": "eliminarCarreraUCPorIdUC",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carreraUC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "CarreraUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la carreraUC"
+                    }
+                }
+            }
+        },
         "/api/horarios/aulas": {
             "get": {
                 "tags": [
@@ -1749,6 +1945,628 @@
                     }
                 }
             }
+        },
+        "/api/horarios/planEstudio": {
+            "get": {
+                "tags": [
+                    "PlanEstudio"
+                ],
+                "summary": "Get list of planEstudio",
+                "description": "Returns list of planEstudio",
+                "operationId": "getPlanEstudioList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/PlanEstudio"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/planEstudio/{id}": {
+            "get": {
+                "tags": [
+                    "PlanEstudio"
+                ],
+                "summary": "Get planEstudio information",
+                "description": "Returns planEstudio data",
+                "operationId": "getPlanEstudioById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of planEstudio to return",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlanEstudio"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "PlanEstudio not found"
+                    }
+                }
+            }
+        },
+        "/api/horarios/planEstudio/guardar": {
+            "post": {
+                "tags": [
+                    "PlanEstudio"
+                ],
+                "summary": "Store new PlanEstudio",
+                "description": "Returns PlanEstudio data",
+                "operationId": "storePlanEstudio",
+                "requestBody": {
+                    "description": "PlanEstudio object that needs to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PlanEstudioDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlanEstudio"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/api/horarios/planEstudio/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "PlanEstudio"
+                ],
+                "summary": "Update an existing PlanEstudio",
+                "description": "Returns updated PlanEstudio data",
+                "operationId": "updatePlanEstudio",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of PlanEstudio to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "PlanEstudio object that needs to be updated",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PlanEstudioDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlanEstudio"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "PlanEstudio not found"
+                    },
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/api/horarios/planEstudio/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "PlanEstudio"
+                ],
+                "summary": "Delete an existing PlanEstudio",
+                "description": "Deletes a PlanEstudio",
+                "operationId": "deletePlanEstudio",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of PlanEstudio to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlanEstudio"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "PlanEstudio not found"
+                    }
+                }
+            }
+        },
+        "/api/horarios/ucPlan": {
+            "get": {
+                "tags": [
+                    "UCPlan"
+                ],
+                "summary": "Get list of ucPlan",
+                "description": "Returns list of ucPlan",
+                "operationId": "getUCPlanList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UCPlan"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/ucPlan/{id}": {
+            "get": {
+                "tags": [
+                    "UCPlan"
+                ],
+                "summary": "Get ucPlan information",
+                "description": "Returns ucPlan data",
+                "operationId": "getUCPlanById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UCPlan id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UCPlan"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/ucPlan/guardar": {
+            "post": {
+                "tags": [
+                    "UCPlan"
+                ],
+                "summary": "Store new UCPlan",
+                "description": "Returns ucPlan data",
+                "operationId": "storeUCPlan",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UCPlan"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UCPlan"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/ucPlan/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "UCPlan"
+                ],
+                "summary": "Update a UCPlan",
+                "description": "Update a UCPlan",
+                "operationId": "updateUCPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of UCPlan to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UCPlan"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "UCPlan updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UCPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "UCPlan not found"
+                    },
+                    "500": {
+                        "description": "Error updating UCPlan"
+                    }
+                }
+            }
+        },
+        "/api/horarios/ucPlan/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "UCPlan"
+                ],
+                "summary": "Delete a UCPlan",
+                "description": "Delete a UCPlan",
+                "operationId": "deleteUCPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of UCPlan to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "UCPlan deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UCPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "UCPlan not found"
+                    },
+                    "500": {
+                        "description": "Error deleting UCPlan"
+                    }
+                }
+            }
+        },
+        "/api/horarios/unidadCurricular": {
+            "get": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Get list of unidadCurricular",
+                "description": "Returns list of unidadCurricular",
+                "operationId": "getUnidadCurricularList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UnidadCurricular"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Store new unidadCurricular",
+                "description": "Returns unidadCurricular data",
+                "operationId": "storeUnidadCurricular",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnidadCurricular"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnidadCurricular"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/unidadCurricular/{id}": {
+            "get": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Get unidadCurricular information",
+                "description": "Returns unidadCurricular data",
+                "operationId": "getUnidadCurricularById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UnidadCurricular id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnidadCurricular"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Update existing unidadCurricular",
+                "description": "Returns updated unidadCurricular data",
+                "operationId": "updateUnidadCurricular",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UnidadCurricular id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnidadCurricular"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnidadCurricular"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Delete existing unidadCurricular",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteUnidadCurricular",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UnidadCurricular id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1870,6 +2688,27 @@
                 },
                 "type": "object"
             },
+            "PlanEstudioDTO": {
+                "title": "PlanEstudioDTO",
+                "description": "DTO para un plan de estudio",
+                "properties": {
+                    "detalle": {
+                        "description": "Detalle del plan de estudio",
+                        "type": "string"
+                    },
+                    "fecha_inicio": {
+                        "description": "Fecha de inicio del plan de estudio",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fecha_fin": {
+                        "description": "Fecha de fin del plan de estudio",
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
             "Administrador": {
                 "title": "Administrador",
                 "description": "Esquema del objeto Administrador",
@@ -1967,6 +2806,21 @@
                     },
                     "id_localidad": {
                         "description": "ID de la localidad",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "CarreraUC": {
+                "title": "CarreraUC",
+                "description": "CarreraUC model",
+                "properties": {
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "id_uc": {
+                        "description": "ID de la unidad curricular",
                         "type": "integer"
                     }
                 },
@@ -2259,6 +3113,31 @@
                 },
                 "type": "object"
             },
+            "PlanEstudio": {
+                "title": "PlanEstudio",
+                "description": "PlanEstudio model",
+                "properties": {
+                    "id_plan": {
+                        "description": "ID del plan de estudio",
+                        "type": "integer"
+                    },
+                    "detalle": {
+                        "description": "Detalle del plan de estudio",
+                        "type": "string"
+                    },
+                    "fecha_inicio": {
+                        "description": "Fecha de inicio del plan de estudio",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fecha_fin": {
+                        "description": "Fecha de fin del plan de estudio",
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
             "UCPlan": {
                 "title": "UCPlan",
                 "description": "UCPlan model",
@@ -2309,6 +3188,10 @@
     },
     "tags": [
         {
+            "name": "CarreraUC",
+            "description": "CarreraUC"
+        },
+        {
             "name": "Aula",
             "description": "Aula"
         },
@@ -2347,6 +3230,18 @@
         {
             "name": "Materias",
             "description": "Materias"
+        },
+        {
+            "name": "PlanEstudio",
+            "description": "PlanEstudio"
+        },
+        {
+            "name": "UCPlan",
+            "description": "UCPlan"
+        },
+        {
+            "name": "UnidadCurricular",
+            "description": "UnidadCurricular"
         }
     ]
 }

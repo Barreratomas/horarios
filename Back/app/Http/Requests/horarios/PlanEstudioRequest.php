@@ -23,16 +23,16 @@ class PlanEstudioRequest extends FormRequest
      */
     public function rules(): array
     {
-        
-        
+
+
         $esCreacion = $this->url() == 'http://127.0.0.1:8000/planEstudio/crear-planEstudio';
 
-        
 
 
-        $detalleRules = $esCreacion ? ['required','string','max:255',Rule::unique('plan_estudio')] : ['nullable','string','max:255',Rule::unique('plan_estudio')];
-        $fechaInicioRules = $esCreacion ? ['required ',' date' ]:[ 'nullable ',' date'];
-        $fechaFinRules = $esCreacion ? ['required ',' date' ]:[ 'nullable ',' date'];
+
+        $detalleRules = $esCreacion ? ['required', 'string', 'max:255', Rule::unique('plan_estudio')] : ['nullable', 'string', 'max:255', Rule::unique('plan_estudio')];
+        $fechaInicioRules = $esCreacion ? ['required ', 'date'] : ['nullable ', 'date'];
+        $fechaFinRules = $esCreacion ? ['required ', 'date'] : ['nullable ', 'date'];
 
 
         return [
