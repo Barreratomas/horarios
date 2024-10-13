@@ -154,3 +154,12 @@ Route::get('/horarios/unidadCurricular/{id}', [UCPlanController::class, 'show'])
 Route::post('/horarios/unidadCurricular/guardar', [UCPlanController::class, 'store']);
 Route::put('/horarios/unidadCurricular/actualizar/{id}', [UCPlanController::class, 'update']);
 Route::delete('/horarios/unidadCurricular/eliminar/{id}', [UCPlanController::class, 'destroy']);
+
+// CarreraUC
+Route::get('/horarios/carreraUC', [UCPlanController::class, 'index']);
+Route::get('/horarios/carreraUC/idCarrera/{id}', [UCPlanController::class, 'show']);
+Route::get('/horarios/carreraUC/idUC/{id}', [UCPlanController::class, 'show']);
+Route::post('/horarios/carreraUC/guardar', [UCPlanController::class, 'store']);
+Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [UCPlanController::class, 'destroy']);
+Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [UCPlanController::class, 'destroy']);
+

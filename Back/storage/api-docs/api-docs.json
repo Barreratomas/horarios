@@ -10,6 +10,202 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/horarios/carreraUC": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get list of carreraUC",
+                "description": "Returns list of carreraUC",
+                "operationId": "getCarreraUCList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CarreraUC"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/idCarrera/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get carreraUC information",
+                "description": "Returns carreraUC data",
+                "operationId": "getCarreraUCByIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del Carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/idUC/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Get carreraUC information",
+                "description": "Returns carreraUC data",
+                "operationId": "getCarreraUCByIdUC",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/guardar": {
+            "post": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Almacenar carreraUC",
+                "description": "Guardar nueva carreraUC",
+                "operationId": "guardarCarreraUC",
+                "requestBody": {
+                    "description": "CarreraUC a ser guardada",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarreraUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC guardada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar la carreraUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/eliminar/idCarrera/{id}": {
+            "delete": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Eliminar carreraUC",
+                "description": "Eliminar carreraUC por ID",
+                "operationId": "eliminarCarreraUCPorIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carreraUC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "CarreraUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la carreraUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraUC/eliminar/idUC/{id}": {
+            "delete": {
+                "tags": [
+                    "CarreraUC"
+                ],
+                "summary": "Eliminar carreraUC",
+                "description": "Eliminar carreraUC por ID",
+                "operationId": "eliminarCarreraUCPorIdUC",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carreraUC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CarreraUC eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "CarreraUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la carreraUC"
+                    }
+                }
+            }
+        },
         "/api/horarios/aulas": {
             "get": {
                 "tags": [
@@ -2615,6 +2811,21 @@
                 },
                 "type": "object"
             },
+            "CarreraUC": {
+                "title": "CarreraUC",
+                "description": "CarreraUC model",
+                "properties": {
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "id_uc": {
+                        "description": "ID de la unidad curricular",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "Docente": {
                 "title": "Docente",
                 "description": "Esquema del objeto Docente",
@@ -2916,11 +3127,13 @@
                     },
                     "fecha_inicio": {
                         "description": "Fecha de inicio del plan de estudio",
-                        "type": "string"
+                        "type": "string",
+                        "format": "date"
                     },
                     "fecha_fin": {
                         "description": "Fecha de fin del plan de estudio",
-                        "type": "string"
+                        "type": "string",
+                        "format": "date"
                     }
                 },
                 "type": "object"
@@ -2974,6 +3187,10 @@
         }
     },
     "tags": [
+        {
+            "name": "CarreraUC",
+            "description": "CarreraUC"
+        },
         {
             "name": "Aula",
             "description": "Aula"
