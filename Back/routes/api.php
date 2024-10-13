@@ -135,15 +135,22 @@ Route::get('/docente/actualizar-h_p_d/{h_p_d}/{dUC}', [HorarioPrevioDocenteContr
 Route::put('/docente/actualizar-h_p_d/{h_p_d}/{dUC}', [HorarioPrevioDocenteController::class, 'actualizar'])->name('actualizarHPD');
 
 // PlanEstudio
-Route::get('/api/horarios/planEstudio', [PlanEstudioController::class, 'index']);
-Route::get('/api/horarios/planEstudio/{id}', [PlanEstudioController::class, 'show']);
-Route::post('/api/horarios/planEstudio/guardar', [PlanEstudioController::class, 'store']);
-Route::put('/api/horarios/planEstudio/actualizar/{id}', [PlanEstudioController::class, 'update']);
-Route::delete('/api/horarios/planEstudio/eliminar/{id}', [PlanEstudioController::class, 'destroy']);
+Route::get('/horarios/planEstudio', [PlanEstudioController::class, 'index']);
+Route::get('/horarios/planEstudio/{id}', [PlanEstudioController::class, 'show']);
+Route::post('/horarios/planEstudio/guardar', [PlanEstudioController::class, 'store']);
+Route::put('/horarios/planEstudio/actualizar/{id}', [PlanEstudioController::class, 'update']);
+Route::delete('/horarios/planEstudio/eliminar/{id}', [PlanEstudioController::class, 'destroy']);
 
 // UCPlan
-Route::get('/api/horarios/uCPlan', [UCPlanController::class, 'index']);
-Route::get('/api/horarios/uCPlan/{id}', [UCPlanController::class, 'show']);
-Route::post('/api/horarios/uCPlan/guardar', [UCPlanController::class, 'store']);
-Route::put('/api/horarios/uCPlan/actualizar/{id}', [UCPlanController::class, 'update']);
-Route::delete('/api/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destroy']);
+Route::get('/horarios/uCPlan', [UCPlanController::class, 'index']);
+Route::get('/horarios/uCPlan/{id}', [UCPlanController::class, 'show']);
+Route::post('/horarios/uCPlan/guardar', [UCPlanController::class, 'store']);
+Route::put('/horarios/uCPlan/actualizar/{id}', [UCPlanController::class, 'update']);
+Route::delete('/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destroy']);
+
+// UnidadCurricular
+Route::get('/horarios/unidadCurricular', [UCPlanController::class, 'index']);
+Route::get('/horarios/unidadCurricular/{id}', [UCPlanController::class, 'show']);
+Route::post('/horarios/unidadCurricular/guardar', [UCPlanController::class, 'store']);
+Route::put('/horarios/unidadCurricular/actualizar/{id}', [UCPlanController::class, 'update']);
+Route::delete('/horarios/unidadCurricular/eliminar/{id}', [UCPlanController::class, 'destroy']);
