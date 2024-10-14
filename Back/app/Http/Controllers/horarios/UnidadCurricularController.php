@@ -5,7 +5,8 @@ namespace App\Http\Controllers\horarios;
 use App\Services\horarios\UnidadCurricularService;
 use App\Http\Requests\horarios\UnidadCurricularRequest;
 use App\Http\Controllers\Controller;
- 
+use Illuminate\Http\Request;
+
 
 class UnidadCurricularController extends Controller
 {
@@ -104,7 +105,7 @@ class UnidadCurricularController extends Controller
      *      @OA\Response(response=500, description="Internal Server Error")
      *     )
      */
-    public function store(UnidadCurricularRequest $request)
+    public function store(Request $request)
     {
         return $this->unidadCurricularService->guardarUnidadCurricular($request);
     }

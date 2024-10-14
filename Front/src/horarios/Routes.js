@@ -5,22 +5,22 @@ export const getRoutes = () => ({
   aulas: {
     main: 'aulas',
     crear: 'aulas/crear',
-    actualizar: (aulaId) => `aulas/actualizar/${aulaId}` // ID al final
+    actualizar: (aulaId) => `aulas/actualizar/${aulaId}`
   },
   materias: {
     main: 'materias',
     crear: 'materias/crear',
-    actualizar: (materiaId) => `materias/actualizar/${materiaId}` // ID al final
+    actualizar: (materiaId) => `materias/actualizar/${materiaId}`
   },
   carreras: {
     main: 'carreras',
     crear: 'carreras/crear',
-    actualizar: (carreraId) => `carreras/actualizar/${carreraId}` // ID al final
+    actualizar: (carreraId) => `carreras/actualizar/${carreraId}`
   },
   comisiones: {
     main: 'comisiones',
     crear: 'comisiones/crear',
-    actualizar: (comisionId) => `comisiones/actualizar/${comisionId}` // ID al final
+    actualizar: (comisionId) => `comisiones/actualizar/${comisionId}`
   },
   asignaciones: 'asignaciones',
   crearHorarioPrevio: (dni) => `crear-horario-previo/${dni}`,
@@ -29,5 +29,10 @@ export const getRoutes = () => ({
     alumnos: 'planilla-alumnos',
     bedelia: 'planilla-bedelia',
     docente: 'planilla-docente'
+  },
+  planes: {
+    main: 'planes',
+    crear: 'planes/crear',
+    actualizar: (planId) => `planes/actualizar/${planId}`
   }
 });

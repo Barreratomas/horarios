@@ -34,11 +34,11 @@ class UnidadCurricularRequest extends FormRequest
 
 
         return [
-            'Unidad_Curricular' => $unidadCurricularRules,
-            'Tipo' => $tipoRules,
-            'HorasSem' => $horasSemRules,
-            'HorasAnual' => $horasAnualRules,
-            'Formato' => $formatoRules
+            'unidad_curricular' => $unidadCurricularRules,
+            'tipo' => $tipoRules,
+            'horas_sem' => $horasSemRules,
+            'horas_anual' => $horasAnualRules,
+            'formato' => $formatoRules
         ];
     }
 }

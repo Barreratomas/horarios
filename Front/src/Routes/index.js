@@ -107,6 +107,10 @@ const RoutesLanding = () => {
         <Route path={routes.planilla.alumnos} element={<Horario />} />
         <Route path={routes.planilla.bedelia} element={<HorarioBedelia />} />
         <Route path={routes.planilla.docente} element={<HorarioDocente />} />
+        {/* plan de estudio */}
+        <Route path={routes.planes.main} element={<Carreras />} />
+        <Route path={routes.planes.crear} element={<CrearCarrera />} />
+        <Route path={routes.planes.actualizar(':planId')} element={<ActualizarCarrera />} />
       </Route>
     </Routes>
   );

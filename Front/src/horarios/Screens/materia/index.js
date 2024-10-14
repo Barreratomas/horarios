@@ -104,11 +104,11 @@ const Materias = () => {
                   width: '30vw'
                 }}
               >
-                <p>Unidad Curricular: {materia.Unidad_Curricular}</p>
-                <p>Tipo: {materia.Tipo}</p>
-                <p>Horas Semanales: {materia.HorasSem}</p>
-                <p>Horas Anuales: {materia.HorasAnual}</p>
-                <p>Formato: {materia.Formato}</p>
+                <p>Unidad Curricular: {materia.unidad_curricular}</p>
+                <p>Tipo: {materia.tipo}</p>
+                <p>Horas Semanales: {materia.horas_sem}</p>
+                <p>Horas Anuales: {materia.horas_anual}</p>
+                <p>Formato: {materia.formato}</p>
 
                 <div className="botones">
                   <button
