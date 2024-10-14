@@ -1,62 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom'; // Para redirigir después de la creación
 
 const CrearComision = () => {
-  const [anio, setAnio] = useState('');
+  const [grado, setGrado] = useState('');
   const [division, setDivision] = useState('');
-  const [idCarrera, setIdCarrera] = useState('');
+  const [detalle, setDetalle] = useState('');
   const [capacidad, setCapacidad] = useState('');
-  const [carreras, setCarreras] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState([]);
+
   const navigate = useNavigate();
+  const { routes } = useOutletContext();
 
-  // Obtener carreras (puedes reemplazarlo con una llamada a la API)
-  useEffect(() => {
-    const obtenerCarreras = async () => {
-      try {
-        const response = await fetch('/api/carreras'); // Cambia la URL según tu API
-        if (response.ok) {
-          const data = await response.json();
-          setCarreras(data);
-        } else {
-          setErrors({ carreras: 'Error al obtener las carreras' });
-        }
-      } catch (error) {
-        setErrors({ carreras: error.message });
-      }
-    };
-    obtenerCarreras();
-  }, []);
-
+  // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({}); // Limpiar errores antes de intentar el envío
-
-    const formData = {
-      anio,
-      division,
-      id_carrera: idCarrera,
-      capacidad
-    };
+    setErrors([]); // Reiniciar errores
 
     try {
-      const response = await fetch('/api/comisiones', {
+      const response = await fetch('http://127.0.0.1:8000/api/horarios/grados/guardar', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ grado, division, detalle, capacidad })
       });
 
       if (response.ok) {
-        navigate('/horarios/comisiones');
+        navigate(`${routes.base}/${routes.comisiones.main}`, {
+          state: { successMessage: 'Grado creado con éxito' }
+        });
       } else {
-        const errorData = await response.json();
-        setErrors(errorData.errors || {});
+        const data = await response.json();
+        if (data.errors) {
+          setErrors(data.errors); // Manejar errores de validación
+        }
       }
     } catch (error) {
-      setErrors({ form: error.message });
+      console.error('Error creando grado:', error);
     }
   };
 
@@ -65,17 +45,18 @@ const CrearComision = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            <label htmlFor="anio">Ingrese el año</label>
+            <label htmlFor="grado">Ingrese el grado</label>
             <br />
             <input
               type="number"
-              name="anio"
-              value={anio}
-              onChange={(e) => setAnio(e.target.value)}
+              name="grado"
+              value={grado}
+              onChange={(e) => setGrado(e.target.value)}
+              required
             />
             <br />
             <br />
-            {errors.anio && <div className="text-danger">{errors.anio}</div>}
+            {errors.grado && <div className="text-danger">{errors.grado}</div>}
 
             <label htmlFor="division">Ingrese la división</label>
             <br />
@@ -84,28 +65,24 @@ const CrearComision = () => {
               name="division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
+              required
             />
             <br />
             <br />
             {errors.division && <div className="text-danger">{errors.division}</div>}
 
-            <label htmlFor="id_carrera">Selecciona una carrera:</label>
+            <label htmlFor="detalle">Ingrese el detalle</label>
             <br />
-            <select
-              name="id_carrera"
-              value={idCarrera}
-              onChange={(e) => setIdCarrera(e.target.value)}
-            >
-              <option value="">Selecciona una carrera</option>
-              {carreras.map((carrera) => (
-                <option key={carrera.id_carrera} value={carrera.id_carrera}>
-                  {carrera.nombre}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              name="detalle"
+              value={detalle}
+              onChange={(e) => setDetalle(e.target.value)}
+              maxLength="70"
+            />
             <br />
             <br />
-            {errors.id_carrera && <div className="text-danger">{errors.id_carrera}</div>}
+            {errors.detalle && <div className="text-danger">{errors.detalle}</div>}
 
             <label htmlFor="capacidad">Ingrese la capacidad</label>
             <br />
@@ -114,11 +91,13 @@ const CrearComision = () => {
               name="capacidad"
               value={capacidad}
               onChange={(e) => setCapacidad(e.target.value)}
+              required
             />
             <br />
             <br />
             {errors.capacidad && <div className="text-danger">{errors.capacidad}</div>}
 
+            <br />
             <button type="submit" className="btn btn-primary me-2">
               Crear
             </button>
@@ -126,15 +105,17 @@ const CrearComision = () => {
         </div>
       </div>
 
-      <div className="container" style={{ width: '500px' }}>
-        {errors.form && (
+      {errors.length > 0 && (
+        <div className="container" style={{ width: '500px' }}>
           <div className="alert alert-danger">
             <ul>
-              <li>{errors.form}</li>
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
             </ul>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

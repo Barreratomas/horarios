@@ -1,72 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 const ActualizarComision = () => {
-  const { id } = useParams();
-  const [anio, setAnio] = useState('');
-  const [division, setDivision] = useState('');
-  const [idCarrera, setIdCarrera] = useState('');
+  const { comisionId } = useParams(); // Obtener ID de la comisión desde la URL
   const [capacidad, setCapacidad] = useState('');
-  const [carreras, setCarreras] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { routes } = useOutletContext();
 
-  // Obtener comision y carreras
+  // Obtener los datos de la comisión existente
   useEffect(() => {
-    const obtenerDatos = async () => {
+    const fetchComision = async () => {
       try {
-        // Obtener detalles de la comision
-        const comisionResponse = await fetch(`/api/comisiones/${id}`);
-        if (!comisionResponse.ok) throw new Error('Error al obtener la comision');
-        const comisionData = await comisionResponse.json();
+        const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/${comisionId}`);
+        const data = await response.json();
 
-        // Obtener carreras
-        const carrerasResponse = await fetch('/api/carreras');
-        if (!carrerasResponse.ok) throw new Error('Error al obtener las carreras');
-        const carrerasData = await carrerasResponse.json();
-
-        // Establecer los datos en el estado
-        setAnio(comisionData.anio);
-        setDivision(comisionData.division);
-        setIdCarrera(comisionData.id_carrera);
-        setCapacidad(comisionData.capacidad);
-        setCarreras(carrerasData);
+        if (response.ok) {
+          setCapacidad(data.capacidad);
+        } else {
+          console.error('Error al obtener la comisión:', data);
+        }
       } catch (error) {
-        setErrors({ fetch: error.message });
+        console.error('Error:', error);
       }
     };
-    obtenerDatos();
-  }, [id]);
+
+    fetchComision();
+  }, [comisionId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({}); // Limpiar errores antes de intentar el envío
-
-    const formData = {
-      anio,
-      division,
-      id_carrera: idCarrera,
-      capacidad
-    };
+    setErrors({}); // Limpiar errores previos
 
     try {
-      const response = await fetch(`/api/comisiones/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/grados/actualizar/${comisionId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ capacidad })
+        }
+      );
 
       if (response.ok) {
-        navigate('/horarios/comisiones'); // Redirigir después de la actualización
+        navigate(`${routes.base}/${routes.comisiones.main}`, {
+          state: { successMessage: 'Carrera actualizada con éxito' }
+        });
       } else {
-        const errorData = await response.json();
-        setErrors(errorData.errors || {});
+        const data = await response.json();
+        if (data.errors) {
+          setErrors(data.errors); // Mostrar errores de validación si los hay
+        }
       }
     } catch (error) {
-      setErrors({ form: error.message });
+      console.error('Error al actualizar la comisión:', error);
     }
   };
 
@@ -75,48 +64,6 @@ const ActualizarComision = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            <label htmlFor="anio">Ingrese el año</label>
-            <br />
-            <input
-              type="number"
-              name="anio"
-              value={anio}
-              onChange={(e) => setAnio(e.target.value)}
-            />
-            <br />
-            <br />
-            {errors.anio && <div className="text-danger">{errors.anio}</div>}
-
-            <label htmlFor="division">Ingrese la división</label>
-            <br />
-            <input
-              type="number"
-              name="division"
-              value={division}
-              onChange={(e) => setDivision(e.target.value)}
-            />
-            <br />
-            <br />
-            {errors.division && <div className="text-danger">{errors.division}</div>}
-
-            <label htmlFor="id_carrera">Selecciona una carrera:</label>
-            <br />
-            <select
-              name="id_carrera"
-              value={idCarrera}
-              onChange={(e) => setIdCarrera(e.target.value)}
-            >
-              <option value="">Selecciona una carrera</option>
-              {carreras.map((carrera) => (
-                <option key={carrera.id_carrera} value={carrera.id_carrera}>
-                  {carrera.nombre}
-                </option>
-              ))}
-            </select>
-            <br />
-            <br />
-            {errors.id_carrera && <div className="text-danger">{errors.id_carrera}</div>}
-
             <label htmlFor="capacidad">Ingrese la capacidad</label>
             <br />
             <input
@@ -126,9 +73,8 @@ const ActualizarComision = () => {
               onChange={(e) => setCapacidad(e.target.value)}
             />
             <br />
-            <br />
             {errors.capacidad && <div className="text-danger">{errors.capacidad}</div>}
-
+            <br />
             <button type="submit" className="btn btn-primary me-2">
               Actualizar
             </button>
@@ -136,15 +82,17 @@ const ActualizarComision = () => {
         </div>
       </div>
 
-      <div className="container" style={{ width: '500px' }}>
-        {errors.form && (
+      {Object.keys(errors).length > 0 && (
+        <div className="container" style={{ width: '500px' }}>
           <div className="alert alert-danger">
             <ul>
-              <li>{errors.form}</li>
+              {Object.values(errors).map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
             </ul>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

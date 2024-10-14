@@ -1,39 +1,47 @@
 import React, { useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 const CrearMateria = () => {
-  const [nombre, setNombre] = useState('');
-  const [modulosSemanales, setModulosSemanales] = useState('');
+  const [unidadCurricular, setUnidadCurricular] = useState('');
+  const [tipo, setTipo] = useState('');
+  const [horasSem, setHorasSem] = useState('');
+  const [horasAnual, setHorasAnual] = useState('');
+  const [formato, setFormato] = useState('');
   const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
+
+  const navigate = useNavigate();
+  const { routes } = useOutletContext();
 
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors([]); // Limpiar errores anteriores
+    setErrors([]); // Reiniciar errores
 
     try {
-      const response = await fetch('/api/materias', {
-        // Cambia la URL según tu API
+      const response = await fetch('http://127.0.0.1:8000/api/materias/guardar', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          nombre,
-          modulos_semanales: modulosSemanales
+          unidadCurricular,
+          tipo,
+          horasSem,
+          horasAnual,
+          formato
         })
       });
 
       if (response.ok) {
-        setSuccessMessage('Materia creada correctamente');
-        setNombre('');
-        setModulosSemanales('');
+        navigate(`${routes.base}/${routes.materias.main}`, {
+          state: { successMessage: 'Materia creada con éxito' }
+        });
       } else {
-        const errorData = await response.json();
-        setErrors(errorData.errors || ['Ocurrió un error al crear la materia']);
+        const data = await response.json();
+        if (data.errors) setErrors(data.errors); // Manejar errores de validación
       }
     } catch (error) {
+      console.error('Error creando materia:', error);
       setErrors([error.message]);
     }
   };
@@ -43,31 +51,62 @@ const CrearMateria = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            <label htmlFor="nombre">Ingrese el nombre</label>
+            <label htmlFor="unidadCurricular">Unidad Curricular</label>
             <br />
             <input
               type="text"
-              name="nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              name="unidadCurricular"
+              value={unidadCurricular}
+              onChange={(e) => setUnidadCurricular(e.target.value)}
             />
             <br />
             <br />
-            {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
-
-            <label htmlFor="modulos_semanales">Ingrese la cantidad de módulos semanales</label>
-            <br />
-            <input
-              type="text"
-              name="modulos_semanales"
-              value={modulosSemanales}
-              onChange={(e) => setModulosSemanales(e.target.value)}
-            />
-            <br />
-            <br />
-            {errors.modulos_semanales && (
-              <div className="text-danger">{errors.modulos_semanales}</div>
+            {errors.unidadCurricular && (
+              <div className="text-danger">{errors.unidadCurricular}</div>
             )}
+
+            <label htmlFor="tipo">Tipo</label>
+            <br />
+            <input type="text" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} />
+            <br />
+            <br />
+            {errors.tipo && <div className="text-danger">{errors.tipo}</div>}
+
+            <label htmlFor="horasSem">Horas Semanales</label>
+            <br />
+            <input
+              type="number"
+              name="horasSem"
+              value={horasSem}
+              onChange={(e) => setHorasSem(e.target.value)}
+            />
+            <br />
+            <br />
+            {errors.horasSem && <div className="text-danger">{errors.horasSem}</div>}
+
+            <label htmlFor="horasAnual">Horas Anuales</label>
+            <br />
+            <input
+              type="number"
+              name="horasAnual"
+              value={horasAnual}
+              onChange={(e) => setHorasAnual(e.target.value)}
+            />
+            <br />
+            <br />
+            {errors.horasAnual && <div className="text-danger">{errors.horasAnual}</div>}
+
+            <label htmlFor="formato">Formato</label>
+            <br />
+            <input
+              type="text"
+              name="formato"
+              value={formato}
+              onChange={(e) => setFormato(e.target.value)}
+            />
+            <br />
+            <br />
+            {errors.formato && <div className="text-danger">{errors.formato}</div>}
 
             <button type="submit" className="btn btn-primary me-2">
               Crear
@@ -76,8 +115,8 @@ const CrearMateria = () => {
         </div>
       </div>
 
-      <div className="container" style={{ width: '500px' }}>
-        {errors.length > 0 && (
+      {errors.length > 0 && (
+        <div className="container" style={{ width: '500px' }}>
           <div className="alert alert-danger">
             <ul>
               {errors.map((error, index) => (
@@ -85,10 +124,8 @@ const CrearMateria = () => {
               ))}
             </ul>
           </div>
-        )}
-
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

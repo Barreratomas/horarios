@@ -139,7 +139,7 @@ const Menu = () => {
                       className="nav-link"
                       onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
                     >
-                      Comisiones
+                      Grados
                     </button>
                   </li>
                   {/* <li className="nav-item">
