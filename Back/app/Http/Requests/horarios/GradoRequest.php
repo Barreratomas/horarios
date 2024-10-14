@@ -30,7 +30,6 @@ class GradoRequest extends FormRequest
         $divisionRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $detalleRules = $esCreacion ? ['required', 'string', 'max:70'] : ['nullable', 'string', 'max:70'];
         $capacidadRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $carreraIdRules = $esCreacion ? ['required', 'integer', 'min:1'] : ['nullable', 'integer', 'min:1'];
 
 
         return [
@@ -38,7 +37,6 @@ class GradoRequest extends FormRequest
             'division' => $divisionRules,
             'detalle' => $detalleRules,
             'capacidad' => $capacidadRules,
-            'carrera_id' => $carreraIdRules
         ];
     }
 }

@@ -56,7 +56,7 @@ class Grado extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['grado', 'division', 'detalle', 'capacidad', 'carrera_id'];
+    protected $fillable = ['grado', 'division', 'detalle', 'capacidad'];
     protected $table = 'grado';
     protected $primaryKey = 'id_grado';
 

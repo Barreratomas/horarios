@@ -38,7 +38,6 @@ const Materias = () => {
 
         const data = await response.json();
         setMaterias(data);
-        console.log(data);
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener materias:', error);
