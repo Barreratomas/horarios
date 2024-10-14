@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 
+
 class UnidadCurricularController extends Controller
 {
     protected $unidadCurricularService;
@@ -25,24 +26,24 @@ class UnidadCurricularController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/horarios/unidadCurricular",
-     *      operationId="getUnidadCurricularList",
-     *      tags={"UnidadCurricular"},
-     *      summary="Get list of unidadCurricular",
-     *      description="Returns list of unidadCurricular",
-     *      @OA\Response(
+     *      path="/api/horarios/unidadCurricular",
+     *     summary="Obtener todas las UnidadCurricular",
+     *     description="Devuelve todas las UnidadCurricular",
+     *     operationId="getUnidadCurricular",
+     *     tags={"UnidadCurricular"},
+     *     @OA\Response(
      *          response=200,
-     *          description="Successful operation",
+     *          description="UnidadCurricular",
      *          @OA\JsonContent(
-     *             type="array",
-     *            @OA\Items(ref="#/components/schemas/UnidadCurricular")
+     *              type="array",
+     *              @OA\Items(ref="#/components/schemas/UnidadCurricular")
      *          )
      *      ),
-     *      @OA\Response(response=400, description="Bad request"),
-     *      @OA\Response(response=401, description="Unauthorized"),
-     *      @OA\Response(response=404, description="Resource Not Found"),
-     *      @OA\Response(response=500, description="Internal Server Error")
-     *     )
+     *     @OA\Response(
+     *          response=500,
+     *          description="Error al obtener las UnidadCurricular"
+     *      )
+     * )
      */
     public function index()
     {
@@ -85,14 +86,14 @@ class UnidadCurricularController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/horarios/unidadCurricular",
+     *     path="/api/horarios/unidadCurricular/guardar",
      *      operationId="storeUnidadCurricular",
      *      tags={"UnidadCurricular"},
      *      summary="Store new unidadCurricular",
      *      description="Returns unidadCurricular data",
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/UnidadCurricular")
+     *          @OA\JsonContent(ref="#/components/schemas/UnidadCurricularDTO")
      *      ),
      *      @OA\Response(
      *          response=201,
@@ -113,7 +114,7 @@ class UnidadCurricularController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/horarios/unidadCurricular/{id}",
+     *     path="/api/horarios/unidadCurricular/actualizar/{id}",
      *      operationId="updateUnidadCurricular",
      *      tags={"UnidadCurricular"},
      *      summary="Update existing unidadCurricular",
@@ -129,7 +130,7 @@ class UnidadCurricularController extends Controller
      *      ),
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/UnidadCurricular")
+     *          @OA\JsonContent(ref="#/components/schemas/UnidadCurricularDTO")
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -147,10 +148,10 @@ class UnidadCurricularController extends Controller
         return $this->unidadCurricularService->actualizarUnidadCurricular($request, $id);
     }
 
-    
+
     /**
      * @OA\Delete(
-     *     path="/api/horarios/unidadCurricular/{id}",
+     *     path="/api/horarios/unidadCurricular/eliminar/{id}",
      *      operationId="deleteUnidadCurricular",
      *      tags={"UnidadCurricular"},
      *      summary="Delete existing unidadCurricular",

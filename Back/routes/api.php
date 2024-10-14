@@ -18,6 +18,7 @@ use App\Http\Controllers\horarios\PlanEstudioController;
 use App\Http\Controllers\horarios\UCPlanController;
 use App\Http\Controllers\horarios\UnidadCurricularController;
 use App\Http\Controllers\CarreraUCController;
+use App\Http\Controllers\InscripcionController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -166,9 +167,9 @@ Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [CarreraUCControlle
 Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [CarreraUCController::class, 'destroy']);
 
 
-// UnidadCurricular
-Route::get('/horarios/unidadCurricular', [UnidadCurricularController::class, 'index']);
-Route::get('/horarios/unidadCurricular/{id}', [UnidadCurricularController::class, 'show']);
-Route::post('/horarios/unidadCurricular/guardar', [UnidadCurricularController::class, 'store']);
-Route::put('/horarios/unidadCurricular/actualizar/{id}', [UnidadCurricularController::class, 'update']);
-Route::delete('/horarios/unidadCurricular/eliminar/{id}', [UnidadCurricularController::class, 'destroy']);
+// Inscipcion
+Route::get('/horarios/inscripcion', [InscripcionController::class, 'index']);
+Route::get('/horarios/inscripcion/{id}', [InscripcionController::class, 'show']);
+Route::post('/horarios/inscripcion/guardar', [InscripcionController::class, 'store']);
+Route::put('/horarios/inscripcion/actualizar/{id}', [InscripcionController::class, 'update']);
+Route::delete('/horarios/inscripcion/eliminar/{id}', [InscripcionController::class, 'destroy']);

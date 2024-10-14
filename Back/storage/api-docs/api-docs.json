@@ -206,6 +206,224 @@
                 }
             }
         },
+        "/api/horarios/inscripcion": {
+            "get": {
+                "tags": [
+                    "Inscripcion"
+                ],
+                "summary": "Get list of inscripcion",
+                "description": "Returns list of inscripcion",
+                "operationId": "getInscripcionList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Inscripcion"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/inscripcion/{id}": {
+            "get": {
+                "tags": [
+                    "Inscripcion"
+                ],
+                "summary": "Get inscripcion information",
+                "description": "Returns inscripcion data",
+                "operationId": "getInscripcionById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Inscripcion Id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/inscripcion/guardar": {
+            "post": {
+                "tags": [
+                    "Inscripcion"
+                ],
+                "summary": "Store new inscripcion",
+                "description": "Returns inscripcion data",
+                "operationId": "storeInscripcion",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InscripcionDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/inscripcion/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Inscripcion"
+                ],
+                "summary": "Update existing inscripcion",
+                "description": "Returns updated inscripcion data",
+                "operationId": "updateInscripcion",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Inscripcion Id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InscripcionDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/inscripcion/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Inscripcion"
+                ],
+                "summary": "Delete existing inscripcion",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteInscripcion",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Inscripcion Id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/horarios/aulas": {
             "get": {
                 "tags": [
@@ -2360,12 +2578,12 @@
                 "tags": [
                     "UnidadCurricular"
                 ],
-                "summary": "Get list of unidadCurricular",
-                "description": "Returns list of unidadCurricular",
-                "operationId": "getUnidadCurricularList",
+                "summary": "Obtener todas las UnidadCurricular",
+                "description": "Devuelve todas las UnidadCurricular",
+                "operationId": "getUnidadCurricular",
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "UnidadCurricular",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2377,59 +2595,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad request"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Resource Not Found"
-                    },
                     "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "post": {
-                "tags": [
-                    "UnidadCurricular"
-                ],
-                "summary": "Store new unidadCurricular",
-                "description": "Returns unidadCurricular data",
-                "operationId": "storeUnidadCurricular",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UnidadCurricular"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UnidadCurricular"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Resource Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
+                        "description": "Error al obtener las UnidadCurricular"
                     }
                 }
             }
@@ -2477,7 +2644,53 @@
                         "description": "Internal Server Error"
                     }
                 }
-            },
+            }
+        },
+        "/api/horarios/unidadCurricular/guardar": {
+            "post": {
+                "tags": [
+                    "UnidadCurricular"
+                ],
+                "summary": "Store new unidadCurricular",
+                "description": "Returns unidadCurricular data",
+                "operationId": "storeUnidadCurricular",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnidadCurricularDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnidadCurricular"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/unidadCurricular/actualizar/{id}": {
             "put": {
                 "tags": [
                     "UnidadCurricular"
@@ -2501,7 +2714,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UnidadCurricular"
+                                "$ref": "#/components/schemas/UnidadCurricularDTO"
                             }
                         }
                     }
@@ -2530,7 +2743,9 @@
                         "description": "Internal Server Error"
                     }
                 }
-            },
+            }
+        },
+        "/api/horarios/unidadCurricular/eliminar/{id}": {
             "delete": {
                 "tags": [
                     "UnidadCurricular"
@@ -2688,6 +2903,29 @@
                 },
                 "type": "object"
             },
+            "InscripcionDTO": {
+                "title": "InscripcionDTO",
+                "description": "DTO para una inscripcion",
+                "properties": {
+                    "fechaHora": {
+                        "description": "Fecha y hora de la inscripcion",
+                        "type": "string"
+                    },
+                    "idAlumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    },
+                    "idCarrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "idGrado": {
+                        "description": "ID del grado",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "PlanEstudioDTO": {
                 "title": "PlanEstudioDTO",
                 "description": "DTO para un plan de estudio",
@@ -2705,6 +2943,33 @@
                         "description": "Fecha de fin del plan de estudio",
                         "type": "string",
                         "format": "date"
+                    }
+                },
+                "type": "object"
+            },
+            "UnidadCurricularDTO": {
+                "title": "UnidadCurricularDTO",
+                "description": "DTO para una unidad curricular",
+                "properties": {
+                    "unidad_curricular": {
+                        "description": "Nombre de la unidad curricular",
+                        "type": "string"
+                    },
+                    "tipo": {
+                        "description": "Tipo de la unidad curricular",
+                        "type": "string"
+                    },
+                    "horas_sem": {
+                        "description": "Horas semanales de la unidad curricular",
+                        "type": "integer"
+                    },
+                    "horas_anual": {
+                        "description": "Horas anuales de la unidad curricular",
+                        "type": "integer"
+                    },
+                    "formato": {
+                        "description": "Formato de la unidad curricular",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -2872,6 +3137,34 @@
                     },
                     "id_localidad": {
                         "description": "ID de la localidad del docente",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Inscripcion": {
+                "title": "Inscripcion",
+                "description": "Inscripcion model",
+                "properties": {
+                    "id_inscripcion": {
+                        "description": "ID de la inscripcion",
+                        "type": "integer"
+                    },
+                    "FechaHora": {
+                        "description": "Fecha y hora de la inscripcion",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id_alumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    },
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "id_grado": {
+                        "description": "ID del grado",
                         "type": "integer"
                     }
                 },
@@ -3161,23 +3454,23 @@
                         "description": "ID de la unidad curricular",
                         "type": "integer"
                     },
-                    "Unidad_Curricular": {
+                    "unidad_curricular": {
                         "description": "Nombre de la unidad curricular",
                         "type": "string"
                     },
-                    "Tipo": {
+                    "tipo": {
                         "description": "Tipo de la unidad curricular",
                         "type": "string"
                     },
-                    "HorasSem": {
+                    "horas_sem": {
                         "description": "Horas semanales de la unidad curricular",
                         "type": "integer"
                     },
-                    "HorasAnual": {
+                    "horas_anual": {
                         "description": "Horas anuales de la unidad curricular",
                         "type": "integer"
                     },
-                    "Formato": {
+                    "formato": {
                         "description": "Formato de la unidad curricular",
                         "type": "string"
                     }
@@ -3190,6 +3483,10 @@
         {
             "name": "CarreraUC",
             "description": "CarreraUC"
+        },
+        {
+            "name": "Inscripcion",
+            "description": "Inscripcion"
         },
         {
             "name": "Aula",
