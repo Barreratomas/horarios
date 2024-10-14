@@ -25,7 +25,7 @@ class AulaRequest extends FormRequest
     {
         
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/aula/crear-aula';
+        $esCreacion = $this->url() == 'http://127.0.0.1:8000/api/horarios/aulas/guardar';
 
         
 

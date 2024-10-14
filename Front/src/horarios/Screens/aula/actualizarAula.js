@@ -27,7 +27,9 @@ const ActualizarAula = () => {
       );
 
       if (response.ok) {
-        navigate(`${routes.base}/${routes.aulas.main}`); // Redirigir a la lista de aulas después de actualizar con éxito
+        navigate(`${routes.base}/${routes.aulas.main}`, {
+          state: { successMessage: 'Aula actualizada con éxito' }
+        });
       } else {
         const data = await response.json();
         if (data.errors) {

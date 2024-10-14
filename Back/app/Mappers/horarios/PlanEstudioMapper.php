@@ -6,7 +6,7 @@ use App\Models\horarios\PlanEstudio;
 
 class PlanEstudioMapper
 {
-    public static function toPlanEstudio(PlanEstudio $planEstudioData)
+    public static function toPlanEstudio($planEstudioData)
     {
         return new PlanEstudio([
             'detalle' => $planEstudioData['detalle'],

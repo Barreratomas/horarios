@@ -27,12 +27,14 @@ use App\Models\AlumnoPlan;
  *     ),
  *     @OA\Property(
  *         property="fecha_inicio",
- *         type="string",
+ *         type="date",
+ *         format="date",
  *         description="Fecha de inicio del plan de estudio"
  *     ),
  *     @OA\Property(
  *         property="fecha_fin",
- *         type="string",
+ *         type="date",
+ *         format="date",
  *         description="Fecha de fin del plan de estudio"
  *     )
  * )

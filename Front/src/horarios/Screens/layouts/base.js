@@ -5,6 +5,7 @@ import Menu from './parcials/menu';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/index.css';
 import '../../css/notificacion.css';
+import '../../css/formularios.css';
 import { useEffect } from 'react';
 import { getRoutes } from '../../Routes';
 // Componente principal

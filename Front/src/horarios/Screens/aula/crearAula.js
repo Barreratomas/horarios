@@ -16,7 +16,7 @@ const CrearAula = () => {
     setErrors({}); // Reiniciar los errores antes de la validacion
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/horarios/aulas', {
+      const response = await fetch('http://127.0.0.1:8000/api/horarios/aulas/guardar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -25,7 +25,9 @@ const CrearAula = () => {
       });
 
       if (response.ok) {
-        navigate(`${routes.base}/${routes.aulas.main}`); // Redirigir a la lista de aulas después de crear con éxito
+        navigate(`${routes.base}/${routes.aulas.main}`, {
+          state: { successMessage: 'Aula creada con éxito' }
+        });
       } else {
         const data = await response.json();
         if (data.errors) {
