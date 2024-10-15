@@ -52,10 +52,13 @@ const Materias = () => {
 
   const handleDelete = async (id_uc) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/materias/eliminar/${id_uc}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/unidadCurricular/eliminar/${id_uc}`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Error al eliminar materia');
 

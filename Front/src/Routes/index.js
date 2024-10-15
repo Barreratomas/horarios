@@ -37,6 +37,10 @@ import Carreras from '../horarios/Screens/carrera';
 import CrearCarrera from '../horarios/Screens/carrera/crearCarrera';
 import ActualizarCarrera from '../horarios/Screens/carrera/actualizarCarrera';
 import { getRoutes } from '../horarios/Routes';
+import Planes from '../horarios/Screens/plan_estudio';
+import CrearPlan from '../horarios/Screens/plan_estudio/crearPlan';
+import ActualizarPlan from '../horarios/Screens/plan_estudio/actualizarPlan';
+import PlanCarrera from '../horarios/Screens/carrera/verPlanCarrera';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
@@ -87,6 +91,7 @@ const RoutesLanding = () => {
         {/* Carreras */}
         <Route path={routes.carreras.main} element={<Carreras />} />
         <Route path={routes.carreras.crear} element={<CrearCarrera />} />
+        <Route path={routes.carreras.plan(':carreraId')} element={<PlanCarrera />} />
         <Route path={routes.carreras.actualizar(':carreraId')} element={<ActualizarCarrera />} />
         {/* Comisiones */}
         <Route path={routes.comisiones.main} element={<Comisiones />} />
@@ -108,9 +113,9 @@ const RoutesLanding = () => {
         <Route path={routes.planilla.bedelia} element={<HorarioBedelia />} />
         <Route path={routes.planilla.docente} element={<HorarioDocente />} />
         {/* plan de estudio */}
-        <Route path={routes.planes.main} element={<Carreras />} />
-        <Route path={routes.planes.crear} element={<CrearCarrera />} />
-        <Route path={routes.planes.actualizar(':planId')} element={<ActualizarCarrera />} />
+        <Route path={routes.planes.main} element={<Planes />} />
+        <Route path={routes.planes.crear} element={<CrearPlan />} />
+        <Route path={routes.planes.actualizar(':planId')} element={<ActualizarPlan />} />
       </Route>
     </Routes>
   );

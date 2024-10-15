@@ -15,6 +15,7 @@ export const getRoutes = () => ({
   carreras: {
     main: 'carreras',
     crear: 'carreras/crear',
+    plan: (carreraId) => `carreras/plan/${carreraId}`,
     actualizar: (carreraId) => `carreras/actualizar/${carreraId}`
   },
   comisiones: {

@@ -137,6 +137,14 @@ const Menu = () => {
                   <li className="nav-item">
                     <button
                       className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
+                    >
+                      Planes
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className="nav-link"
                       onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
                     >
                       Grados

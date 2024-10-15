@@ -27,7 +27,7 @@ const Carreras = () => {
         setSuccessMessage(''); // Eliminar el mensaje después de la transición
         setHideMessage(false); // Resetear para la próxima vez
 
-        // Aquí navegamos a la misma ruta sin estado para limpiar el location.state
+        // navegamos a la misma ruta sin estado para limpiar el location.state
         navigate(location.pathname, { replace: true }); // Reemplaza la entrada en el historial para no tener el state
       }, 3500);
     }
@@ -122,6 +122,14 @@ const Carreras = () => {
                   }
                 >
                   Actualizar
+                </button>
+                <button
+                  className="btn btn-info me-2"
+                  onClick={() =>
+                    navigate(`${routes.base}/${routes.carreras.plan(carrera.id_carrera)}`)
+                  }
+                >
+                  Ver plan
                 </button>
                 <button className="btn btn-danger" onClick={() => handleDelete(carrera.id_carrera)}>
                   Eliminar

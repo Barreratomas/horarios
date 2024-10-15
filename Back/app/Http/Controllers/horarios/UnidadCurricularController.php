@@ -106,7 +106,7 @@ class UnidadCurricularController extends Controller
      *      @OA\Response(response=500, description="Internal Server Error")
      *     )
      */
-    public function store(Request $request)
+    public function store(UnidadCurricularRequest $request)
     {
         return $this->unidadCurricularService->guardarUnidadCurricular($request);
     }

@@ -16,21 +16,27 @@
     font-size: 1rem;
     border-radius: 8px;
     transition: background-color 0.3s ease;
+    color: white;
+
   }
   
   .btn-primary {
     background-color: #007bff;
-    color: white;
     border: none;
   }
   
   .btn-primary:hover {
     background-color: #0056b3;
   }
+  .btn-info:hover {
+    color: white;
+    background-color: #33b0c0;
+    border-color: #33b0c0;
+
+  }
   
   .btn-danger {
     background-color: #dc3545;
-    color: white;
     border: none;
   }
   
