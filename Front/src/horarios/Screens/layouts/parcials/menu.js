@@ -163,6 +163,14 @@ const Menu = () => {
                       Asignacion docentes
                     </button>
                   </li>
+                  <li className="nav-item">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno}`)}
+                    >
+                      Asignacion alumnos
+                    </button>
+                  </li>
                 </>
               )}
             </ul>

@@ -14,7 +14,10 @@ const Asignaciones = () => {
   useEffect(() => {
     const obtenerDocentes = async () => {
       try {
-        const response = await fetch('/api/docentes');
+        // traerme los datos de disponibilidad
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/uCPlan', {
+          headers: { Accept: 'application/json' }
+        });
         if (!response.ok) throw new Error('Error al obtener docentes');
         const data = await response.json();
         setDocentes(data);
@@ -57,6 +60,7 @@ const Asignaciones = () => {
       </div>
 
       <div className="container">
+        <p>a espera de que se termine disponibilidad</p>
         {docentes.map((docente) => (
           <div
             key={docente.dni}
@@ -85,14 +89,14 @@ const Asignaciones = () => {
                     width: '28.5vw'
                   }}
                 >
-                  {h_p_d.dia && <p>Día horario previo: {h_p_d.dia}</p>}
+                  {/* {h_p_d.dia && <p>Día horario previo: {h_p_d.dia}</p>}
                   <p>Hora horario previo: {h_p_d.hora}</p>
                   <p>Materia: {dm.materia.nombre}</p>
                   <p>Nombre del aula: {dm.aula.nombre}</p>
                   <p>
                     Comisión: {dm.comision.anio}°{dm.comision.division}
                   </p>
-                  <p>Carrera: {dm.comision.carrera.nombre}</p>
+                  <p>Carrera: {dm.comision.carrera.nombre}</p> */}
 
                   <button
                     className="btn btn-secondary m-2"
