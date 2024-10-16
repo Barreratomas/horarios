@@ -35,5 +35,9 @@ export const getRoutes = () => ({
     main: 'planes',
     crear: 'planes/crear',
     actualizar: (planId) => `planes/actualizar/${planId}`
+  },
+  asignacionesAlumno: {
+    main: 'asignacion-alumno',
+    actualizar: (alumnoId) => `asignaciones-alumno/actualizar/${alumnoId}`
   }
 });

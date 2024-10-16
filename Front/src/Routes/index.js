@@ -41,6 +41,8 @@ import Planes from '../horarios/Screens/plan_estudio';
 import CrearPlan from '../horarios/Screens/plan_estudio/crearPlan';
 import ActualizarPlan from '../horarios/Screens/plan_estudio/actualizarPlan';
 import PlanCarrera from '../horarios/Screens/carrera/verPlanCarrera';
+import AsignacionAlumno from '../horarios/Screens/asignacion alumno';
+import ActualizarAsignarAlumno from '../horarios/Screens/asignacion alumno/actualizarAsignacionAlumno';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
@@ -116,6 +118,13 @@ const RoutesLanding = () => {
         <Route path={routes.planes.main} element={<Planes />} />
         <Route path={routes.planes.crear} element={<CrearPlan />} />
         <Route path={routes.planes.actualizar(':planId')} element={<ActualizarPlan />} />
+
+        {/* Asignaciones alumnos*/}
+        <Route path={routes.asignacionesAlumno.main} element={<AsignacionAlumno />} />
+        <Route
+          path={routes.asignacionesAlumno.actualizar(':alummnoId')}
+          element={<ActualizarAsignarAlumno />}
+        />
       </Route>
     </Routes>
   );
