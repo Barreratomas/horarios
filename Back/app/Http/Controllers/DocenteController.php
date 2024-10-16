@@ -44,7 +44,7 @@ class DocenteController extends Controller
      * )
      * )
      */
-    public function inicio()
+    public function index()
     {
         return $this->docenteService->obtenerTodosLosDocente();
     }
