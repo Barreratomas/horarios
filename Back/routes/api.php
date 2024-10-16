@@ -19,6 +19,7 @@ use App\Http\Controllers\horarios\UCPlanController;
 use App\Http\Controllers\horarios\UnidadCurricularController;
 use App\Http\Controllers\CarreraUCController;
 use App\Http\Controllers\InscripcionController;
+use App\Http\Controllers\AlumnoGradoController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -173,3 +174,10 @@ Route::get('/horarios/inscripcion/{id}', [InscripcionController::class, 'show'])
 Route::post('/horarios/inscripcion/guardar', [InscripcionController::class, 'store']);
 Route::put('/horarios/inscripcion/actualizar/{id}', [InscripcionController::class, 'update']);
 Route::delete('/horarios/inscripcion/eliminar/{id}', [InscripcionController::class, 'destroy']);
+
+// AlumnoGrado
+Route::get('/horarios/alumnoGrados', [AlumnoGradoController::class, 'index']);
+Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::class, 'showByAlumno']);
+Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
+Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
+Route::post('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosGrados']);

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\horarios;
+namespace App\Http\Controllers;
 
 use App\Models\AlumnoGrado;
 use App\Http\Controllers\Controller;
-use App\Services\horarios\AlumnoGradoService;
+use App\Services\AlumnoGradoService;
 use Illuminate\Http\Request;
 
 class AlumnoGradoController extends Controller
@@ -47,30 +47,34 @@ class AlumnoGradoController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/horarios/alumnoGrados/guardar",
+     *      path="/api/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}",
      *      summary="Guardar una nueva relación Alumno-Grado",
      *      description="Crea una nueva relación Alumno-Grado",
      *      operationId="guardarAlumnoGrado",
      *      tags={"AlumnoGrado"},
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/AlumnoGrado")
+     *          @OA\JsonContent(
+     *             required={"id_alumno", "id_grado"},
+     *            @OA\Property(property="id_alumno", type="integer", format="int64", example=1),
+     *           @OA\Property(property="id_grado", type="integer", format="int64", example=1)
+     *       )
      *      ),
      *      @OA\Response(
      *          response=201,
-     *          description="Relación creada correctamente",
-     *          @OA\JsonContent(ref="#/components/schemas/AlumnoGrado")
+     *          description="Relación creada correctamente"
      *      ),
      *      @OA\Response(
-     *          response=400,
+     *          response=500,
      *          description="Error al crear la relación"
      *      )
      * )
      */
-    public function store(Request $request)
+    public function store($id_alumno, $id_grado)
     {
-        return $this->alumnoGradoService->guardarAlumnoGrado($request);
+        return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);
     }
+    
 
     /**
      * @OA\Get(
@@ -100,6 +104,37 @@ class AlumnoGradoController extends Controller
     public function showByAlumno($id_alumno)
     {
         return $this->alumnoGradoService->obtenerAlumnoGradoPorIdAlumno($id_alumno);
+    }
+
+
+    /**
+     * @OA\Get(
+     *      path="/api/horarios/alumnoGrados/grado/{id_grado}",
+     *      summary="Obtener relación Alumno-Grado por ID de grado",
+     *      description="Devuelve la relación Alumno-Grado por ID de grado",
+     *      operationId="getAlumnoGradoPorIdGrado",
+     *      tags={"AlumnoGrado"},
+     *      @OA\Parameter(
+     *          name="id_grado",
+     *          in="path",
+     *          description="ID del grado",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Relación obtenida correctamente",
+     *          @OA\JsonContent(ref="#/components/schemas/AlumnoGrado")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="AlumnoGrado no encontrado"
+     *      )
+     * )
+     */
+    public function showByGrado($id_grado)
+    {
+        return $this->alumnoGradoService->obtenerAlumnoGradoPorIdGrado($id_grado);
     }
 
     /**
@@ -134,4 +169,46 @@ class AlumnoGradoController extends Controller
     {
         return $this->alumnoGradoService->eliminarAlumnoGradoPorIdAlumno($id_alumno);
     }
+
+
+
+    /**
+     * @OA\Post(
+     *      path="/api/horarios/alumnoGrados/asignar",
+     *      summary="Asignar alumnos a grados",
+     *      description="Asigna alumnos a grados",
+     *      operationId="asignarAlumnosGrados",
+     *      tags={"AlumnoGrado"},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"alumnos", "grados"},
+     *              @OA\Property(
+     *                  property="alumnos",
+     *                  type="array",
+     *                  @OA\Items(type="integer")
+     *              ),
+     *              @OA\Property(
+     *                  property="grados",
+     *                  type="array",
+     *                  @OA\Items(type="integer")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Alumnos asignados correctamente"
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Error al asignar los alumnos"
+     *      )
+     * )
+     */
+    public function asignarAlumnosGrados(Request $request){
+        $alumnos = $request->alumnos;
+        $grados = $request->grados;
+        return $this->alumnoGradoService->asignarAlumnosGrados($alumnos, $grados);
+    }
+
 }

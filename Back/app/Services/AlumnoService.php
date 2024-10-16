@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\horarios;
+namespace App\Services;
 
-use App\Repositories\horarios\AlumnoRepository;
-use App\Mappers\horarios\AlumnoMapper;
+use App\Repositories\AlumnoRepository;
+use App\Mappers\AlumnoMapper;
 use App\Models\Alumno;
 use Exception;
 use Illuminate\Support\Facades\Log;

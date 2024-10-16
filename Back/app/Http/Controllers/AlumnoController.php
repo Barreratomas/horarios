@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\alumnos;
+namespace App\Http\Controllers;
 
 use app\Models\Alumno;
 use App\Http\Controllers\Controller;
-use app\Services\horarios\AlumnoService;
+use app\Services\AlumnoService;
 use Illuminate\Http\Request;
 
 class AlumnoController extends Controller
@@ -80,7 +80,7 @@ class AlumnoController extends Controller
      *     description="Guardar un alumno",
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/AlumnoDTO")
+     *         @OA\JsonContent(ref="#/components/schemas/Alumno")
      *     ),
      *     @OA\Response(
      *         response=201,
@@ -115,7 +115,7 @@ class AlumnoController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/AlumnoDTO")
+     *         @OA\JsonContent(ref="#/components/schemas/Alumno")
      *     ),
      *     @OA\Response(
      *         response=200,

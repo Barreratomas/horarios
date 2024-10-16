@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mappers\horarios;
+namespace App\Mappers;
 
 use App\Models\Alumno;
 

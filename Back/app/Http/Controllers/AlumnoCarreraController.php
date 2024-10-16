@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\horarios;
+namespace App\Http\Controllers;
 
 use app\Models\AlumnoCarrera;
 use App\Http\Controllers\Controller;
-use App\Services\horarios\AlumnoCarreraService;
+use App\Services\AlumnoCarreraService;
 use Illuminate\Http\Request;
 
 class AlumnoCarreraController extends Controller

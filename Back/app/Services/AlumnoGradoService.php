@@ -1,20 +1,23 @@
 <?php
 
-namespace App\Services\horarios;
+namespace App\Services;
 
-use App\Repositories\horarios\AlumnoGradoRepository;
-use App\Mappers\horarios\AlumnoGradoMapper;
+use App\Http\Controllers\horarios\GradoController;
+use App\Repositories\AlumnoGradoRepository;
+use App\Mappers\AlumnoGradoMapper;
 use App\Models\AlumnoGrado;
+use App\Services\horarios\GradoService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 class AlumnoGradoService implements AlumnoGradoRepository
 {
     protected $alumnoGradoMapper;
-
-    public function __construct(AlumnoGradoMapper $alumnoGradoMapper)
+    public $gradoService;
+    public function __construct(AlumnoGradoMapper $alumnoGradoMapper, GradoService $gradoService)
     {
         $this->alumnoGradoMapper = $alumnoGradoMapper;
+        $this->gradoService = $gradoService;
     }
 
     public function obtenerTodosAlumnoGrado()
@@ -30,7 +33,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
     public function obtenerAlumnoGradoPorIdAlumno($id_alumno)
     {
-        $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->first();
+        $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->get();
         if (!$alumnoGrado) {
             return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
         }
@@ -44,7 +47,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
     public function obtenerAlumnoGradoPorIdGrado($id_grado)
     {
-        $alumnoGrado = AlumnoGrado::where('id_grado', $id_grado)->first();
+        $alumnoGrado = AlumnoGrado::where('id_grado', $id_grado)->get();
         if (!$alumnoGrado) {
             return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
         }
@@ -56,17 +59,32 @@ class AlumnoGradoService implements AlumnoGradoRepository
         }
     }
 
-    public function guardarAlumnoGrado($request)
+    
+    public function guardarAlumnoGrado($id_alumno, $id_grado)
     {
+        
+        //$gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado);
+        $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado);
+        /*
+        $grado = $gradoResponse->getData();
+        $capacidad = $grado->capacidad;
+        
+        $alumnosGrados = $this->obtenerAlumnoGradoPorIdGrado($id_grado);
+        if (count($alumnosGrados) >= $capacidad) {
+            return response()->json(['error' => 'El grado ya alcanzó su capacidad máxima'], 400);
+        }
         try {
-            $alumnoGradoData = $request->all();
-            $alumnoGradoModel = $this->alumnoGradoMapper->toAlumnoGrado($alumnoGradoData);
+            $alumnoGradoModel = $this->alumnoGradoMapper->toAlumnoGrado($id_alumno, $id_grado);
             $alumnoGradoModel->save();
             return response()->json($alumnoGradoModel, 201);
+
         } catch (Exception $e) {
             Log::error('Error al guardar el alumnoGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el alumnoGrado'], 500);
         }
+            */
+            return response()->json($gradoResponse, 201);
+        
     }
 
     public function eliminarAlumnoGradoPorIdAlumno($id_alumno)
@@ -98,4 +116,24 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'Hubo un error al eliminar el alumnoGrado'], 500);
         }
     }
+
+    //asignar todos los alumnos a sus respectivos grados.
+    public function asignarAlumnosGrados($alumnos, $grados)
+    {
+        try {
+            foreach ($alumnos as $alumno) {
+                foreach ($grados as $grado) {
+                    $alumnoGrado = new AlumnoGrado();
+                    $alumnoGrado->id_alumno = $alumno->id_alumno;
+                    $alumnoGrado->id_grado = $grado->id_grado;
+                    $alumnoGrado->save();
+                }
+            }
+            return response()->json(['success' => 'Alumnos asignados a sus respectivos grados'], 200);
+        } catch (Exception $e) {
+            Log::error('Error al asignar los alumnos a sus respectivos grados: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al asignar los alumnos a sus respectivos grados'], 500);
+        }
+    }
+
 }

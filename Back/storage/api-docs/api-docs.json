@@ -10,6 +10,910 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/horarios/alumnoCarreras": {
+            "get": {
+                "tags": [
+                    "AlumnoCarrera"
+                ],
+                "summary": "Obtener todas las relaciones Alumno-Carrera",
+                "description": "Devuelve todas las relaciones Alumno-Carrera",
+                "operationId": "getAlumnoCarreras",
+                "responses": {
+                    "200": {
+                        "description": "Relaciones obtenidas correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AlumnoCarrera"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las relaciones"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "AlumnoCarrera"
+                ],
+                "summary": "Guardar una nueva relación Alumno-Carrera",
+                "description": "Crea una nueva relación Alumno-Carrera",
+                "operationId": "guardarAlumnoCarrera",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlumnoCarrera"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Relación creada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoCarrera"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al crear la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoCarreras/{id_alumno}": {
+            "get": {
+                "tags": [
+                    "AlumnoCarrera"
+                ],
+                "summary": "Obtener relaciones Alumno-Carrera por ID de alumno",
+                "description": "Devuelve la relación Alumno-Carrera correspondiente al ID de un alumno",
+                "operationId": "getAlumnoCarreraPorIdAlumno",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoCarrera"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Relación no encontrada"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "AlumnoCarrera"
+                ],
+                "summary": "Eliminar una relación Alumno-Carrera por ID de alumno",
+                "description": "Elimina una relación Alumno-Carrera correspondiente al ID de un alumno",
+                "operationId": "eliminarAlumnoCarreraPorIdAlumno",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "Relación no encontrada"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoCarreras/{id_carrera}": {
+            "delete": {
+                "tags": [
+                    "AlumnoCarrera"
+                ],
+                "summary": "Eliminar una relación Alumno-Carrera por ID de carrera",
+                "description": "Elimina una relación Alumno-Carrera correspondiente al ID de una carrera",
+                "operationId": "eliminarAlumnoCarreraPorIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id_carrera",
+                        "in": "path",
+                        "description": "ID de la carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "Relación no encontrada"
+                    }
+                }
+            }
+        },
+        "/api/alumnos": {
+            "get": {
+                "tags": [
+                    "Alumno"
+                ],
+                "summary": "Obtener todos los alumnos",
+                "description": "Retorna un array de alumnos",
+                "operationId": "52ca0d8dad6b04f9c7e3f43eca221f9d",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener los alumnos"
+                    }
+                }
+            }
+        },
+        "/api/alumnos/{id}": {
+            "get": {
+                "tags": [
+                    "Alumno"
+                ],
+                "summary": "Obtener un alumno por ID",
+                "description": "Retorna un alumno",
+                "operationId": "f3ed84cbc12195084fe314f4c055c40e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el alumno"
+                    },
+                    "500": {
+                        "description": "Error al obtener el alumno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Alumno"
+                ],
+                "summary": "Eliminar un alumno",
+                "description": "Eliminar un alumno",
+                "operationId": "6c6ef9d7128996dfd0ee5c79ba9e4bbc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el alumno"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el alumno"
+                    }
+                }
+            }
+        },
+        "/api/alumnos/guardar": {
+            "post": {
+                "tags": [
+                    "Alumno"
+                ],
+                "summary": "Guardar un alumno",
+                "description": "Guardar un alumno",
+                "operationId": "395e74ebf2c31b90b35ffe7e6f2e3e44",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Alumno"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar el alumno"
+                    }
+                }
+            }
+        },
+        "/api/alumnos/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Alumno"
+                ],
+                "summary": "Actualizar un alumno",
+                "description": "Actualizar un alumno",
+                "operationId": "e95bdebc6296c2c49e47a9e4f039ec89",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Alumno"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el alumno"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el alumno"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados": {
+            "get": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Obtener todas las relaciones Alumno-Grado",
+                "description": "Devuelve todas las relaciones Alumno-Grado",
+                "operationId": "getAlumnoGrados",
+                "responses": {
+                    "200": {
+                        "description": "Relaciones obtenidas correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AlumnoGrado"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las relaciones"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}": {
+            "post": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Guardar una nueva relación Alumno-Grado",
+                "description": "Crea una nueva relación Alumno-Grado",
+                "operationId": "guardarAlumnoGrado",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_alumno",
+                                    "id_grado"
+                                ],
+                                "properties": {
+                                    "id_alumno": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "example": 1
+                                    },
+                                    "id_grado": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Relación creada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al crear la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados/alumno/{id_alumno}": {
+            "get": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Obtener relación Alumno-Grado por ID de alumno",
+                "description": "Devuelve la relación Alumno-Grado por ID de alumno",
+                "operationId": "getAlumnoGradoPorIdAlumno",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoGrado"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "AlumnoGrado no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados/grado/{id_grado}": {
+            "get": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Obtener relación Alumno-Grado por ID de grado",
+                "description": "Devuelve la relación Alumno-Grado por ID de grado",
+                "operationId": "getAlumnoGradoPorIdGrado",
+                "parameters": [
+                    {
+                        "name": "id_grado",
+                        "in": "path",
+                        "description": "ID del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoGrado"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "AlumnoGrado no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados/eliminar/{id_alumno}": {
+            "delete": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Eliminar una relación Alumno-Grado",
+                "description": "Elimina una relación Alumno-Grado por id_alumno",
+                "operationId": "eliminarAlumnoGrado",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "Id del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "AlumnoGrado no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoGrados/asignar": {
+            "post": {
+                "tags": [
+                    "AlumnoGrado"
+                ],
+                "summary": "Asignar alumnos a grados",
+                "description": "Asigna alumnos a grados",
+                "operationId": "asignarAlumnosGrados",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "alumnos",
+                                    "grados"
+                                ],
+                                "properties": {
+                                    "alumnos": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "grados": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Alumnos asignados correctamente"
+                    },
+                    "400": {
+                        "description": "Error al asignar los alumnos"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes": {
+            "get": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Obtener todas las relaciones Alumno-Plan",
+                "description": "Devuelve todas las relaciones Alumno-Plan",
+                "operationId": "getAlumnoPlanes",
+                "responses": {
+                    "200": {
+                        "description": "Relaciones obtenidas correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AlumnoPlan"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las relaciones"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes/guardar": {
+            "post": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Guardar una nueva relación Alumno-Plan",
+                "description": "Crea una nueva relación Alumno-Plan",
+                "operationId": "guardarAlumnoPlan",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlumnoPlan"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Relación creada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoPlan"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error al crear la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes/alumno/{id_alumno}": {
+            "get": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Obtener relación Alumno-Plan por ID de alumno",
+                "description": "Devuelve la relación Alumno-Plan por ID de alumno",
+                "operationId": "getAlumnoPlanPorIdAlumno",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "AlumnoPlan no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes/plan/{id_plan}": {
+            "get": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Obtener relación Alumno-Plan por ID de plan",
+                "description": "Devuelve la relación Alumno-Plan por ID de plan",
+                "operationId": "getAlumnoPlanPorIdPlan",
+                "parameters": [
+                    {
+                        "name": "id_plan",
+                        "in": "path",
+                        "description": "ID del plan de estudio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlumnoPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "AlumnoPlan no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes/eliminar/alumno/{id_alumno}": {
+            "delete": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Eliminar una relación Alumno-Plan por ID de alumno",
+                "description": "Elimina una relación Alumno-Plan por ID de alumno",
+                "operationId": "eliminarAlumnoPlanPorIdAlumno",
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "AlumnoPlan no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoPlanes/eliminar/plan/{id_plan}": {
+            "delete": {
+                "tags": [
+                    "AlumnoPlan"
+                ],
+                "summary": "Eliminar una relación Alumno-Plan por ID de plan",
+                "description": "Elimina una relación Alumno-Plan por ID de plan",
+                "operationId": "eliminarAlumnoPlanPorIdPlan",
+                "parameters": [
+                    {
+                        "name": "id_plan",
+                        "in": "path",
+                        "description": "ID del plan de estudio",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Relación eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "AlumnoPlan no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la relación"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC": {
+            "get": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Obtener todos los alumnosUC",
+                "description": "Retorna un array de alumnosUC",
+                "operationId": "1c2a685ca2ce6ad649ccaa192fe18b76",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener los alumnosUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC/alumno/{id}": {
+            "get": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Obtener un alumnoUC por ID de alumno",
+                "description": "Retorna un alumnoUC",
+                "operationId": "fc72a348cd011d4fc640ce72c38c9654",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "AlumnoUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al obtener el alumnoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC/uc/{id}": {
+            "get": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Obtener un alumnoUC por ID de UC",
+                "description": "Retorna un alumnoUC",
+                "operationId": "497261fe07de8c894b01c7e7a0b2143e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "AlumnoUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al obtener el alumnoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC/guardar": {
+            "post": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Guardar un alumnoUC",
+                "description": "Retorna el alumnoUC guardado",
+                "operationId": "77f3cb4ce946debc3c5aa288816d5399",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlumnoUC"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar el alumnoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC/eliminar/alumno/{id}": {
+            "delete": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Eliminar un alumnoUC por ID de alumno",
+                "description": "Retorna el alumnoUC eliminado",
+                "operationId": "211cc82821c9a1d6de9fe0704229057b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "AlumnoUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el alumnoUC"
+                    }
+                }
+            }
+        },
+        "/api/horarios/alumnoUC/eliminar/uc/{id}": {
+            "delete": {
+                "tags": [
+                    "AlumnoUC"
+                ],
+                "summary": "Eliminar un alumnoUC por ID de UC",
+                "description": "Retorna el alumnoUC eliminado",
+                "operationId": "644179ea9ea120a0a22c63cf021433ee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la UC",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "AlumnoUC no encontrada"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el alumnoUC"
+                    }
+                }
+            }
+        },
         "/api/horarios/carreraUC": {
             "get": {
                 "tags": [
@@ -3076,6 +3980,66 @@
                 },
                 "type": "object"
             },
+            "AlumnoCarrera": {
+                "title": "AlumnoCarrera",
+                "description": "Esquema del objeto AlumnoCarrera",
+                "properties": {
+                    "id_alumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    },
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "AlumnoGrado": {
+                "title": "AlumnoGrado",
+                "description": "Esquema del objeto AlumnoGrado",
+                "properties": {
+                    "id_alumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    },
+                    "id_grado": {
+                        "description": "ID del grado",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "AlumnoPlan": {
+                "title": "AlumnoPlan",
+                "description": "Esquema del objeto AlumnoPlan",
+                "properties": {
+                    "id_plan": {
+                        "description": "ID del plan",
+                        "type": "integer"
+                    },
+                    "id_alumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "AlumnoUC": {
+                "title": "AlumnoUC",
+                "description": "Esquema del objeto AlumnoUC",
+                "properties": {
+                    "id_alumno": {
+                        "description": "ID del alumno",
+                        "type": "integer"
+                    },
+                    "id_uc": {
+                        "description": "ID de la unidad curricular",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "CarreraUC": {
                 "title": "CarreraUC",
                 "description": "CarreraUC model",
@@ -3480,6 +4444,26 @@
         }
     },
     "tags": [
+        {
+            "name": "AlumnoCarrera",
+            "description": "AlumnoCarrera"
+        },
+        {
+            "name": "Alumno",
+            "description": "Alumno"
+        },
+        {
+            "name": "AlumnoGrado",
+            "description": "AlumnoGrado"
+        },
+        {
+            "name": "AlumnoPlan",
+            "description": "AlumnoPlan"
+        },
+        {
+            "name": "AlumnoUC",
+            "description": "AlumnoUC"
+        },
         {
             "name": "CarreraUC",
             "description": "CarreraUC"

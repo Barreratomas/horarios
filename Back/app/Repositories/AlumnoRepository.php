@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\horarios;
+namespace App\Repositories;
 
 interface AlumnoRepository
 {
