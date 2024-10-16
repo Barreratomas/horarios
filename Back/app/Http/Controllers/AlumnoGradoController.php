@@ -52,13 +52,19 @@ class AlumnoGradoController extends Controller
      *      description="Crea una nueva relación Alumno-Grado",
      *      operationId="guardarAlumnoGrado",
      *      tags={"AlumnoGrado"},
-     *      @OA\RequestBody(
+     *      @OA\Parameter(
+     *          name="id_alumno",
+     *          description="ID del alumno",
      *          required=true,
-     *          @OA\JsonContent(
-     *             required={"id_alumno", "id_grado"},
-     *            @OA\Property(property="id_alumno", type="integer", format="int64", example=1),
-     *           @OA\Property(property="id_grado", type="integer", format="int64", example=1)
-     *       )
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Parameter(
+     *          name="id_grado",
+     *          description="ID del grado",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
      *      ),
      *      @OA\Response(
      *          response=201,
@@ -69,7 +75,7 @@ class AlumnoGradoController extends Controller
      *          description="Error al crear la relación"
      *      )
      * )
-     */
+    */
     public function store($id_alumno, $id_grado)
     {
         return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);

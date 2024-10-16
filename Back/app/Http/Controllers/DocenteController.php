@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\horarios;
+namespace App\Http\Controllers;
 
 use App\Http\Requests\DocenteRequest;
 use App\Models\Docente;
@@ -19,74 +19,7 @@ class DocenteController extends Controller
         $this->docenteService = $docenteService;
     }
 
-    public function index()
-    {
-        $docentes = $this->docenteService->obtenerTodosDocentes();
-        return view('docente.index', compact('docentes'));
-    }
-
-    public function mostrarDocente(Request $request)
-    {
-        $dni = $request->input('dni');
-        $docente = $this->docenteService->obtenerDocentePorDni($dni);
-        
-        return view('docente.ind', compact('docente'));
-    }
-
-    public function crear(){
-        return view('docente.crearDocente');
-    }
-
-    public function store(DocenteRequest $request)
-    {
-        $dni = $request->input('dni');
-        $nombre = $request->input('nombre');
-        $apellido = $request->input('apellido');
-        $email = $request->input('email');
-       
-
-        $response = $this->docenteService->guardarDocente($dni,$nombre,$apellido,$email);
-        if (isset($response['success'])) {
-            
-
-            return redirect()->route('indexDocente')->with('success', $response['success']);
-        } else {
-            return redirect()->route('mostrarFormularioDocente')->withErrors(['error' => $response['error']]);
-        }
-    }
-
-
-public function formularioActualizar (Docente $docente)
-    {
-    return view('docente.actualizarDocente', compact('docente'));
-    }
-
-    public function actualizar(DocenteRequest $request ,Docente $docente)
-    {
-       
-        $nombre = $request->input('nombre');
-        $apellido = $request->input('apellido');
-        $email = $request->input('email');
-
-        $response = $this->docenteService->actualizarDocente($nombre,$apellido,$email, $docente);
-        if (isset($response['success'])) {
-            return redirect()->route('indexDocente')->with('success', $response['success']);
-        } else {
-            return redirect()->route('indexDocente')->withErrors(['error' => $response['error']]);
-        }
-    }
-
-    public function eliminar( Docente $docente)
-    {
-        
-        $response = $this->docenteService->eliminarDocente($docente);
-        if (isset($response['success'])) {
-            return redirect()->route('indexDocente')->with('success', $response['success']);
-        } else {
-            return redirect()->route('indexDocente')->withErrors(['error' => $response['error']]);
-        }
-    }
-
+    
     //------------------------------------------------------------------------------------------------------------------
     // Swagger
 
@@ -113,7 +46,7 @@ public function formularioActualizar (Docente $docente)
      */
     public function inicio()
     {
-        return $this->docenteService->obtenerDocente();
+        return $this->docenteService->obtenerTodosLosDocente();
     }
 
     /**
@@ -161,7 +94,7 @@ public function formularioActualizar (Docente $docente)
      *     operationId="guardarDocente",
      *     @OA\RequestBody(
      *     required=true,
-     *     @OA\JsonContent(ref="#/components/schemas/Docente")
+     *     @OA\JsonContent(ref="#/components/schemas/DocenteDTO")
      * ),
      *     @OA\Response(
      *     response=200,
@@ -173,7 +106,7 @@ public function formularioActualizar (Docente $docente)
      * )
      * )
      */
-        public function guardarDocentes(Request $request)
+    public function guardarDocentes(Request $request)
     {
         $docente = $request->all();
         return $this->docenteService->guardarDocentes($docente);
@@ -197,7 +130,7 @@ public function formularioActualizar (Docente $docente)
      * ),
      *     @OA\RequestBody(
      *     required=true,
-     *     @OA\JsonContent(ref="#/components/schemas/Docente")
+     *     @OA\JsonContent(ref="#/components/schemas/DocenteDTO")
      * ),
      *     @OA\Response(
      *     response=200,

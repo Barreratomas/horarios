@@ -20,6 +20,7 @@ use App\Http\Controllers\horarios\UnidadCurricularController;
 use App\Http\Controllers\CarreraUCController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\AlumnoGradoController;
+use App\Http\Controllers\DocenteController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -181,3 +182,10 @@ Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::
 Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
 Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
 Route::post('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosGrados']);
+
+// Docente
+Route::get('/horarios/docentes', [DocenteController::class, 'index']);
+Route::get('/horarios/docentes/{id}', [DocenteController::class, 'show']);
+Route::post('/horarios/docentes/guardar', [DocenteController::class, 'store']);
+Route::put('/horarios/docentes/actualizar/{id}', [DocenteController::class, 'update']);
+Route::delete('/horarios/docentes/eliminar/{id}', [DocenteController::class, 'destroy']);

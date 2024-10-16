@@ -352,32 +352,26 @@
                 "summary": "Guardar una nueva relación Alumno-Grado",
                 "description": "Crea una nueva relación Alumno-Grado",
                 "operationId": "guardarAlumnoGrado",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id_alumno",
-                                    "id_grado"
-                                ],
-                                "properties": {
-                                    "id_alumno": {
-                                        "type": "integer",
-                                        "format": "int64",
-                                        "example": 1
-                                    },
-                                    "id_grado": {
-                                        "type": "integer",
-                                        "format": "int64",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "parameters": [
+                    {
+                        "name": "id_alumno",
+                        "in": "path",
+                        "description": "ID del alumno",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "id_grado",
+                        "in": "path",
+                        "description": "ID del grado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "201": {
                         "description": "Relación creada correctamente"
@@ -1110,6 +1104,175 @@
                 }
             }
         },
+        "/api/docentes": {
+            "get": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Obtener todos los docentes",
+                "description": "Devuelve todos los docentes",
+                "operationId": "obtenerDocente",
+                "responses": {
+                    "200": {
+                        "description": "Docentes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Docente"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los docentes"
+                    }
+                }
+            }
+        },
+        "/api/docentes/{id}": {
+            "get": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Obtener docente por dni",
+                "description": "Devuelve un docente",
+                "operationId": "obtenerDocentePorDni",
+                "parameters": [
+                    {
+                        "name": "dni",
+                        "in": "path",
+                        "description": "DNI del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Docente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Docente"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al obtener el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/guardar": {
+            "post": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Guardar docente",
+                "description": "Guarda un docente",
+                "operationId": "guardarDocente",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocenteDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Docente guardado correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Actualizar docente",
+                "description": "Actualiza un docente",
+                "operationId": "actualizarDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DocenteDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Docente actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Eliminar docente",
+                "description": "Elimina un docente",
+                "operationId": "eliminarDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Docente eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el docente"
+                    }
+                }
+            }
+        },
         "/api/horarios/inscripcion": {
             "get": {
                 "tags": [
@@ -1324,6 +1487,159 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/localidades": {
+            "get": {
+                "tags": [
+                    "Localidad"
+                ],
+                "summary": "Obtener todas las localidades",
+                "description": "Retorna un array de localidades",
+                "operationId": "5c195544324d41e68d5f85a38d2c46b4",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener las localidades"
+                    }
+                }
+            }
+        },
+        "/api/localidades/{id}": {
+            "get": {
+                "tags": [
+                    "Localidad"
+                ],
+                "summary": "Obtener una localidad por ID",
+                "description": "Retorna una localidad",
+                "operationId": "013c9d8a8336da54898d3f1db44b1347",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la localidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la localidad"
+                    },
+                    "500": {
+                        "description": "Error al obtener la localidad"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Localidad"
+                ],
+                "summary": "Eliminar una localidad",
+                "description": "Eliminar una localidad",
+                "operationId": "84a9c258329a6715ae472340296dd61d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la localidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la localidad"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la localidad"
+                    }
+                }
+            }
+        },
+        "/api/localidades/guardar": {
+            "post": {
+                "tags": [
+                    "Localidad"
+                ],
+                "summary": "Guardar una localidad",
+                "description": "Guardar una localidad",
+                "operationId": "c8b220786cb6d930a8838e82ad9fe9e5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocalidadDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar la localidad"
+                    }
+                }
+            }
+        },
+        "/api/localidades/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Localidad"
+                ],
+                "summary": "Actualizar una localidad",
+                "description": "Actualizar una localidad",
+                "operationId": "3258aca77feda7b0b31fe52b3d55f5e9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la localidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LocalidadDTO"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la localidad"
+                    },
+                    "500": {
+                        "description": "Error al actualizar la localidad"
                     }
                 }
             }
@@ -1974,175 +2290,6 @@
                     },
                     "500": {
                         "description": "Error al eliminar la disponibilidad"
-                    }
-                }
-            }
-        },
-        "/api/docentes": {
-            "get": {
-                "tags": [
-                    "Docente"
-                ],
-                "summary": "Obtener todos los docentes",
-                "description": "Devuelve todos los docentes",
-                "operationId": "obtenerDocente",
-                "responses": {
-                    "200": {
-                        "description": "Docentes",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Docente"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error al obtener los docentes"
-                    }
-                }
-            }
-        },
-        "/api/docentes/{id}": {
-            "get": {
-                "tags": [
-                    "Docente"
-                ],
-                "summary": "Obtener docente por dni",
-                "description": "Devuelve un docente",
-                "operationId": "obtenerDocentePorDni",
-                "parameters": [
-                    {
-                        "name": "dni",
-                        "in": "path",
-                        "description": "DNI del docente",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Docente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Docente"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Docente no encontrado"
-                    },
-                    "500": {
-                        "description": "Error al obtener el docente"
-                    }
-                }
-            }
-        },
-        "/api/docentes/guardar": {
-            "post": {
-                "tags": [
-                    "Docente"
-                ],
-                "summary": "Guardar docente",
-                "description": "Guarda un docente",
-                "operationId": "guardarDocente",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Docente"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Docente guardado correctamente"
-                    },
-                    "500": {
-                        "description": "Error al guardar el docente"
-                    }
-                }
-            }
-        },
-        "/api/docentes/actualizar/{id}": {
-            "put": {
-                "tags": [
-                    "Docente"
-                ],
-                "summary": "Actualizar docente",
-                "description": "Actualiza un docente",
-                "operationId": "actualizarDocente",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID del docente",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Docente"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Docente actualizado correctamente"
-                    },
-                    "404": {
-                        "description": "Docente no encontrado"
-                    },
-                    "500": {
-                        "description": "Error al actualizar el docente"
-                    }
-                }
-            }
-        },
-        "/api/docentes/eliminar/{id}": {
-            "delete": {
-                "tags": [
-                    "Docente"
-                ],
-                "summary": "Eliminar docente",
-                "description": "Elimina un docente",
-                "operationId": "eliminarDocente",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID del docente",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Docente eliminado correctamente"
-                    },
-                    "404": {
-                        "description": "Docente no encontrado"
-                    },
-                    "500": {
-                        "description": "Error al eliminar el docente"
                     }
                 }
             }
@@ -3780,6 +3927,53 @@
                 },
                 "type": "object"
             },
+            "DocenteDTO": {
+                "title": "DocenteDTO",
+                "description": "DTO para un docente",
+                "properties": {
+                    "dni": {
+                        "description": "DNI del docente",
+                        "type": "string"
+                    },
+                    "nombre": {
+                        "description": "Nombre del docente",
+                        "type": "string"
+                    },
+                    "apellido": {
+                        "description": "Apellido del docente",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email del docente",
+                        "type": "string"
+                    },
+                    "telefono": {
+                        "description": "Telefono del docente",
+                        "type": "string"
+                    },
+                    "genero": {
+                        "description": "Genero del docente",
+                        "type": "string"
+                    },
+                    "fecha_nac": {
+                        "description": "Fecha de nacimiento del docente",
+                        "type": "string"
+                    },
+                    "nacionalidad": {
+                        "description": "Nacionalidad del docente",
+                        "type": "string"
+                    },
+                    "direccion": {
+                        "description": "Direccion del docente",
+                        "type": "string"
+                    },
+                    "id_localidad": {
+                        "description": "Id de la localidad del docente",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "GradoDTO": {
                 "title": "GradoDTO",
                 "description": "GradoDTO model",
@@ -3826,6 +4020,17 @@
                     "idGrado": {
                         "description": "ID del grado",
                         "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "LocalidadDTO": {
+                "title": "LocalidadDTO",
+                "description": "DTO para una localidad",
+                "properties": {
+                    "localidad": {
+                        "description": "Nombre de la localidad",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -4130,6 +4335,21 @@
                     "id_grado": {
                         "description": "ID del grado",
                         "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Localidad": {
+                "title": "Localidad",
+                "description": "Esquema del objeto Localidad",
+                "properties": {
+                    "id_localidad": {
+                        "description": "ID de la localidad",
+                        "type": "integer"
+                    },
+                    "localidad": {
+                        "description": "Nombre de la localidad",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -4469,8 +4689,16 @@
             "description": "CarreraUC"
         },
         {
+            "name": "Docente",
+            "description": "Docente"
+        },
+        {
             "name": "Inscripcion",
             "description": "Inscripcion"
+        },
+        {
+            "name": "Localidad",
+            "description": "Localidad"
         },
         {
             "name": "Aula",
@@ -4487,10 +4715,6 @@
         {
             "name": "Disponibilidad",
             "description": "Disponibilidad"
-        },
-        {
-            "name": "Docente",
-            "description": "Docente"
         },
         {
             "name": "DocenteUC",
