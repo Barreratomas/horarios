@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom'; // Para redirigir después de la creación
 
 const CrearHorarioPrevio = () => {
   const [profesores, setProfesores] = useState([]);
@@ -8,12 +8,12 @@ const CrearHorarioPrevio = () => {
   const [horarios, setHorarios] = useState([{ dia: '', hora: '' }]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
+  const { routes } = useOutletContext();
   // Obtener la lista de profesores al cargar el componente
   useEffect(() => {
     const obtenerProfesores = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/profesores', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/docentes', {
           headers: { Accept: 'application/json' }
         });
 
@@ -59,26 +59,33 @@ const CrearHorarioPrevio = () => {
   // Manejar el envío del formulario
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrors({}); // Reiniciar errores
 
-    const formData = new FormData();
-    formData.append('docente', docenteSeleccionado);
-    formData.append('trabajaInstitucion', trabajaInstitucion);
-    formData.append('horarios', JSON.stringify(horarios));
+    // Crear la matriz de horarios
+    const horariosMatrix = horarios.map((horario) => [horario.dia, horario.hora]);
+
+    const dataToSend = {
+      id_docente: docenteSeleccionado,
+      horarios: horariosMatrix
+    };
 
     try {
-      const response = await fetch('/api/storeHPD/', {
+      const response = await fetch('http://127.0.0.1:8000/api/storeHPD/', {
         method: 'POST',
-        body: formData,
         headers: {
+          'Content-Type': 'application/json',
           'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-        }
+        },
+        body: JSON.stringify(dataToSend)
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setErrors(errorData.errors || {});
+        setErrors(errorData.errors || {}); // Manejar errores de validación
       } else {
-        navigate('/ruta-deseada'); // Redirige después de la creación
+        navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`, {
+          state: { successMessage: 'Horario previo del docente creado con éxito' }
+        });
       }
     } catch (error) {
       console.error('Error al crear el horario:', error);
@@ -89,12 +96,25 @@ const CrearHorarioPrevio = () => {
     <div className="container py-3">
       <h2>Crear Horario Previo</h2>
 
+      <style>
+        {`
+          select.form-control {
+            background-color: white; /* Fondo blanco para mayor visibilidad */
+            color: black; /* Texto negro */
+          }
+          select.form-control option {
+            background-color: white; /* Fondo blanco para las opciones */
+            color: black; /* Texto negro para las opciones */
+          }
+        `}
+      </style>
+
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="docente">Seleccione un docente:</label>
           <select
             id="docente"
-            className="form-control"
+            className="form-control h_p_d_select"
             value={docenteSeleccionado}
             onChange={handleDocenteChange}
             required
@@ -110,6 +130,10 @@ const CrearHorarioPrevio = () => {
 
         {docenteSeleccionado && (
           <>
+            <p>
+              Docente seleccionado: {profesores.find((p) => p.id === docenteSeleccionado)?.nombre}
+            </p>
+
             <div className="mb-3">
               <label>¿Trabaja en otra institución?</label>
               <br />
@@ -170,7 +194,7 @@ const CrearHorarioPrevio = () => {
 
         <br />
         <button type="submit" className="btn btn-primary" disabled={!docenteSeleccionado}>
-          Siguiente
+          Crear
         </button>
       </form>
 

@@ -19,6 +19,14 @@ form {
     width: 100%;
     margin: auto;
 }
+.h_p_d_select{
+    color: black;
+  
+  }
+  
+  select.form-control option {
+    color: black; 
+  }
 
 label {
     display: block;
