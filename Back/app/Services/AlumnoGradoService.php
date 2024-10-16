@@ -7,13 +7,14 @@ use App\Repositories\AlumnoGradoRepository;
 use App\Mappers\AlumnoGradoMapper;
 use App\Models\AlumnoGrado;
 use App\Services\horarios\GradoService;
+use App\Models\horarios\Grado;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 class AlumnoGradoService implements AlumnoGradoRepository
 {
     protected $alumnoGradoMapper;
-    public $gradoService;
+    protected $gradoService;
     public function __construct(AlumnoGradoMapper $alumnoGradoMapper, GradoService $gradoService)
     {
         $this->alumnoGradoMapper = $alumnoGradoMapper;
@@ -59,17 +60,18 @@ class AlumnoGradoService implements AlumnoGradoRepository
         }
     }
 
-    
+
     public function guardarAlumnoGrado($id_alumno, $id_grado)
     {
-        
-        //$gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado);
+
         $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado);
-        /*
         $grado = $gradoResponse->getData();
         $capacidad = $grado->capacidad;
-        
-        $alumnosGrados = $this->obtenerAlumnoGradoPorIdGrado($id_grado);
+
+        $alumnosGrados = $this->obtenerAlumnoGradoPorIdGrado($id_grado)->original;
+        //Log::info('Alumnos en el grado: ' . $capacidad . ' ' . json_encode($alumnosGrados));
+        //Log::info('Count:' . count($alumnosGrados->original));
+
         if (count($alumnosGrados) >= $capacidad) {
             return response()->json(['error' => 'El grado ya alcanzó su capacidad máxima'], 400);
         }
@@ -82,9 +84,8 @@ class AlumnoGradoService implements AlumnoGradoRepository
             Log::error('Error al guardar el alumnoGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el alumnoGrado'], 500);
         }
-            */
-            return response()->json($gradoResponse, 201);
         
+
     }
 
     public function eliminarAlumnoGradoPorIdAlumno($id_alumno)

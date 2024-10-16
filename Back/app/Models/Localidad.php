@@ -6,6 +6,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
+
+/**
+ * @OA\Schema(
+ *     schema="Localidad",
+ *     title="Localidad",
+ *     description="Esquema del objeto Localidad",
+ *     @OA\Property(
+ *         property="id_localidad",
+ *         type="integer",
+ *         description="ID de la localidad"
+ *     ),
+ *     @OA\Property(
+ *         property="localidad",
+ *         type="string",
+ *         description="Nombre de la localidad"
+ *     )
+ * )
+ */
 class Localidad extends Model
 {
     use HasFactory;
@@ -13,6 +32,8 @@ class Localidad extends Model
     protected $fillable = ['id_localidad', 'localidad'];
     protected $table = 'localidad';
     protected $primaryKey = 'id_localidad';
+
+    public $autoincrement = false; 
 
     public $timestamps = false; 
 

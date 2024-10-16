@@ -81,6 +81,8 @@ class Docente extends Model
     protected $fillable = ['DNI', 'nombre', 'apellido', 'email', 'telefono', 'genero', 'fecha_nac', 'nacionalidad', 'direccion', 'id_localidad'];
     protected $table = 'docente';
     protected $primaryKey = 'id_docente';
+    public $incrementing = true;
+    public $timestamps = false;
 
     // Un docente pertenece a una localidad
     public function localidad():BelongsTo{
