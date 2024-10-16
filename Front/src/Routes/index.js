@@ -27,7 +27,7 @@ import ActualizarMateria from '../horarios/Screens/materia/actualizarMateria';
 import Comisiones from '../horarios/Screens/comision';
 import CrearComision from '../horarios/Screens/comision/crearComision';
 import ActualizarComision from '../horarios/Screens/comision/actualizarComision';
-import Asignaciones from '../horarios/Screens/asignacion';
+// import Asignaciones from '../horarios/Screens/asignacion';
 import CrearHorarioPrevio from '../horarios/Screens/horarioPrevioDocente/crearHorarioPrevio';
 import ActualizarHorarioPrevio from '../horarios/Screens/horarioPrevioDocente/actualizarHorarioPrevioDocente';
 import Horario from '../horarios/Screens/horario/index';
@@ -43,6 +43,7 @@ import ActualizarPlan from '../horarios/Screens/plan_estudio/actualizarPlan';
 import PlanCarrera from '../horarios/Screens/carrera/verPlanCarrera';
 import AsignacionAlumno from '../horarios/Screens/asignacion alumno';
 import ActualizarAsignarAlumno from '../horarios/Screens/asignacion alumno/actualizarAsignacionAlumno';
+import HorarioPrevio from '../horarios/Screens/comision';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
@@ -102,14 +103,15 @@ const RoutesLanding = () => {
           path={routes.comisiones.actualizar(':comisionId')}
           element={<ActualizarComision />}
         />
-        {/* Asignaciones */}
-        <Route path={routes.asignaciones} element={<Asignaciones />} />
+
         {/* Horario previo docente */}
-        <Route path={routes.crearHorarioPrevio(':dni')} element={<CrearHorarioPrevio />} />
+        <Route path={routes.horariosPreviosDocente.main} element={<HorarioPrevio />} />
+        <Route path={routes.horariosPreviosDocente.crear} element={<CrearHorarioPrevio />} />
         <Route
-          path={routes.actualizarHorarioPrevio(':hpdId', ':dmId')}
+          path={routes.horariosPreviosDocente.actualizarHorarioPrevio(':hpdId')}
           element={<ActualizarHorarioPrevio />}
         />
+
         {/* Planilla */}
         <Route path={routes.planilla.alumnos} element={<Horario />} />
         <Route path={routes.planilla.bedelia} element={<HorarioBedelia />} />
@@ -125,6 +127,9 @@ const RoutesLanding = () => {
           path={routes.asignacionesAlumno.actualizar(':alummnoId')}
           element={<ActualizarAsignarAlumno />}
         />
+        {/* disponibilidad */}
+        <Route path={routes.disponibilidad.main} element={<Planes />} />
+        {/* <Route path={routes.planes.actualizar(':planId')} element={<ActualizarPlan />} /> */}
       </Route>
     </Routes>
   );

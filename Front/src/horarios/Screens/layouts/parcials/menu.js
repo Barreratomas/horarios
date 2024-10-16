@@ -158,15 +158,25 @@ const Menu = () => {
                   <li className="nav-item">
                     <button
                       className="nav-link"
-                      onClick={() => navigate(`${routes.base}/${routes.asignaciones}`)}
+                      onClick={() =>
+                        navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`)
+                      }
                     >
-                      Asignacion docentes
+                      horario previo del docente
                     </button>
                   </li>
                   <li className="nav-item">
                     <button
                       className="nav-link"
-                      onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno}`)}
+                      onClick={() => navigate(`${routes.base}/${routes.disponibilidad.main}`)}
+                    >
+                      asignaciones del docente
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.main}`)}
                     >
                       Asignacion alumnos
                     </button>

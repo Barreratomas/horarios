@@ -23,13 +23,19 @@ export const getRoutes = () => ({
     crear: 'comisiones/crear',
     actualizar: (comisionId) => `comisiones/actualizar/${comisionId}`
   },
-  asignaciones: 'asignaciones',
-  crearHorarioPrevio: (dni) => `crear-horario-previo/${dni}`,
-  actualizarHorarioPrevio: (hpdId, dmId) => `actualizar-horario-previo/${hpdId}/${dmId}`,
+  horariosPreviosDocente: {
+    main: 'horarios-previos-docentes',
+    crear: 'horarios-previos-docentes/crear',
+    actualizarHorarioPrevio: (hpdId) => `horarios-previos-docentes/actualizar/${hpdId}`
+  },
   planilla: {
     alumnos: 'planilla-alumnos',
     bedelia: 'planilla-bedelia',
     docente: 'planilla-docente'
+  },
+  disponibilidad: {
+    main: 'disponibilidad'
+    // actualizar: (planId) => `planes/actualizar/${planId}` a espera de decision de como llevar a cabo
   },
   planes: {
     main: 'planes',

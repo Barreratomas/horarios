@@ -1,80 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 
-const Comisiones = () => {
+const HorarioPrevio = () => {
   const navigate = useNavigate();
-  const { routes } = useOutletContext();
-  const location = useLocation();
+  const { routes } = useOutletContext(); // Acceder a las rutas definidas
+  const location = useLocation(); // Obtener ubicación actual para manejar el estado de navegación
 
-  const [loading, setLoading] = useState(true); // Manejar estado de carga
-  const [serverUp, setServerUp] = useState(false); // Estado del servidor
-
-  const [comisiones, setComisiones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [serverUp, setServerUp] = useState(false);
+  const [horarios, setHorarios] = useState([]);
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
 
+  // Efecto para manejar la carga inicial y los mensajes de éxito
   useEffect(() => {
     if (location.state && location.state.successMessage) {
       setSuccessMessage(location.state.successMessage);
 
-      setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3s
+      setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3 segundos
 
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500); // Limpiar estado de navegación
+        navigate(location.pathname, { replace: true }); // Limpiar el estado de navegación
+      }, 3500);
     }
 
-    const fetchComisiones = async () => {
+    const fetchHorarios = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/grados', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios_previos', {
           headers: { Accept: 'application/json' }
         });
 
-        if (!response.ok) throw new Error('Error al obtener comisiones');
+        if (!response.ok) throw new Error('Error al obtener horarios previos');
 
         const data = await response.json();
-        setComisiones(data);
+        setHorarios(data);
         setServerUp(true);
       } catch (error) {
-        console.error('Error al obtener comisiones:', error);
+        console.error('Error al obtener horarios previos:', error);
         setErrors([error.message || 'Servidor fuera de servicio...']);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchComisiones();
+    fetchHorarios();
   }, [location.state, navigate, location.pathname]);
 
-  const handleDelete = async (id_comision) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta comisión?')) return;
+  // Función para eliminar un horario previo
+  const handleDelete = async (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este horario?')) return;
 
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/grados/eliminar/${id_comision}`,
-        {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios_previos/${id}`, {
+        method: 'DELETE'
+      });
 
-      if (!response.ok) throw new Error('Error al eliminar la comisión');
+      if (!response.ok) throw new Error('Error al eliminar el horario');
 
-      setComisiones(comisiones.filter((comision) => comision.id_grado !== id_comision));
-      setSuccessMessage('Comisión eliminada correctamente');
+      setHorarios(horarios.filter((horario) => horario.id !== id));
+      setSuccessMessage('Horario eliminado correctamente');
 
-      setTimeout(() => setHideMessage(true), 3000);
+      setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3 segundos
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
-        navigate(location.pathname, { replace: true });
+        navigate(location.pathname, { replace: true }); // Limpiar navegación
       }, 3500);
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar la comisión']);
+      console.error('Error al eliminar horario:', error);
+      setErrors([error.message || 'Error al eliminar el horario']);
     }
   };
 
@@ -84,12 +82,14 @@ const Comisiones = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container py-3">
+          <h2>Horarios Previos</h2>
+
           <div className="row align-items-center justify-content-center">
             <div className="col-6 text-center">
               <button
                 type="button"
                 className="btn btn-primary me-2"
-                onClick={() => navigate(`${routes.base}/${routes.comisiones.crear}`)}
+                onClick={() => navigate(`${routes.base}/${routes.horariosPrevios.crear}`)}
                 style={{ display: 'inline-block', marginRight: '10px' }}
               >
                 Crear
@@ -98,9 +98,9 @@ const Comisiones = () => {
           </div>
 
           <div className="container">
-            {comisiones.map((comision) => (
+            {horarios.map((horario) => (
               <div
-                key={comision.id_grado}
+                key={horario.id}
                 style={{
                   border: '1px solid #ccc',
                   borderRadius: '5px',
@@ -109,18 +109,16 @@ const Comisiones = () => {
                   width: '30vw'
                 }}
               >
-                <p>
-                  Grado: {comision.grado}° {comision.division}
-                </p>
-                <p>Detalle: {comision.detalle}</p>
-                <p>Capacidad: {comision.capacidad}</p>
+                <p>Docente: {horario.docente_nombre}</p>
+                <p>Día: {horario.dia}</p>
+                <p>Hora: {horario.hora}</p>
 
                 <div className="botones">
                   <button
                     type="button"
                     className="btn btn-primary me-2"
                     onClick={() =>
-                      navigate(`${routes.base}/${routes.comisiones.actualizar(comision.id_grado)}`)
+                      navigate(`${routes.base}/${routes.horariosPrevios.actualizar(horario.id)}`)
                     }
                     style={{ display: 'inline-block', marginRight: '10px' }}
                   >
@@ -130,7 +128,7 @@ const Comisiones = () => {
                   <button
                     type="button"
                     className="btn btn-danger"
-                    onClick={() => handleDelete(comision.id_grado)}
+                    onClick={() => handleDelete(horario.id)}
                   >
                     Eliminar
                   </button>
@@ -162,4 +160,4 @@ const Comisiones = () => {
   );
 };
 
-export default Comisiones;
+export default HorarioPrevio;
