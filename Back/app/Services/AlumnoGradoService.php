@@ -10,7 +10,11 @@ use App\Models\AlumnoGrado;
 use App\Services\horarios\GradoService;
 use App\Models\horarios\Grado;
 use App\Models\AlumnoUC;
+use App\Models\horarios\CarreraPlan;
+use App\Models\horarios\GradoUC;
+use App\Models\horarios\PlanEstudio;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AlumnoGradoService implements AlumnoGradoRepository
@@ -81,13 +85,10 @@ class AlumnoGradoService implements AlumnoGradoRepository
             $alumnoGradoModel = $this->alumnoGradoMapper->toAlumnoGrado($id_alumno, $id_grado);
             $alumnoGradoModel->save();
             return response()->json($alumnoGradoModel, 201);
-
         } catch (Exception $e) {
             Log::error('Error al guardar el alumnoGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el alumnoGrado'], 500);
         }
-        
-
     }
 
     public function eliminarAlumnoGradoPorIdAlumno($id_alumno)
@@ -123,27 +124,70 @@ class AlumnoGradoService implements AlumnoGradoRepository
     //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
     public function asignarAlumnosACarreras()
     {
-        // Pasamos primero de alumno_uc a unidadCurricular
-        $alumnosUC = AlumnoUC::all();
-        $ucsPlan = UCPlan::all();
+        $alumnosUC = AlumnoUC::all();   // Relación alumnos con UCs
+        $ucsPlan = UCPlan::all();        // Relación UCs con Planes
+        $carrerasPlan = CarreraPlan::all();  // Relación Planes con Carreras
+        $gradoUC = GradoUC::all();  // Relación entre grados y UCs
 
+        $dataToInsertAlumnoCarrera = [];
+        $dataToInsertAlumnoGrado = [];  // Para asociar alumnos con grados
+
+        // Recorrer los alumnosUC y sus relaciones
         foreach ($alumnosUC as $alumnoUC) {
             $id_alumno = $alumnoUC->id_alumno;
             $id_uc = $alumnoUC->id_uc;
-            $id_carrera = $id_uc->id_plan->id_carrera;
-            Log::info('Alumno: ' . $id_alumno . ' UC: ' . $id_uc . ' Carrera: ' . $id_carrera);
 
-            
-/*
-            $alumnoGrado = new AlumnoGrado();
-            $alumnoGrado->id_alumno = $id_alumno;
-            $alumnoGrado->id_grado = $id_uc;
-            $alumnoGrado->save();
-            */
+            // Buscar el id_plan relacionado con el id_uc
+            $ucPlan = $ucsPlan->firstWhere('id_uc', $id_uc);
+
+            if ($ucPlan) {
+                $id_plan = $ucPlan->id_plan;
+                Log::info("Plan para UC $id_uc: $id_plan");
+
+                // Buscar la carrera relacionada con ese plan
+                $carreraPlan = $carrerasPlan->firstWhere('id_plan', $id_plan);
+
+                if ($carreraPlan) {
+                    $id_carrera = $carreraPlan->id_carrera;
+                    Log::info("Carrera para Plan $id_plan: $id_carrera");
+
+                    // Almacenar los datos para insertar en alumno_carrera
+                    $dataToInsertAlumnoCarrera[] = [
+                        'id_alumno' => $id_alumno,
+                        'id_carrera' => $id_carrera
+                    ];
+
+                    // Buscar el grado asociado a la UC del alumno
+                    $gradoUCEntry = $gradoUC->firstWhere('id_uc', $id_uc);
+
+                    if ($gradoUCEntry) {
+                        $id_grado = $gradoUCEntry->id_grado;
+                        Log::info("Grado para UC $id_uc: $id_grado");
+
+                        // Crear una nueva instancia de AlumnoGrado y guardarla
+                        AlumnoGrado::create([
+                            'id_alumno' => $id_alumno,
+                            'id_grado' => $id_grado
+                        ]);
+
+                        Log::info("Alumno $id_alumno asignado al grado $id_grado.");
+                    } else {
+                        Log::warning("No se encontró grado para UC: $id_uc");
+                    }
+                } else {
+                    Log::warning("No se encontró carrera para Plan: $id_plan");
+                }
+            } else {
+                Log::warning("No se encontró plan para UC: $id_uc");
+            }
         }
-        
 
-
+        // Insertar en la tabla alumno_carrera (aquí mantenemos la inserción en bloque)
+        if (!empty($dataToInsertAlumnoCarrera)) {
+            DB::table('alumno_carrera')->insert($dataToInsertAlumnoCarrera);
+            Log::info("Datos insertados en la tabla alumno_carrera correctamente.");
+        } else {
+            Log::warning("No se encontraron datos para insertar en alumno_carrera.");
+        }
     }
-
 }

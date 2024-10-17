@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 const Comisiones = () => {
   const navigate = useNavigate();
   const { routes } = useOutletContext(); // Acceder a las rutas definidas
-  const location = useLocation(); // Obtener ubicación actual para manejar el estado de navegación
+  const location = useLocation(); // Manejar el estado de navegación
 
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
@@ -30,7 +30,7 @@ const Comisiones = () => {
     const fetchGrados = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/grados', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrado', {
           headers: { Accept: 'application/json' }
         });
 
@@ -55,7 +55,7 @@ const Comisiones = () => {
     if (!window.confirm('¿Estás seguro de eliminar este grado?')) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/${id}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/eliminar/${id}`, {
         method: 'DELETE'
       });
 
@@ -64,11 +64,11 @@ const Comisiones = () => {
       setGrados(grados.filter((grado) => grado.id_grado !== id));
       setSuccessMessage('Grado eliminado correctamente');
 
-      setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3 segundos
+      setTimeout(() => setHideMessage(true), 3000);
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
-        navigate(location.pathname, { replace: true }); // Limpiar navegación
+        navigate(location.pathname, { replace: true });
       }, 3500);
     } catch (error) {
       console.error('Error al eliminar grado:', error);
@@ -96,9 +96,9 @@ const Comisiones = () => {
           </div>
 
           <div className="container">
-            {grados.map((grado) => (
+            {grados.map(({ id_grado, id_carrera, carrera, grado }) => (
               <div
-                key={grado.id_grado}
+                key={`${id_grado}-${id_carrera}`} // Key única combinada
                 style={{
                   border: '1px solid #ccc',
                   borderRadius: '5px',
@@ -107,6 +107,8 @@ const Comisiones = () => {
                   width: '30vw'
                 }}
               >
+                <h5>Carrera: {carrera.carrera}</h5>
+                <p>Cupo: {carrera.cupo}</p>
                 <p>Grado: {grado.grado}</p>
                 <p>División: {grado.division}</p>
                 <p>Detalle: {grado.detalle}</p>
@@ -117,7 +119,7 @@ const Comisiones = () => {
                     type="button"
                     className="btn btn-primary me-2"
                     onClick={() =>
-                      navigate(`${routes.base}/${routes.comisiones.actualizar(grado.id_grado)}`)
+                      navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
                     }
                     style={{ display: 'inline-block', marginRight: '10px' }}
                   >
@@ -127,7 +129,7 @@ const Comisiones = () => {
                   <button
                     type="button"
                     className="btn btn-danger"
-                    onClick={() => handleDelete(grado.id_grado)}
+                    onClick={() => handleDelete(id_grado)}
                   >
                     Eliminar
                   </button>
