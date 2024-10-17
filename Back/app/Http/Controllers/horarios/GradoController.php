@@ -109,13 +109,15 @@ class GradoController extends Controller
      */
     public function store(GradoRequest $request)
     {
-        return $this->gradoService->guardarGrados($request);
+        $gradoResponse = $this->gradoService->guardarGrados($request);
+        $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
 
-        $grado = $request->validated();
+        
+
         $id_carrera = $request->input('id_carrera');
 
 
-        $this->carreraGradoService->crearCarreraGrado($id_carrera, $grado->id);
+        $this->carreraGradoService->crearCarreraGrado($id_carrera, $grado->id_grado);
         return response()->json(['message' => 'Grado creado y asignado a carrera exitosamente', 'data' => $grado], 201);
 
     }
