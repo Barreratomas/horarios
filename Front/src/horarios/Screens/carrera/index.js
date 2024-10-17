@@ -24,10 +24,9 @@ const Carreras = () => {
 
       // Limpiar después de la transición
       setTimeout(() => {
-        setSuccessMessage(''); // Eliminar el mensaje después de la transición
-        setHideMessage(false); // Resetear para la próxima vez
+        setSuccessMessage('');
+        setHideMessage(false);
 
-        // navegamos a la misma ruta sin estado para limpiar el location.state
         navigate(location.pathname, { replace: true }); // Reemplaza la entrada en el historial para no tener el state
       }, 3500);
     }
@@ -142,10 +141,7 @@ const Carreras = () => {
         <h1>Este módulo no está disponible en este momento</h1>
       )}
 
-      <div
-        id="messages-container"
-        className={`container ${hideMessage ? 'hide-messages' : ''}`} // Corregido: Comillas para el template string
-      >
+      <div id="messages-container" className={`container ${hideMessage ? 'hide-messages' : ''}`}>
         {errors.length > 0 && (
           <div className="alert alert-danger">
             <ul>

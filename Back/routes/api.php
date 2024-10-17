@@ -135,6 +135,7 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 Route::get('/horarios/crear-horario', [HorarioController::class, 'store'])->name('storeHorario');
 
 // HorarioPrevioDocente(REVISAR LA LOGICA)
+// agregar index
 Route::get('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'crear'])->name('mostrarFormularioHPD');
 Route::post('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'store'])->name('storeHPD');
 Route::put('horarios/docente/actualizar-h_p_d/{h_p_d}', [HorarioPrevioDocenteController::class, 'actualizar'])->name('actualizarHPD');
@@ -188,7 +189,7 @@ Route::get('/horarios/alumnos', [AlumnoController::class, 'index']);
 Route::get('/horarios/alumnoGrados', [AlumnoGradoController::class, 'index']);
 Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::class, 'showByAlumno']);
 Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
-Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
+Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}/{id_carrera}', [AlumnoGradoController::class, 'store']);
 Route::post('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosGrados']);
 
 // Docente
