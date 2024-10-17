@@ -24,7 +24,6 @@ import ActualizarAula from '../horarios/Screens/aula/actualizarAula';
 import Materias from '../horarios/Screens/materia';
 import CrearMateria from '../horarios/Screens/materia/crearMateria';
 import ActualizarMateria from '../horarios/Screens/materia/actualizarMateria';
-import Comisiones from '../horarios/Screens/comision';
 import CrearComision from '../horarios/Screens/comision/crearComision';
 import ActualizarComision from '../horarios/Screens/comision/actualizarComision';
 // import Asignaciones from '../horarios/Screens/asignacion';
@@ -43,8 +42,9 @@ import ActualizarPlan from '../horarios/Screens/plan_estudio/actualizarPlan';
 import PlanCarrera from '../horarios/Screens/carrera/verPlanCarrera';
 import AsignacionAlumno from '../horarios/Screens/asignacion alumno';
 import ActualizarAsignarAlumno from '../horarios/Screens/asignacion alumno/actualizarAsignacionAlumno';
-import HorarioPrevio from '../horarios/Screens/comision';
 import CrearAsignacionAlumno from '../horarios/Screens/asignacion alumno/crearAsignacionAlumno';
+import Comisiones from '../horarios/Screens/comision';
+import HorarioPrevio from '../horarios/Screens/horarioPrevioDocente';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas

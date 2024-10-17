@@ -135,6 +135,7 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 Route::get('/horarios/crear-horario', [HorarioController::class, 'store'])->name('storeHorario');
 
 // HorarioPrevioDocente(REVISAR LA LOGICA)
+// agregar index
 Route::get('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'crear'])->name('mostrarFormularioHPD');
 Route::post('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'store'])->name('storeHPD');
 Route::put('horarios/docente/actualizar-h_p_d/{h_p_d}', [HorarioPrevioDocenteController::class, 'actualizar'])->name('actualizarHPD');

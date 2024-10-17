@@ -21,7 +21,7 @@ const CrearAula = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad }) // Incluir capacidad aquí
+        body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad })
       });
 
       if (response.ok) {

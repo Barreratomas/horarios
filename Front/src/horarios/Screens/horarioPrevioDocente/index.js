@@ -9,7 +9,7 @@ const HorarioPrevio = () => {
   useEffect(() => {
     const fetchHorariosPrevios = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios_previos', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/horarios_previos', {
           headers: { Accept: 'application/json' }
         });
 

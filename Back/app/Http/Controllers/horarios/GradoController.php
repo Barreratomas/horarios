@@ -7,14 +7,18 @@ use App\Models\horarios\Grado;
 use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\CarreraGradoService;
+use Illuminate\Support\Facades\Log;
 
 class GradoController extends Controller
 {
     protected $gradoService;
+    protected $carreraGradoService; 
 
-    public function __construct(GradoService $gradoService)
+    public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService)
     {
         $this->gradoService = $gradoService;
+        $this->carreraGradoService = $carreraGradoService;
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -105,7 +109,17 @@ class GradoController extends Controller
      */
     public function store(GradoRequest $request)
     {
-        return $this->gradoService->guardarGrados($request);
+        $gradoResponse = $this->gradoService->guardarGrados($request);
+        $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
+
+        
+
+        $id_carrera = $request->input('id_carrera');
+
+
+        $this->carreraGradoService->crearCarreraGrado($id_carrera, $grado->id_grado);
+        return response()->json(['message' => 'Grado creado y asignado a carrera exitosamente', 'data' => $grado], 201);
+
     }
 
     /**

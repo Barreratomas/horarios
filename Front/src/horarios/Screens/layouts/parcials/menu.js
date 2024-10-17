@@ -137,17 +137,17 @@ const Menu = () => {
                   <li className="nav-item">
                     <button
                       className="nav-link"
-                      onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
+                      onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
                     >
-                      Planes de estudio
+                      Grados
                     </button>
                   </li>
                   <li className="nav-item">
                     <button
                       className="nav-link"
-                      onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
+                      onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
                     >
-                      Grados
+                      Planes de estudio
                     </button>
                   </li>
                   {/* <li className="nav-item">
@@ -162,7 +162,7 @@ const Menu = () => {
                         navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`)
                       }
                     >
-                      horario previo del docente
+                      horario previo del docente(en desarrollo)
                     </button>
                   </li>
                   <li className="nav-item">
@@ -170,7 +170,7 @@ const Menu = () => {
                       className="nav-link"
                       onClick={() => navigate(`${routes.base}/${routes.disponibilidad.main}`)}
                     >
-                      asignaciones del docente
+                      asignaciones del docente(en desarrollo)
                     </button>
                   </li>
                   <li className="nav-item">

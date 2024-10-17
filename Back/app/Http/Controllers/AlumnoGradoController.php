@@ -82,6 +82,7 @@ class AlumnoGradoController extends Controller
     public function store($id_alumno, $id_grado)
     {
         return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);
+        
     }
 
 
