@@ -91,7 +91,7 @@ const Aulas = () => {
   return (
     <>
       {loading ? (
-        <p>Cargando...</p> // Mensaje de carga
+        <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
@@ -99,7 +99,7 @@ const Aulas = () => {
               <button
                 type="button"
                 className="btn btn-primary me-2"
-                onClick={() => navigate(`${routes.base}/${routes.aulas.crear}`)} // Corregido: Comillas alrededor de la plantilla
+                onClick={() => navigate(`${routes.base}/${routes.aulas.crear}`)}
                 style={{ display: 'inline-block', marginRight: '10px' }}
               >
                 Crear

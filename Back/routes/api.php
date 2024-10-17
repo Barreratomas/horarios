@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\horarios\CambioDocenteController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\horarios\UnidadCurricularController;
 use App\Http\Controllers\CarreraUCController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\AlumnoGradoController;
+use App\Http\Controllers\CarreraGradoController;
 use App\Http\Controllers\DocenteController;
 
 
@@ -107,6 +109,7 @@ Route::post('/horarios/gradoUC/guardar', [GradoUcController::class, 'store']);
 Route::delete('/horarios/gradoUC/eliminar/idGrado/{id}', [GradoUcController::class, 'eliminarGradoUcPorIdGrado']);
 Route::delete('/horarios/gradoUC/eliminar/idUC/{id}', [GradoUcController::class, 'eliminarGradoUcPorIdUC']);
 
+
 // Disponibilidad
 Route::get('/horarios/disponibilidad', [DisponibilidadController::class, 'index']);
 Route::get('/horarios/disponibilidad/{id}', [DisponibilidadController::class, 'show']);
@@ -165,6 +168,12 @@ Route::post('/horarios/carreraUC/guardar', [CarreraUCController::class, 'store']
 Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [CarreraUCController::class, 'destroy']);
 Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [CarreraUCController::class, 'destroy']);
 
+// CarreraGrado
+Route::get('/horarios/carreraGrado', [CarreraGradoController::class, 'index']);
+Route::get('/horarios/carreraGrado/idCarrera/{id}', [CarreraGradoController::class, 'showByCarrera']);
+Route::get('/horarios/carreraGrado/grado/{id}', [CarreraGradoController::class, 'showByGrado']);
+Route::post('/horarios/carreraGrado/guardar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'store']);
+
 
 // Inscipcion
 Route::get('/horarios/inscripcion', [InscripcionController::class, 'index']);
@@ -172,6 +181,8 @@ Route::get('/horarios/inscripcion/{id}', [InscripcionController::class, 'show'])
 Route::post('/horarios/inscripcion/guardar', [InscripcionController::class, 'store']);
 Route::put('/horarios/inscripcion/actualizar/{id}', [InscripcionController::class, 'update']);
 Route::delete('/horarios/inscripcion/eliminar/{id}', [InscripcionController::class, 'destroy']);
+
+Route::get('/horarios/alumnos', [AlumnoController::class, 'index']);
 
 // AlumnoGrado
 Route::get('/horarios/alumnoGrados', [AlumnoGradoController::class, 'index']);

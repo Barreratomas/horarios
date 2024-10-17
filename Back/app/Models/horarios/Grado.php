@@ -5,6 +5,7 @@ namespace App\Models\horarios;
 use App\Models\horarios\Disponibilidad;
 use App\Models\horarios\Horario;
 use App\Models\AlumnoGrado;
+use App\Models\CarreraGrado;
 use App\Models\horarios\GradoUC;
 
 
@@ -98,10 +99,17 @@ class Grado extends Model
         return $this->hasMany(GradoUC::class, 'Id_Grado', 'Id_Grado');
     }
 
-    // Un grado pertenece a una carrera
+    // Un grado pertenece a una carrera. esto tiene que asociarse a la tabla intermedia(carreraGrado)
     public function carrera():BelongsTo{
         return $this->belongsTo(Carrera::class, 'carrera_id', 'Id_Carrera');
     }
+
+     // Un grado tiene uno o muchos carrera_grado
+     public function carrera_grado(): HasMany
+     {
+         return $this->hasMany(CarreraGrado::class, 'id_grado', 'id_grado');
+     }
+    
 
 /*
     // Un grado tiene uno o muchos inscripcion_aspirante

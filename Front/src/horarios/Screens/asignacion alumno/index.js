@@ -28,13 +28,14 @@ const AsignacionAlumno = () => {
 
     const fetchAlumnos = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/uCPlan', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnoGrados', {
           headers: { Accept: 'application/json' }
         });
 
         if (!response.ok) throw new Error('Error al obtener los alumnos');
 
         const data = await response.json();
+        console.log(data);
         setAlumnos(data);
         setServerUp(true);
       } catch (error) {
@@ -52,7 +53,6 @@ const AsignacionAlumno = () => {
     if (!window.confirm('¿Estás seguro de eliminar esta asignación?')) return;
 
     try {
-      // falta la api que elimina a el alumno de la comision
       const response = await fetch(`http://127.0.0.1:8000/api/alumnos/eliminar/${dni}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
@@ -75,8 +75,6 @@ const AsignacionAlumno = () => {
 
   const handleAssignStudent = async () => {
     try {
-      // falta la api que agrega a el alumno de la comision
-
       const response = await fetch('http://127.0.0.1:8000/api/asignar-alumno', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,11 +97,16 @@ const AsignacionAlumno = () => {
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
+          <button className="btn btn-primary me-2" onClick={handleAssignStudent}>
+            Asignacion masiva
+          </button>
           <button
+            type="button"
             className="btn btn-primary me-2"
-            onClick={handleAssignStudent} // Cambiar a la nueva función
+            onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.crear}`)}
+            style={{ display: 'inline-block', marginRight: '10px' }}
           >
-            Asignar Alumno
+            Asignar solo un alumno
           </button>
         </div>
       </div>
@@ -112,7 +115,7 @@ const AsignacionAlumno = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container">
-          <p>A espera de que se haga la API de asignación de alumnos</p>
+          <p>A espera de que se termine la API de asignación de alumnos</p>
           {alumnos.map((alumno) => (
             <div
               key={alumno.dni}

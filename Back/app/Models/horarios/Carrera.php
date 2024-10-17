@@ -3,6 +3,7 @@
 namespace App\Models\horarios;
 
 use App\Models\AlumnoCarrera;
+use App\Models\CarreraGrado;
 use App\Models\CarreraUC;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -86,9 +87,16 @@ class Carrera extends Model
         return $this->hasMany(CarreraUC::class, 'Id_Carrera', 'Id_Carrera');
     }
 
-    // Una carrera pertenece a un grado
+    // Una carrera pertenece a un grado.esto tiene que asociarse a la tabla intermedia(carreraGrado)
     public function grado(){
         return $this->belongsTo(Grado::class, 'Id_Grado', 'Id_Grado');
     }
+
+    // Una carrera tiene uno o muchos carrera_grado
+    public function carrera_grado(): HasMany
+    {
+        return $this->hasMany(CarreraGrado::class, 'id_carrera', 'id_carrera');
+    }
+    
 
 }

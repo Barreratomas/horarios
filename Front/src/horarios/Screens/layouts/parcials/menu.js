@@ -139,7 +139,7 @@ const Menu = () => {
                       className="nav-link"
                       onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
                     >
-                      Planes
+                      Planes de estudio
                     </button>
                   </li>
                   <li className="nav-item">
@@ -178,7 +178,7 @@ const Menu = () => {
                       className="nav-link"
                       onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.main}`)}
                     >
-                      Asignacion alumnos
+                      Asignacion alumnos a grados
                     </button>
                   </li>
                 </>

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use app\Models\Alumno;
 use App\Http\Controllers\Controller;
-use app\Services\AlumnoService;
+use App\Services\AlumnoService;
+// use app\Services\AlumnoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;//+
 
 class AlumnoController extends Controller
 {
@@ -13,6 +15,7 @@ class AlumnoController extends Controller
 
     public function __construct(AlumnoService $alumnoService)
     {
+
         $this->alumnoService = $alumnoService;
     }
 

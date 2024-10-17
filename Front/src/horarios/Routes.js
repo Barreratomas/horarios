@@ -44,6 +44,7 @@ export const getRoutes = () => ({
   },
   asignacionesAlumno: {
     main: 'asignacion-alumno',
+    crear: 'asignacion-alumno/crear',
     actualizar: (alumnoId) => `asignaciones-alumno/actualizar/${alumnoId}`
   }
 });
