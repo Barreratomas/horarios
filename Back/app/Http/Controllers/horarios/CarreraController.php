@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CarreraController extends Controller
 {
@@ -17,6 +18,7 @@ class CarreraController extends Controller
     public function __construct(CarreraService $carreraService)
     {
         $this->carreraService = $carreraService;
+
     }
 
     /*

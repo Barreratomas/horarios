@@ -7,6 +7,7 @@ use App\Models\horarios\Grado;
 use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class GradoController extends Controller
 {
@@ -106,6 +107,10 @@ class GradoController extends Controller
     public function store(GradoRequest $request)
     {
         return $this->gradoService->guardarGrados($request);
+        // $gradoResponse = $this->gradoService->guardarGrados($request);
+        // $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
+
+        // Log::info('ID del grado:', [ $grado->id_grado ]);
     }
 
     /**

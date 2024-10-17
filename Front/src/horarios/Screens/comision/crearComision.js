@@ -39,7 +39,7 @@ const CrearComision = () => {
       console.error('Error creando grado:', error);
     }
   };
-
+  // agregar carrera en grado
   return (
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
