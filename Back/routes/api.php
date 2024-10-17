@@ -189,7 +189,7 @@ Route::get('/horarios/alumnos', [AlumnoController::class, 'index']);
 Route::get('/horarios/alumnoGrados', [AlumnoGradoController::class, 'index']);
 Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::class, 'showByAlumno']);
 Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
-Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}/{id_carrera}', [AlumnoGradoController::class, 'store']);
+Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
 Route::post('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosGrados']);
 
 // Docente
