@@ -9,7 +9,20 @@
 .col-6{
     width: 100%;
 }
-
+.form-select {
+    width: 100%; /* Asegura que el select ocupe el 100% del ancho del contenedor */
+    overflow: hidden; /* Oculta cualquier desbordamiento */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos si hay desbordamiento de texto */
+    white-space: nowrap; /* Evita que el texto se envuelva en varias líneas */
+  }
+  
+  .option-text {
+    display: block; /* Hace que el texto ocupe el bloque completo */
+    width: 100%; /* Establece el ancho completo */
+    overflow: hidden; /* Evita el desbordamiento */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos para el texto que no cabe */
+    white-space: nowrap; /* Evita el salto de línea */
+  }
 form {
     background-color: #fff;
     border-radius: 8px;
@@ -18,15 +31,16 @@ form {
     max-width: 500px;
     width: 100%;
     margin: auto;
+    text-overflow: ellipsis;
 }
 .h_p_d_select{
     color: black;
   
-  }
+}
   
   select.form-control option {
     color: black; 
-  }
+}
 
 label {
     display: block;

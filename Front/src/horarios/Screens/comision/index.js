@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 
-const HorarioPrevio = () => {
+const Comisiones = () => {
   const navigate = useNavigate();
   const { routes } = useOutletContext(); // Acceder a las rutas definidas
   const location = useLocation(); // Obtener ubicación actual para manejar el estado de navegación
 
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
-  const [horarios, setHorarios] = useState([]);
+  const [grados, setGrados] = useState([]);
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
@@ -27,42 +27,42 @@ const HorarioPrevio = () => {
       }, 3500);
     }
 
-    const fetchHorarios = async () => {
+    const fetchGrados = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios_previos', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/grados', {
           headers: { Accept: 'application/json' }
         });
 
-        if (!response.ok) throw new Error('Error al obtener horarios previos');
+        if (!response.ok) throw new Error('Error al obtener los grados');
 
         const data = await response.json();
-        setHorarios(data);
+        console.log(data);
+        setGrados(data);
         setServerUp(true);
       } catch (error) {
-        console.error('Error al obtener horarios previos:', error);
+        console.error('Error al obtener grados:', error);
         setErrors([error.message || 'Servidor fuera de servicio...']);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHorarios();
+    fetchGrados();
   }, [location.state, navigate, location.pathname]);
 
-  // Función para eliminar un horario previo
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este horario?')) return;
+    if (!window.confirm('¿Estás seguro de eliminar este grado?')) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/horarios_previos/${id}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/${id}`, {
         method: 'DELETE'
       });
 
-      if (!response.ok) throw new Error('Error al eliminar el horario');
+      if (!response.ok) throw new Error('Error al eliminar el grado');
 
-      setHorarios(horarios.filter((horario) => horario.id !== id));
-      setSuccessMessage('Horario eliminado correctamente');
+      setGrados(grados.filter((grado) => grado.id_grado !== id));
+      setSuccessMessage('Grado eliminado correctamente');
 
       setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3 segundos
       setTimeout(() => {
@@ -71,8 +71,8 @@ const HorarioPrevio = () => {
         navigate(location.pathname, { replace: true }); // Limpiar navegación
       }, 3500);
     } catch (error) {
-      console.error('Error al eliminar horario:', error);
-      setErrors([error.message || 'Error al eliminar el horario']);
+      console.error('Error al eliminar grado:', error);
+      setErrors([error.message || 'Error al eliminar el grado']);
     }
   };
 
@@ -82,14 +82,12 @@ const HorarioPrevio = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container py-3">
-          <h2>Horarios Previos</h2>
-
           <div className="row align-items-center justify-content-center">
             <div className="col-6 text-center">
               <button
                 type="button"
                 className="btn btn-primary me-2"
-                onClick={() => navigate(`${routes.base}/${routes.horariosPrevios.crear}`)}
+                onClick={() => navigate(`${routes.base}/${routes.comisiones.crear}`)}
                 style={{ display: 'inline-block', marginRight: '10px' }}
               >
                 Crear
@@ -98,9 +96,9 @@ const HorarioPrevio = () => {
           </div>
 
           <div className="container">
-            {horarios.map((horario) => (
+            {grados.map((grado) => (
               <div
-                key={horario.id}
+                key={grado.id_grado}
                 style={{
                   border: '1px solid #ccc',
                   borderRadius: '5px',
@@ -109,16 +107,17 @@ const HorarioPrevio = () => {
                   width: '30vw'
                 }}
               >
-                <p>Docente: {horario.docente_nombre}</p>
-                <p>Día: {horario.dia}</p>
-                <p>Hora: {horario.hora}</p>
+                <p>Grado: {grado.grado}</p>
+                <p>División: {grado.division}</p>
+                <p>Detalle: {grado.detalle}</p>
+                <p>Capacidad: {grado.capacidad}</p>
 
                 <div className="botones">
                   <button
                     type="button"
                     className="btn btn-primary me-2"
                     onClick={() =>
-                      navigate(`${routes.base}/${routes.horariosPrevios.actualizar(horario.id)}`)
+                      navigate(`${routes.base}/${routes.comisiones.actualizar(grado.id_grado)}`)
                     }
                     style={{ display: 'inline-block', marginRight: '10px' }}
                   >
@@ -128,7 +127,7 @@ const HorarioPrevio = () => {
                   <button
                     type="button"
                     className="btn btn-danger"
-                    onClick={() => handleDelete(horario.id)}
+                    onClick={() => handleDelete(grado.id_grado)}
                   >
                     Eliminar
                   </button>
@@ -160,4 +159,4 @@ const HorarioPrevio = () => {
   );
 };
 
-export default HorarioPrevio;
+export default Comisiones;
