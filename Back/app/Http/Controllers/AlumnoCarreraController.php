@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class AlumnoCarreraController extends Controller
 {
     protected $alumnoCarreraService;
+    protected $alumnoCarrera;
 
     public function __construct(AlumnoCarreraService $alumnoCarreraService)
     {

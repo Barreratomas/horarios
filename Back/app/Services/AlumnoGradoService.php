@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Http\Controllers\horarios\GradoController;
+use App\Models\horarios\UCPlan;
 use App\Repositories\AlumnoGradoRepository;
 use App\Mappers\AlumnoGradoMapper;
 use App\Models\AlumnoGrado;
 use App\Services\horarios\GradoService;
 use App\Models\horarios\Grado;
+use App\Models\AlumnoUC;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -118,23 +120,30 @@ class AlumnoGradoService implements AlumnoGradoRepository
         }
     }
 
-    //asignar todos los alumnos a sus respectivos grados.
-    public function asignarAlumnosGrados($alumnos, $grados)
+    //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
+    public function asignarAlumnosACarreras()
     {
-        try {
-            foreach ($alumnos as $alumno) {
-                foreach ($grados as $grado) {
-                    $alumnoGrado = new AlumnoGrado();
-                    $alumnoGrado->id_alumno = $alumno->id_alumno;
-                    $alumnoGrado->id_grado = $grado->id_grado;
-                    $alumnoGrado->save();
-                }
-            }
-            return response()->json(['success' => 'Alumnos asignados a sus respectivos grados'], 200);
-        } catch (Exception $e) {
-            Log::error('Error al asignar los alumnos a sus respectivos grados: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al asignar los alumnos a sus respectivos grados'], 500);
+        // Pasamos primero de alumno_uc a unidadCurricular
+        $alumnosUC = AlumnoUC::all();
+        $ucsPlan = UCPlan::all();
+
+        foreach ($alumnosUC as $alumnoUC) {
+            $id_alumno = $alumnoUC->id_alumno;
+            $id_uc = $alumnoUC->id_uc;
+            $id_carrera = $id_uc->id_plan->id_carrera;
+            Log::info('Alumno: ' . $id_alumno . ' UC: ' . $id_uc . ' Carrera: ' . $id_carrera);
+
+            
+/*
+            $alumnoGrado = new AlumnoGrado();
+            $alumnoGrado->id_alumno = $id_alumno;
+            $alumnoGrado->id_grado = $id_uc;
+            $alumnoGrado->save();
+            */
         }
+        
+
+
     }
 
 }

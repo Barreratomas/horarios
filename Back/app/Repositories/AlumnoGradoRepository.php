@@ -11,8 +11,8 @@ interface AlumnoGradoRepository
     public function eliminarAlumnoGradoPorIdAlumno($id_alumno);
     public function eliminarAlumnoGradoPorIdGrado($id_grado);
 
-    //asignar todos los alumnos a sus respectivos grados
-    public function asignarAlumnosGrados($alumnos, $grados);
+    //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
+    public function asignarAlumnosACarreras();
 
 
 }

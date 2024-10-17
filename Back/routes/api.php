@@ -168,12 +168,6 @@ Route::post('/horarios/carreraUC/guardar', [CarreraUCController::class, 'store']
 Route::delete('/horarios/carreraUC/eliminar/idCarrera/{id}', [CarreraUCController::class, 'destroy']);
 Route::delete('/horarios/carreraUC/eliminar/idUC/{id}', [CarreraUCController::class, 'destroy']);
 
-// CarreraGrado
-Route::get('/horarios/carreraGrado', [CarreraGradoController::class, 'index']);
-Route::get('/horarios/carreraGrado/idCarrera/{id}', [CarreraGradoController::class, 'showByCarrera']);
-Route::get('/horarios/carreraGrado/grado/{id}', [CarreraGradoController::class, 'showByGrado']);
-Route::post('/horarios/carreraGrado/guardar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'store']);
-
 
 // Inscipcion
 Route::get('/horarios/inscripcion', [InscripcionController::class, 'index']);
@@ -189,7 +183,7 @@ Route::get('/horarios/alumnoGrados', [AlumnoGradoController::class, 'index']);
 Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::class, 'showByAlumno']);
 Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
 Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
-Route::post('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosGrados']);
+Route::get('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosACarreras']);
 
 // Docente
 Route::get('/horarios/docentes', [DocenteController::class, 'index']);
@@ -197,3 +191,10 @@ Route::get('/horarios/docentes/{id}', [DocenteController::class, 'show']);
 Route::post('/horarios/docentes/guardar', [DocenteController::class, 'store']);
 Route::put('/horarios/docentes/actualizar/{id}', [DocenteController::class, 'update']);
 Route::delete('/horarios/docentes/eliminar/{id}', [DocenteController::class, 'destroy']);
+
+// CarreraGrado
+Route::get('/horarios/carreraGrados', [CarreraGradoController::class, 'index']);
+Route::get('/horarios/carreraGrados/carrera/{id_carrera}', [CarreraGradoController::class, 'showByCarrera']);
+Route::get('/horarios/carreraGrados/grado/{id_grado}', [CarreraGradoController::class, 'showByGrado']);
+Route::post('/horarios/carreraGrados/guardar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'store']);
+Route::delete('/horarios/carreraGrados/eliminar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'destroy']);

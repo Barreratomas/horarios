@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\AlumnoGrado;
 use App\Http\Controllers\Controller;
 use App\Services\AlumnoGradoService;
+use App\Services\CarreraGradoService;
 use Illuminate\Http\Request;
 
 class AlumnoGradoController extends Controller
 {
     private $alumnoGradoService;
+    private $carreraGradoService;
 
-    public function __construct(AlumnoGradoService $alumnoGradoService)
+    public function __construct(AlumnoGradoService $alumnoGradoService, CarreraGradoService $carreraGradoService)
     {
         $this->alumnoGradoService = $alumnoGradoService;
+        $this->carreraGradoService = $carreraGradoService;
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -75,12 +78,12 @@ class AlumnoGradoController extends Controller
      *          description="Error al crear la relación"
      *      )
      * )
-    */
+     */
     public function store($id_alumno, $id_grado)
     {
         return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);
     }
-    
+
 
     /**
      * @OA\Get(
@@ -178,43 +181,10 @@ class AlumnoGradoController extends Controller
 
 
 
-    /**
-     * @OA\Post(
-     *      path="/api/horarios/alumnoGrados/asignar",
-     *      summary="Asignar alumnos a grados",
-     *      description="Asigna alumnos a grados",
-     *      operationId="asignarAlumnosGrados",
-     *      tags={"AlumnoGrado"},
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={"alumnos", "grados"},
-     *              @OA\Property(
-     *                  property="alumnos",
-     *                  type="array",
-     *                  @OA\Items(type="integer")
-     *              ),
-     *              @OA\Property(
-     *                  property="grados",
-     *                  type="array",
-     *                  @OA\Items(type="integer")
-     *              )
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Alumnos asignados correctamente"
-     *      ),
-     *      @OA\Response(
-     *          response=400,
-     *          description="Error al asignar los alumnos"
-     *      )
-     * )
-     */
-    public function asignarAlumnosGrados(Request $request){
-        $alumnos = $request->alumnos;
-        $grados = $request->grados;
-        return $this->alumnoGradoService->asignarAlumnosGrados($alumnos, $grados);
+    
+    public function asignarAlumnosACarreras()
+    {
+        return $this->alumnoGradoService->asignarAlumnosACarreras();
     }
 
 }

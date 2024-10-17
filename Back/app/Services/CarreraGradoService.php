@@ -4,41 +4,100 @@ namespace App\Services;
 
 use App\Models\CarreraGrado;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\CarreraGradoRepository;
+use App\Services\horarios\GradoService;
+use App\Services\horarios\CarreraService;
+use App\Mappers\CarreraGradoMapper;
+use Exception;
 
-class CarreraGradoService
+class CarreraGradoService implements CarreraGradoRepository
 {
-    public function getAllCarrerasGrados()
+
+    protected $carreraGradoMapper;
+    protected $gradoService;
+    protected $carreraService;
+
+    public function __construct(CarreraGradoMapper $carreraGradoMapper, GradoService $gradoService, CarreraService $carreraService)
     {
-        return CarreraGrado::with('carrera', 'grado')->get();
+        $this->carreraGradoMapper = $carreraGradoMapper;
+        $this->gradoService = $gradoService;
+        $this->carreraService = $carreraService;
     }
 
-    public function crearCarreraGrado($id_carrera, $id_grado)
+    public function obtenerTodosCarreraGrado()
     {
         try {
-            $carreraGradoModel = new CarreraGrado();
-            $carreraGradoModel->id_carrera = $id_carrera;
-            $carreraGradoModel->id_grado = $id_grado;
-            $carreraGradoModel->save();
-
-            return response()->json($carreraGradoModel, 201);
-        } catch (\Exception $e) {
-            Log::error('Error al guardar CarreraGrado: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al guardar CarreraGrado'], 500);
+            $carrerasGrados = CarreraGrado::all();
+            return response()->json($carrerasGrados, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener los carrerasGrados: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener los carrerasGrados'], 500);
         }
     }
 
-    public function findById($id)
+    public function obtenerCarreraGradoPorIdCarrera($id_carrera)
     {
-       
+        $carreraGrado = CarreraGrado::where('id_carrera', $id_carrera)->get();
+        if (!$carreraGrado) {
+            return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+        }
+        try {
+            return response()->json($carreraGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el carreraGrado'], 500);
+        }
     }
 
-    public function update()
+
+    public function obtenerCarreraGradoPorIdGrado($id_grado)
     {
-       
+        $carreraGrado = CarreraGrado::where('id_grado', $id_grado)->get();
+        if (!$carreraGrado) {
+            return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+        }
+        try {
+            return response()->json($carreraGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el carreraGrado'], 500);
+        }
     }
 
-    public function delete($id)
+    public function guardarCarreraGrado($id_carrera, $id_grado)
     {
-      
+        $grado = $this->gradoService->obtenerGradoPorId($id_grado);
+        $carrera = $this->carreraService->obtenerCarreraPorId($id_carrera);
+        if (!$grado || !$carrera) {
+            return ['error' => 'No se encontró el grado o la carrera'];
+        }
+
+        try{
+            $carreraGrado = $this->carreraGradoMapper->toCarreraGrado($id_carrera, $id_grado);
+            $carreraGrado->save();
+            return response()->json($carreraGrado, 201);
+        } catch (Exception $e) {
+            Log::error('Error al guardar la carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al guardar la carreraGrado'], 500);
+        }
     }
+
+    
+
+    public function eliminarCarreraGradoPorIdGradoYCarrera($id_carrera, $id_grado)
+    {
+        $carreraGrado = CarreraGrado::where('id_grado', $id_grado)->where('id_carrera', $id_carrera)->first();
+        if (!$carreraGrado) {
+            return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+        }
+        try {
+            $carreraGrado->delete();
+            return response()->json($carreraGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al eliminar la carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al eliminar la carreraGrado'], 500);
+        }
+    }
+
+
 }

@@ -486,52 +486,6 @@
                 }
             }
         },
-        "/api/horarios/alumnoGrados/asignar": {
-            "post": {
-                "tags": [
-                    "AlumnoGrado"
-                ],
-                "summary": "Asignar alumnos a grados",
-                "description": "Asigna alumnos a grados",
-                "operationId": "asignarAlumnosGrados",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "alumnos",
-                                    "grados"
-                                ],
-                                "properties": {
-                                    "alumnos": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    },
-                                    "grados": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Alumnos asignados correctamente"
-                    },
-                    "400": {
-                        "description": "Error al asignar los alumnos"
-                    }
-                }
-            }
-        },
         "/api/horarios/alumnoPlanes": {
             "get": {
                 "tags": [
@@ -4240,6 +4194,21 @@
                     },
                     "id_uc": {
                         "description": "ID de la unidad curricular",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "CarreraGrado": {
+                "title": "CarreraGrado",
+                "description": "Esquema del objeto CarreraGrado",
+                "properties": {
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "id_grado": {
+                        "description": "ID del grado",
                         "type": "integer"
                     }
                 },
