@@ -18,7 +18,7 @@ class CarreraGradoController extends Controller
 
     public function index()
     {
-        $carreras = $this->carreraGradoService->getAll();
+        $carreras = $this->carreraGradoService->getAllCarrerasGrados();
         return response()->json($carreras);
     }
 

@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Log;
 
 class CarreraGradoService
 {
-    public function getAll()
+    public function getAllCarrerasGrados()
     {
-        return CarreraGrado::all();
+        return CarreraGrado::with('carrera', 'grado')->get();
     }
 
     public function crearCarreraGrado($id_carrera, $id_grado)
