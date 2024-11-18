@@ -6,13 +6,20 @@ const Aulas = () => {
   const { routes } = useOutletContext();
   const location = useLocation();
 
-  const [loading, setLoading] = useState(true); // Estado para manejar la carga
-  const [serverUp, setServerUp] = useState(false); // Estado para manejar el estado del servidor
-
+  const [loading, setLoading] = useState(true);
+  const [serverUp, setServerUp] = useState(false);
   const [aulas, setAulas] = useState([]);
+  const [filteredAulas, setFilteredAulas] = useState([]);
+  const [searchCriteria, setSearchCriteria] = useState({
+    nombre: '',
+    tipo: ''
+  });
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
+
+  // Opciones para los selects
+  const tipos = ['Normal', 'Laboratorio', 'Sum'];
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -25,15 +32,14 @@ const Aulas = () => {
 
       // Limpiar después de la transición
       setTimeout(() => {
-        setSuccessMessage(''); // Eliminar el mensaje después de la transición
-        setHideMessage(false); // Resetear para la próxima vez
+        setSuccessMessage('');
+        setHideMessage(false);
 
-        // aca navega a la misma ruta sin estado para limpiar el location.state
         navigate(location.pathname, { replace: true }); // Reemplaza la entrada en el historial para no tener el state
       }, 3500);
     }
 
-    const checkServerStatus = async () => {
+    const fetchAulas = async () => {
       setLoading(true);
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/aulas', {
@@ -42,22 +48,20 @@ const Aulas = () => {
 
         if (!response.ok) throw new Error(' ');
 
-        const jsonResponse = await response.json();
-        if (jsonResponse) {
-          setAulas(jsonResponse);
-          setServerUp(true);
-        } else {
-          alert('Servidor fuera de servicio...');
-        }
+        const data = await response.json();
+        console.log(data);
+        setAulas(data);
+        setFilteredAulas(data);
+        setServerUp(true);
       } catch (error) {
-        console.error('Error checking server status:', error);
-        alert('Error al verificar el servidor...');
+        console.error('Error al obtener aulas:', error);
+        alert('Servidor fuera de servicio...');
       } finally {
         setLoading(false);
       }
     };
 
-    checkServerStatus();
+    fetchAulas();
   }, [location.state, navigate, location.pathname]);
 
   const handleDelete = async (id_aula) => {
@@ -70,37 +74,97 @@ const Aulas = () => {
       if (!response.ok) throw new Error('Error al eliminar aula');
 
       setAulas(aulas.filter((aula) => aula.id_aula !== id_aula));
-      setSuccessMessage('Aula eliminada con éxito');
+      setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== id_aula));
+      setSuccessMessage('Aula eliminada correctamente');
 
-      // Mostrar el mensaje durante 3 segundos
-      setTimeout(() => {
-        setHideMessage(true); // Ocultar con la clase CSS
-      }, 3000);
-
+      setTimeout(() => setHideMessage(true), 3000);
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
-
-        // Limpiar el estado de location
         navigate(location.pathname, { replace: true });
       }, 3500);
     } catch (error) {
       setErrors([error.message || 'Error al eliminar aula']);
     }
   };
+
+  const handleSearch = (event) => {
+    const { name, value } = event.target;
+
+    // Actualiza los criterios de búsqueda
+    const newCriteria = {
+      ...searchCriteria,
+      [name]: value.toLowerCase()
+    };
+    setSearchCriteria(newCriteria);
+
+    // Aplica los filtros considerando todos los criterios seleccionados
+    const filtered = aulas.filter(
+      (aula) =>
+        aula.nombre.toLowerCase().includes(newCriteria.nombre) &&
+        (!newCriteria.tipo || aula.tipo_aula.toLowerCase() === newCriteria.tipo)
+    );
+
+    setFilteredAulas(filtered);
+  };
+
+  const handleClearFilters = () => {
+    setSearchCriteria({
+      nombre: '',
+      tipo: ''
+    });
+    setFilteredAulas(aulas);
+  };
+
   return (
     <>
       {loading ? (
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container py-3">
-          <div className="row align-items-center justify-content-center">
-            <div className="col-6 text-center">
+          <div className="row align-items-center justify-content-center mb-3">
+            <div className="col-12 text-center">
+              <div className="filter mb-2 d-flex flex-wrap align-items-center">
+                {/* Input ocupa el 70% del espacio */}
+                <input
+                  type="text"
+                  className="form-control mb-2 mb-md-0 me-md-2"
+                  placeholder="Buscar por nombre de aula..."
+                  name="nombre"
+                  value={searchCriteria.nombre}
+                  onChange={handleSearch}
+                  style={{ flex: '0 0 50%' }} // El input ocupa el 70%
+                />
+
+                {/* Select tipo ocupa el 15% del espacio */}
+                <select
+                  className="form-select mb-2 mb-md-0 me-md-2"
+                  name="tipo"
+                  value={searchCriteria.tipo}
+                  onChange={handleSearch}
+                  style={{ flex: '0 0 25%' }} // El select tipo ocupa el 15%
+                >
+                  <option value="">Filtrar por tipo...</option>
+                  {tipos.map((tipo) => (
+                    <option key={tipo} value={tipo.toLowerCase()}>
+                      {tipo}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2 px-0 py-1 mx-2"
+                  onClick={handleClearFilters}
+                  style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
+                >
+                  Limpiar Filtros
+                </button>
+              </div>
               <button
                 type="button"
-                className="btn btn-primary me-2"
+                className="btn btn-primary"
                 onClick={() => navigate(`${routes.base}/${routes.aulas.crear}`)}
-                style={{ display: 'inline-block', marginRight: '10px' }}
               >
                 Crear
               </button>
@@ -108,47 +172,51 @@ const Aulas = () => {
           </div>
 
           <div className="container">
-            {aulas.map((aula) => (
-              <div
-                key={aula.id_aula}
-                style={{
-                  border: '1px solid #ccc',
-                  borderRadius: '5px',
-                  padding: '10px',
-                  marginBottom: '10px',
-                  width: '30vw'
-                }}
-              >
-                <p>Nombre: {aula.nombre}</p>
-                <p>Tipo de Aula: {aula.tipo_aula}</p>
-                <p>Capacidad: {aula.capacidad}</p>
+            {filteredAulas.length > 0 ? (
+              filteredAulas.map((aula) => (
+                <div
+                  key={aula.id_aula}
+                  style={{
+                    border: '1px solid #ccc',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    marginBottom: '10px',
+                    width: '30vw'
+                  }}
+                >
+                  <p>Nombre: {aula.nombre}</p>
+                  <p>Tipo: {aula.tipo_aula}</p>
+                  <p>Capacidad: {aula.capacidad}</p>
 
-                <div className="botones">
-                  <button
-                    type="button"
-                    className="btn btn-primary me-2"
-                    onClick={() =>
-                      navigate(`${routes.base}/${routes.aulas.actualizar(aula.id_aula)}`)
-                    } // Corregido: Comillas alrededor de la plantilla
-                    style={{ display: 'inline-block', marginRight: '10px' }}
-                  >
-                    Actualizar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(aula.id_aula)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="botones">
+                    <button
+                      type="button"
+                      className="btn btn-primary me-2"
+                      onClick={() =>
+                        navigate(`${routes.base}/${routes.aulas.actualizar(aula.id_aula)}`)
+                      }
+                    >
+                      Actualizar
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(aula.id_aula)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No se encontraron aulas que coincidan con la búsqueda.</p>
+            )}
           </div>
 
           <div
             id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`} // Corregido: Comillas para el template string
+            className={`container ${hideMessage ? 'hide-messages' : ''}`}
           >
             {errors.length > 0 && (
               <div className="alert alert-danger">
