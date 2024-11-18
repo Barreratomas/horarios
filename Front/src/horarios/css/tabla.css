@@ -486,7 +486,6 @@
 }
 .horarios {
     align-self: stretch;
-    border-radius: 20px 20px 0 0;
     background-color: #2e2a2a;
     overflow: hidden;
     flex-direction: row;
@@ -1056,6 +1055,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+
 }
 
 @media screen and (max-width: 1200px) {
@@ -1188,11 +1188,12 @@
     rgb(37 92 109 / 67%)
     );
     align-items: flex-start;
-    padding-bottom: 4rem;
     box-sizing: border-box;
     gap: 3.125rem;
     letter-spacing: normal;
     background-repeat: no-repeat;
+    padding: 0;
+    border-radius: 25px;
 }
 .planilla1 {
     align-self: stretch;
@@ -1237,4 +1238,24 @@ tbody{
 
 #aula{
     color: #f0ff98;
+}
+
+.comision {
+    position: relative;
+    margin-top: 5rem;
+    background-color: #2e2a2a;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 20px; /* Borde redondeado solo en la parte superior izquierda */
+    border-top-right-radius: 20px; /* Borde redondeado solo en la parte superior derecha */    padding-top: 20px;
+  }
+  
+.comision h4{
+    color: white;
+    font-size: medium;
+    padding: 0;
+    margin: 0;
+    /* padding-left: 2rem; */
 }

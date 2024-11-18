@@ -34,40 +34,47 @@ const Tabla = () => {
   ];
 
   return (
-    <div className="bedelia-horario">
-      <h3 style={{ fontFamily: 'sans-serif', color: 'white' }}>Año: 1</h3>
-      <h4 style={{ fontFamily: 'sans-serif', color: 'white' }}>División: A</h4>
-      <table className="planilla1">
-        <thead className="horarios">
-          <tr>
-            <th className="div">Días / Horarios</th>
-            {Object.keys(inicio).map((key) => (
-              <th className={`p${key}`} key={key}>
-                {inicio[key]} - {fin[key]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {dias.map((dia) => (
-            <tr className="xd" key={dia}>
-              <th className="dias" style={dia === 'viernes' ? { borderRadius: '0 0 0 20px' } : {}}>
-                {dia}
-              </th>
-              {Object.keys(inicio).map((modulo) => (
-                <td
-                  className="thhh"
-                  style={{ backgroundColor: colores[modulo % colores.length] }}
-                  key={modulo}
-                >
-                  {' '}
-                </td>
+    <>
+      <div className="comision">
+        <h4 style={{ fontFamily: 'sans-serif' }}>Año: 1</h4>
+        <h4 style={{ fontFamily: 'sans-serif' }}>División: A</h4>
+      </div>
+      <div className="bedelia-horario" style={{ padding: 0 }}>
+        <table className="planilla1">
+          <thead className="horarios">
+            <tr>
+              <th className="div">Días / Horarios</th>
+              {Object.keys(inicio).map((key) => (
+                <th className={`p${key}`} key={key}>
+                  {inicio[key]} - {fin[key]}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {dias.map((dia) => (
+              <tr className="xd" key={dia}>
+                <th
+                  className="dias"
+                  style={dia === 'viernes' ? { borderRadius: '0 0 0 20px' } : {}}
+                >
+                  {dia}
+                </th>
+                {Object.keys(inicio).map((modulo) => (
+                  <td
+                    className="thhh"
+                    style={{ backgroundColor: colores[modulo % colores.length] }}
+                    key={modulo}
+                  >
+                    {' '}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 

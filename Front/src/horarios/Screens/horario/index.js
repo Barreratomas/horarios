@@ -5,7 +5,6 @@ import FormularioHoraio from '../layouts/parcials/formularioHorario';
 const Horario = () => {
   return (
     <div className="container">
-      <p>hola</p>
       <FormularioHoraio />
       <div className="row">
         <Table />
