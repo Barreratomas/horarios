@@ -125,6 +125,7 @@ body {
     line-height: 5rem;
     font-weight: 700;
     font-family: inherit;
+    color: #fffffff3;
 }
 .titulo-wrapper {
     display: flex;
@@ -147,6 +148,8 @@ body {
     display: inline-block;
     box-sizing: border-box;
     padding-right: 1.25rem;
+    color: #fffffff3;
+
 }
 .en-este-sitio,
 .mejorando-asi-todo {

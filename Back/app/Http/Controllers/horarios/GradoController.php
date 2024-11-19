@@ -115,9 +115,13 @@ class GradoController extends Controller
         
 
         $id_carrera = $request->input('id_carrera');
+        // Log para verificar la relación con la carrera
+        Log::info('Asignando grado a carrera', [
+            'id_carrera' => $id_carrera,
+            'id_grado' => $grado->id_grado,
+        ]);
 
-
-        $this->carreraGradoService->crearCarreraGrado($id_carrera, $grado->id_grado);
+        $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado);
         return response()->json(['message' => 'Grado creado y asignado a carrera exitosamente', 'data' => $grado], 201);
 
     }

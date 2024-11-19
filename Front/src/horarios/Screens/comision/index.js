@@ -6,39 +6,67 @@ const Comisiones = () => {
   const { routes } = useOutletContext(); // Acceder a las rutas definidas
   const location = useLocation(); // Manejar el estado de navegación
 
+  const [filteredComisiones, setFilteredComisiones] = useState([]);
+  const [searchCriteria, setSearchCriteria] = useState({
+    carrera: '',
+    detalle: ''
+  });
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
   const [grados, setGrados] = useState([]);
+  const [carreras, setCarreras] = useState([]); // Lista única de carreras
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
 
-  // Efecto para manejar la carga inicial y los mensajes de éxito
   useEffect(() => {
     if (location.state && location.state.successMessage) {
       setSuccessMessage(location.state.successMessage);
 
-      setTimeout(() => setHideMessage(true), 3000); // Ocultar mensaje en 3 segundos
-
+      setTimeout(() => setHideMessage(true), 3000);
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
-        navigate(location.pathname, { replace: true }); // Limpiar el estado de navegación
+        navigate(location.pathname, { replace: true });
       }, 3500);
     }
 
     const fetchGrados = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrado', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados', {
           headers: { Accept: 'application/json' }
         });
 
         if (!response.ok) throw new Error('Error al obtener los grados');
 
         const data = await response.json();
-        console.log(data);
-        setGrados(data);
+
+        const normalizedData = data.map((item) => ({
+          carrera: {
+            carrera: item.carrera.carrera,
+            cupo: item.carrera.cupo,
+            id_carrera: item.carrera.id_carrera
+          },
+          grado: {
+            capacidad: item.grado.capacidad,
+            detalle: item.grado.detalle,
+            division: item.grado.division,
+            grado: item.grado.grado,
+            id_grado: item.grado.id_grado
+          },
+          id_carrera: item.id_carrera,
+          id_grado: item.id_grado
+        }));
+
+        setGrados(normalizedData);
+        setFilteredComisiones(normalizedData);
+
+        // Obtener una lista única de carreras para el select
+        const uniqueCarreras = Array.from(
+          new Set(normalizedData.map((comision) => comision.carrera.carrera))
+        );
+        setCarreras(uniqueCarreras);
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener grados:', error);
@@ -61,7 +89,10 @@ const Comisiones = () => {
 
       if (!response.ok) throw new Error('Error al eliminar el grado');
 
-      setGrados(grados.filter((grado) => grado.id_grado !== id));
+      setGrados(grados.filter((grado) => grado.grado.id_grado !== id));
+      setFilteredComisiones(
+        filteredComisiones.filter((comision) => comision.grado.id_grado !== id)
+      );
       setSuccessMessage('Grado eliminado correctamente');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -76,6 +107,29 @@ const Comisiones = () => {
     }
   };
 
+  const handleSearch = (event) => {
+    const { name, value } = event.target;
+
+    const newCriteria = {
+      ...searchCriteria,
+      [name]: value
+    };
+    setSearchCriteria(newCriteria);
+
+    const filtered = grados.filter(
+      (comision) =>
+        (newCriteria.carrera === '' || comision.carrera.carrera === newCriteria.carrera) &&
+        comision.grado.detalle.toLowerCase().includes(newCriteria.detalle.toLowerCase())
+    );
+
+    setFilteredComisiones(filtered);
+  };
+
+  const handleClearFilters = () => {
+    setSearchCriteria({ carrera: '', detalle: '' });
+    setFilteredComisiones(grados);
+  };
+
   return (
     <>
       {loading ? (
@@ -84,11 +138,45 @@ const Comisiones = () => {
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
             <div className="col-6 text-center">
+              <div className="filter mb-2 d-flex flex-wrap align-items-center">
+                <input
+                  type="text"
+                  className="form-control mb-2 mb-md-0 me-md-2"
+                  placeholder="Buscar por detalle..."
+                  name="detalle"
+                  value={searchCriteria.detalle}
+                  onChange={handleSearch}
+                  style={{ flex: '0 0 50%' }} // El input ocupa el 50%
+                />
+                <select
+                  className="form-select mb-2 mb-md-0 me-md-2"
+                  name="carrera"
+                  value={searchCriteria.carrera}
+                  onChange={handleSearch}
+                  style={{ flex: '0 0 25%' }} // El select tipo ocupa el 25%
+                >
+                  <option value="">Todas las carreras</option>
+                  {carreras.map((carrera, index) => (
+                    <option key={index} value={carrera}>
+                      {carrera}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleClearFilters}
+                  style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
+                >
+                  Limpiar
+                </button>
+              </div>
+
               <button
                 type="button"
                 className="btn btn-primary me-2"
                 onClick={() => navigate(`${routes.base}/${routes.comisiones.crear}`)}
-                style={{ display: 'inline-block', marginRight: '10px' }}
               >
                 Crear
               </button>
@@ -96,46 +184,48 @@ const Comisiones = () => {
           </div>
 
           <div className="container">
-            {grados.map(({ id_grado, id_carrera, carrera, grado }) => (
-              <div
-                key={`${id_grado}-${id_carrera}`} // Key única combinada
-                style={{
-                  border: '1px solid #ccc',
-                  borderRadius: '5px',
-                  padding: '10px',
-                  marginBottom: '10px',
-                  width: '30vw'
-                }}
-              >
-                <h5>Carrera: {carrera.carrera}</h5>
-                <p>Cupo: {carrera.cupo}</p>
-                <p>Grado: {grado.grado}</p>
-                <p>División: {grado.division}</p>
-                <p>Detalle: {grado.detalle}</p>
-                <p>Capacidad: {grado.capacidad}</p>
+            {filteredComisiones.length > 0 ? (
+              filteredComisiones.map(({ id_grado, id_carrera, carrera, grado }) => (
+                <div
+                  key={`${id_grado}-${id_carrera}`}
+                  style={{
+                    border: '1px solid #ccc',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    marginBottom: '10px',
+                    width: '30vw'
+                  }}
+                >
+                  <h5>Carrera: {carrera.carrera}</h5>
+                  <p>Cupo: {carrera.cupo}</p>
+                  <p>Grado: {grado.grado}</p>
+                  <p>División: {grado.division}</p>
+                  <p>Detalle: {grado.detalle}</p>
+                  <p>Capacidad: {grado.capacidad}</p>
 
-                <div className="botones">
-                  <button
-                    type="button"
-                    className="btn btn-primary me-2"
-                    onClick={() =>
-                      navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
-                    }
-                    style={{ display: 'inline-block', marginRight: '10px' }}
-                  >
-                    Actualizar
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(id_grado)}
-                  >
-                    Eliminar
-                  </button>
+                  <div className="botones">
+                    <button
+                      type="button"
+                      className="btn btn-primary me-2"
+                      onClick={() =>
+                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
+                      }
+                    >
+                      Actualizar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(id_grado)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No se encontraron comisiones que coincidan con la búsqueda.</p>
+            )}
           </div>
 
           <div
