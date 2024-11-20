@@ -22,6 +22,7 @@ use App\Http\Controllers\CarreraUCController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\AlumnoGradoController;
 use App\Http\Controllers\CarreraGradoController;
+use App\Http\Controllers\CarreraPlanController;
 use App\Http\Controllers\DocenteController;
 
 
@@ -153,6 +154,14 @@ Route::get('/horarios/uCPlan/{id}', [UCPlanController::class, 'show']);
 Route::post('/horarios/uCPlan/guardar', [UCPlanController::class, 'store']);
 Route::put('/horarios/uCPlan/actualizar/{id}', [UCPlanController::class, 'update']);
 Route::delete('/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destroy']);
+
+// CarreraPlan
+Route::get('/horarios/uCPlan', [CarreraPlanController::class, 'index']);
+Route::get('/horarios/uCPlan/{id}', [CarreraPlanController::class, 'obtenerCarreraPlanPorIdCarrera']);
+Route::get('/horarios/uCPlan/{id}', [CarreraPlanController::class, 'obtenerCarreraPlanPorIdPlan']);
+Route::post('/horarios/uCPlan/guardar', [CarreraPlanController::class, 'store']);
+Route::delete('/horarios/uCPlan/eliminar/{id}', [CarreraPlanController::class, 'eliminarCarreraPlanPorIdCarreraYPlan']);
+
 
 // UnidadCurricular
 Route::get('/horarios/unidadCurricular', [UnidadCurricularController::class, 'index']);
