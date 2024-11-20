@@ -6,6 +6,7 @@ use App\Repositories\horarios\UCPlanRepository;
 use App\Mappers\horarios\UCPlanMapper;
 use App\Models\horarios\UCPlan;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UCPlanService implements UCPlanRepository
@@ -43,19 +44,33 @@ class UCPlanService implements UCPlanRepository
         }
     }
 
-    public function guardarUCPlan($request)
+    public function guardarUCPlan($id_plan, $materias)
     {
         try {
-            $uCPlanData = $request->all(); 
-            $uCPlan = new UCPlan($uCPlanData); 
-            $uCPlanModel = $this->uCPlanMapper->toUCPlan($uCPlan);
-            $uCPlanModel->save();
-            return response()->json($uCPlanModel, 201);
+            // Comienza una transacción para asegurar que todas las materias se guarden correctamente
+            DB::beginTransaction();
+
+            foreach ($materias as $materiaId) {
+                $uCPlan = new UCPlan();
+                $uCPlan->id_plan_estudio = $id_plan;  
+                $uCPlan->id_materia = $materiaId;     
+
+                $uCPlan->save();
+            }
+
+            // Si todo salió bien, confirma la transacción
+            DB::commit();
+
+            return response()->json(['message' => 'Materias asociadas con éxito'], 201);
         } catch (Exception $e) {
-            Log::error('Error al guardar el uCPlan: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al guardar el uCPlan'], 500);
+            // Si hay un error, se cancela la transacción
+            DB::rollBack();
+
+            Log::error('Error al guardar las materias del plan de estudio: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al guardar las materias del plan de estudio'], 500);
         }
     }
+
 
 
     public function actualizarUCPlan($request, $id)

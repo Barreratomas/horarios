@@ -5,16 +5,18 @@ namespace App\Http\Controllers\horarios;
 use App\Services\horarios\PlanEstudioService;
 use App\Http\Requests\horarios\PlanEstudioRequest;
 use App\Http\Controllers\Controller;
-
+use App\Services\horarios\UCPlanService;
+use Illuminate\Support\Facades\Log;
 
 class PlanEstudioController extends Controller
 {
     protected $planEstudioService;
+    protected $UCPlanService;
 
-    public function __construct(PlanEstudioService $planEstudioService)
+    public function __construct(PlanEstudioService $planEstudioService, UCPlanService $UCPlanService)
     {
         $this->planEstudioService = $planEstudioService;
-
+        $this->UCPlanService = $UCPlanService;
     }
 
 
@@ -110,8 +112,36 @@ class PlanEstudioController extends Controller
      */
     public function store(PlanEstudioRequest $request)
     {
-        return $this->planEstudioService->guardarPlanEstudio($request->all());
+        $data = $request->only(['detalle', 'fecha_inicio', 'fecha_fin']);
+    
+        $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
+
+        $PE = $PEResponse->getData();  // Extrae el contenido del JSON
+    
+        if (isset($PE->error)) {
+            return response()->json(['error' => $PE->error], 500);
+        }
+    
+        $id_carrera = $request->input('id_carrera');
+        $materias = $request->input('materias');
+    
+        Log::info('Asignando grado a carrera', [
+            'id_carrera' => $id_carrera,
+            'id_grado' => $PE->id_plan,
+        ]);
+    
+        $materiaResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
+    
+        if ($materiaResponse->getStatusCode() !== 201) {
+            return response()->json($materiaResponse->getData(), 500);
+        }
+
+
+        
+    
+        return response()->json(['message' => 'Plan de estudio guardado con éxito'], 201);
     }
+    
 
 
     /**

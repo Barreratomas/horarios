@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\horarios;
 
-use App\Models\Aula;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class PlanEstudioRequest extends FormRequest
 {
@@ -23,22 +21,23 @@ class PlanEstudioRequest extends FormRequest
      */
     public function rules(): array
     {
+        $esCreacion = $this->isMethod('post');
 
-
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/planEstudio/crear-planEstudio';
-
-
-
-
-        $detalleRules = $esCreacion ? ['required', 'string', 'max:255', Rule::unique('plan_estudio')] : ['nullable', 'string', 'max:255', Rule::unique('plan_estudio')];
-        $fechaInicioRules = $esCreacion ? ['required ', 'date'] : ['nullable ', 'date'];
-        $fechaFinRules = $esCreacion ? ['required ', 'date'] : ['nullable ', 'date'];
-
+        $detalleRules = $esCreacion ? ['required', 'string', 'max:255']  : ['nullable', 'string', 'max:255'];
+        $carreraRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
+        $fechaInicioRules = $esCreacion  ? ['required', 'date']  : ['nullable', 'date'];
+        $fechaFinRules = $esCreacion  ? ['required', 'date', 'after_or_equal:fecha_inicio']  : ['nullable', 'date', 'after_or_equal:fecha_inicio'];
+        $materiasRules = $esCreacion ? ['required', 'array', 'min:1']  : ['nullable', 'array'];
+        $materiasItemRules = ['integer'];
 
         return [
             'detalle' => $detalleRules,
+            'carrera_id' => $carreraRules,
             'fecha_inicio' => $fechaInicioRules,
-            'fecha_fin' => $fechaFinRules
+            'fecha_fin' => $fechaFinRules,
+            'materias' => $materiasRules,
+            'materias.*' => $materiasItemRules,
         ];
     }
+
 }
