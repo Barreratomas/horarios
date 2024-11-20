@@ -188,4 +188,9 @@ class AlumnoGradoController extends Controller
         return $this->alumnoGradoService->asignarAlumnosACarreras();
     }
 
+    public function cambiarGrado(Request $request)
+    {
+        return $this->alumnoGradoService->cambiarGradoRecursante($request->dni, $request->id_grado);
+    }
+    
 }

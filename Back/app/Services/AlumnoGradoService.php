@@ -9,6 +9,7 @@ use App\Mappers\AlumnoGradoMapper;
 use App\Models\AlumnoGrado;
 use App\Services\horarios\GradoService;
 use App\Models\horarios\Grado;
+use App\Models\Alumno;
 use App\Models\AlumnoUC;
 use App\Models\horarios\CarreraPlan;
 use App\Models\horarios\GradoUC;
@@ -190,4 +191,72 @@ class AlumnoGradoService implements AlumnoGradoRepository
             Log::warning("No se encontraron datos para insertar en alumno_carrera.");
         }
     }
+
+    public function cambiarGradoRecursante($dni, $id_grado)
+    {
+        try {
+            // Obtener el alumno por DNI pasado
+            $alumno = Alumno::where('dni', $dni)->first();
+
+            if (!$alumno) {
+                Log::warning("Alumno con DNI: $dni no encontrado");
+                return response()->json(['error' => 'Alumno no encontrado'], 404);
+            }
+
+            $id_alumno = $alumno->id_alumno;
+            Log::info("Alumno encontrado: ID $id_alumno, verificando si es recursante");
+
+            // Validar si el alumno es recursante 
+            $esRecursante = AlumnoUC::where('id_alumno', $id_alumno)->exists();
+
+            if (!$esRecursante) {
+                Log::warning("El alumno con ID $id_alumno no es recursante. Proceso detenido.");
+                return response()->json(['error' => 'El alumno no es recursante'], 403);
+            }
+
+            Log::info("El alumno con ID $id_alumno es recursante. Verificando el grado.");
+
+            
+            // Validar que el grado existe y tiene capacidad
+            $grado = Grado::find($id_grado);
+
+            if (!$grado) {
+                Log::warning("Grado con ID $id_grado no encontrado");
+                return response()->json(['error' => 'Grado no encontrado'], 404);
+            }
+
+            $capacidad = $grado->capacidad;
+            Log::info("Grado encontrado: ID $id_grado con capacidad máxima de $capacidad");
+
+            $alumnosEnGrado = AlumnoGrado::where('id_grado', $id_grado)->count();
+            Log::info("Alumnos actualmente en el grado $id_grado: $alumnosEnGrado");
+
+            if ($alumnosEnGrado >= $capacidad) {
+                Log::warning("El grado con ID $id_grado ha alcanzado su capacidad máxima");
+                return response()->json(['error' => 'El grado ha alcanzado su capacidad máxima'], 400);
+            }
+           
+            // Cambiar el grado del alumno
+            $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->first();
+
+            if (!$alumnoGrado) {
+                Log::warning("El alumno con ID $id_alumno no tiene una comision asignada actualmente");
+                return response()->json(['error' => 'El alumno no tiene asignada ninguna comision actualmente'], 404);
+            }
+
+            Log::info("Cambiando comision del alumno con ID $id_alumno al grado $id_grado");
+
+            $alumnoGrado->id_grado = $id_grado;
+            $alumnoGrado->save();
+
+            Log::info("Comision cambiada exitosamente para el alumno con ID $id_alumno al grado $id_grado");
+
+            return response()->json(['success' => 'Comision cambiada exitosamente'], 200);
+        } catch (Exception $e) {
+            Log::error("Error al cambiar la comision para el alumno con DNI: $dni al grado $id_grado. Detalles: " . $e->getMessage());
+            return response()->json(['error' => 'Ocurrió un error al cambiar la comision'], 500);
+        }
+    }
+    
+
 }
