@@ -137,7 +137,7 @@ const Comisiones = () => {
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
-            <div className="col-6 text-center">
+            <div className="col-12 text-center">
               <div className="filter mb-2 d-flex flex-wrap align-items-center">
                 <input
                   type="text"
@@ -165,11 +165,11 @@ const Comisiones = () => {
 
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-secondary me-2 px-0 py-1 mx-2"
                   onClick={handleClearFilters}
                   style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
                 >
-                  Limpiar
+                  Limpiar filtros
                 </button>
               </div>
 
