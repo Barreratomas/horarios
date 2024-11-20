@@ -13,6 +13,8 @@ interface AlumnoGradoRepository
 
     //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
     public function asignarAlumnosACarreras();
+    //cambiar de comision a alumno recursante
+    public function cambiarGradoRecursante($dni, $id_grado);
 
 
 }
