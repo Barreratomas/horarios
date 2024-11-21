@@ -47,4 +47,11 @@ class UCPlan extends Model
     {
         return $this->belongsTo(PlanEstudio::class, 'id_plan', 'id_plan');
     }
+    
+    public static function findByKey($id_uc, $id_plan)
+    {
+        return self::where('id_uc', $id_uc)
+            ->where('id_plan', $id_plan)
+            ->first();
+    }
 }

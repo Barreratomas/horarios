@@ -14,7 +14,6 @@ const ActualizarPlan = () => {
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const { planId } = useParams(); // Obtener el ID del plan desde la URL
-  console.log('ID del plan:', planId);
 
   // Obtener el plan de estudio actual para editarlo
   useEffect(() => {
@@ -29,8 +28,8 @@ const ActualizarPlan = () => {
         setDetalle(data.detalle);
         setFechaInicio(data.fecha_inicio);
         setFechaFin(data.fecha_fin);
-        // setSelectedCarrera(data.id_carrera);
-        // setSelectedMaterias(data.materias.map((materia) => materia.id_uc)); // Ajustar según cómo vengas las materias
+        setSelectedCarrera(data.carreras[0]?.id_carrera || ''); // Asumiendo que hay una sola carrera asociada
+        setSelectedMaterias(data.unidades_curriculares.map((materia) => materia.id_uc)); // Asumiendo que materias ya están mapeadas por id_uc
       } catch (error) {
         console.error('Error al obtener el plan:', error);
         setErrors([error.message || 'Servidor fuera de servicio...']);

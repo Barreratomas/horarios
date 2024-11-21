@@ -148,7 +148,7 @@ const Planes = () => {
                 </Accordion>
 
                 {/* Accordion para las carreras */}
-                <Accordion title="Ver Carreras Asociadas">
+                <Accordion title="Ver Carrera Asociada">
                   {plan.carreras.length > 0 ? (
                     <ul>
                       {plan.carreras.map((carrera) => (

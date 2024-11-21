@@ -126,22 +126,13 @@ class PlanEstudioController extends Controller
             $materias = $request->input('materias');
     
             // Log de datos iniciales
-            Log::info('Datos del request para guardar plan de estudio(ya controller)', [
-                'data' => $data,
-                'id_carrera' => $id_carrera,
-                'materias' => $materias,
-            ]);
-    
+          
             // Guardar plan de estudio
             $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
-            Log::info('Respuesta del servicio guardarPlanEstudio', [
-                'response' => $PEResponse
-            ]);
+          
     
             $PE = $PEResponse->getData();
-            Log::info('Datos extraídos de la respuesta de guardarPlanEstudio', [
-                'PE' => $PE
-            ]);
+         
     
             if (isset($PE->error)) {
                 Log::error('Error en la respuesta de guardarPlanEstudio', [
@@ -152,9 +143,7 @@ class PlanEstudioController extends Controller
     
             // Guardar UCPlan
             $ucplanResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
-            Log::info('Respuesta del servicio guardarUCPlan', [
-                'response' => $ucplanResponse
-            ]);
+          
     
             if ($ucplanResponse->getStatusCode() !== 201) {
                 DB::rollBack();
@@ -166,9 +155,7 @@ class PlanEstudioController extends Controller
     
             // Guardar CarreraPlan
             $carreraPlanResponse = $this->CarreraPlanService->guardarCarreraPlan($PE->id_plan, $id_carrera);
-            Log::info('Respuesta del servicio guardarCarreraPlan', [
-                'response' => $carreraPlanResponse
-            ]);
+          
     
             if ($carreraPlanResponse->getStatusCode() !== 201) {
                 DB::rollBack();
@@ -179,7 +166,6 @@ class PlanEstudioController extends Controller
             }
     
             DB::commit();
-            Log::info('Plan de estudio guardado con éxito');
             return response()->json(['message' => 'Plan de estudio guardado con éxito'], 201);
                 
         } catch (Exception $e) {
@@ -232,8 +218,71 @@ class PlanEstudioController extends Controller
      */
     public function update(PlanEstudioRequest $request, $id)
     {
-        return $this->planEstudioService->actualizarPlanEstudio($request->all(), $id);
+        DB::beginTransaction(); // Inicia la transacción
+
+        try {
+            // Obtener datos del request
+            $data = $request->only(['detalle', 'fecha_inicio', 'fecha_fin']);
+            $id_carrera = $request->input('id_carrera');
+            $materias = $request->input('materias');
+
+            // Log de datos iniciales
+            
+
+            // Actualizar el PlanEstudio
+            $planEstudioResponse = $this->planEstudioService->actualizarPlanEstudio($data, $id);
+          
+
+            if ($planEstudioResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+                Log::error('Error al actualizar PlanEstudio', [
+                    'response' => $planEstudioResponse->getData()
+                ]);
+                return response()->json($planEstudioResponse->getData(), 500);
+            }
+
+            // Actualizar UCPlan si se han enviado materias
+            if (isset($materias)) {
+                $ucplanResponse = $this->UCPlanService->actualizarUCPlan($materias, $id);
+               
+
+                if ($ucplanResponse->getStatusCode() !== 200) {
+                    DB::rollBack();
+                    Log::error('Error al actualizar UCPlan', [
+                        'response' => $ucplanResponse->getData()
+                    ]);
+                    return response()->json($ucplanResponse->getData(), 500);
+                }
+            }
+
+
+            // Actualizar CarreraPlan si se ha enviado id_carrera
+            if (isset($id_carrera)) {
+                $carreraPlanResponse = $this->CarreraPlanService->actualizarCarreraPlan($id_carrera, $id);
+               
+
+                if ($carreraPlanResponse->getStatusCode() !== 200) {
+                    DB::rollBack();
+                    Log::error('Error al actualizar CarreraPlan', [
+                        'response' => $carreraPlanResponse->getData()
+                    ]);
+                    return response()->json($carreraPlanResponse->getData(), 500);
+                }
+            }
+
+            DB::commit(); // Si todo fue bien, commit de la transacción
+            return response()->json(['message' => 'Plan de estudio actualizado con éxito'], 200);
+
+        } catch (Exception $e) {
+            DB::rollBack(); // Si ocurre una excepción, revertimos la transacción
+            Log::error('Error al actualizar el plan de estudio', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Hubo un error al actualizar el plan de estudio'], 500);
+        }
     }
+
 
 
     /**
