@@ -2,7 +2,7 @@
 
 namespace App\Mappers;
 
-use App\Models\horarios\CarreraPlan;
+use App\Models\CarreraPlan;
 
 
 class CarreraPlanMapper

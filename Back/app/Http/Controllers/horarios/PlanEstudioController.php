@@ -5,7 +5,7 @@ namespace App\Http\Controllers\horarios;
 use App\Services\horarios\PlanEstudioService;
 use App\Http\Requests\horarios\PlanEstudioRequest;
 use App\Http\Controllers\Controller;
-use App\Models\horarios\CarreraPlan;
+use App\Services\CarreraPlanService;
 use App\Services\horarios\UCPlanService;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +15,13 @@ class PlanEstudioController extends Controller
 {
     protected $planEstudioService;
     protected $UCPlanService;
-    protected $CarreraPlan;
+    protected $CarreraPlanService;
 
-    public function __construct(PlanEstudioService $planEstudioService, UCPlanService $UCPlanService, CarreraPlan $CarreraPlan)
+    public function __construct(PlanEstudioService $planEstudioService, UCPlanService $UCPlanService, CarreraPlanService $CarreraPlanService)
     {
         $this->planEstudioService = $planEstudioService;
         $this->UCPlanService = $UCPlanService;
-        $this->CarreraPlan = $CarreraPlan;
+        $this->CarreraPlanService = $CarreraPlanService;
 
     }
 
@@ -117,48 +117,81 @@ class PlanEstudioController extends Controller
      * )
      */
     public function store(PlanEstudioRequest $request)
-{
-    DB::beginTransaction();
-
-    try {
-        $data = $request->only(['detalle', 'fecha_inicio', 'fecha_fin']);
-        $id_carrera = $request->input('id_carrera');
-        $materias = $request->input('materias');
-
-        // Guardar plan de estudio
-        $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
-        $PE = $PEResponse->getData();
-
-        if (isset($PE->error)) {
-            return response()->json(['error' => $PE->error], 500);
-        }
-
-        // Guardar UCPlan
-        $ucplanResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
-
-        if ($ucplanResponse->getStatusCode() !== 201) {
+    {
+        DB::beginTransaction();
+    
+        try {
+            $data = $request->only(['detalle', 'fecha_inicio', 'fecha_fin']);
+            $id_carrera = $request->input('id_carrera');
+            $materias = $request->input('materias');
+    
+            // Log de datos iniciales
+            Log::info('Datos del request para guardar plan de estudio(ya controller)', [
+                'data' => $data,
+                'id_carrera' => $id_carrera,
+                'materias' => $materias,
+            ]);
+    
+            // Guardar plan de estudio
+            $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
+            Log::info('Respuesta del servicio guardarPlanEstudio', [
+                'response' => $PEResponse
+            ]);
+    
+            $PE = $PEResponse->getData();
+            Log::info('Datos extraídos de la respuesta de guardarPlanEstudio', [
+                'PE' => $PE
+            ]);
+    
+            if (isset($PE->error)) {
+                Log::error('Error en la respuesta de guardarPlanEstudio', [
+                    'error' => $PE->error
+                ]);
+                return response()->json(['error' => $PE->error], 500);
+            }
+    
+            // Guardar UCPlan
+            $ucplanResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
+            Log::info('Respuesta del servicio guardarUCPlan', [
+                'response' => $ucplanResponse
+            ]);
+    
+            if ($ucplanResponse->getStatusCode() !== 201) {
+                DB::rollBack();
+                Log::error('Error al guardar UCPlan', [
+                    'response' => $ucplanResponse->getData()
+                ]);
+                return response()->json($ucplanResponse->getData(), 500);
+            }
+    
+            // Guardar CarreraPlan
+            $carreraPlanResponse = $this->CarreraPlanService->guardarCarreraPlan($PE->id_plan, $id_carrera);
+            Log::info('Respuesta del servicio guardarCarreraPlan', [
+                'response' => $carreraPlanResponse
+            ]);
+    
+            if ($carreraPlanResponse->getStatusCode() !== 201) {
+                DB::rollBack();
+                Log::error('Error al guardar CarreraPlan', [
+                    'response' => $carreraPlanResponse->getData()
+                ]);
+                return response()->json($carreraPlanResponse->getData(), 500);
+            }
+    
+            DB::commit();
+            Log::info('Plan de estudio guardado con éxito');
+            return response()->json(['message' => 'Plan de estudio guardado con éxito'], 201);
+                
+        } catch (Exception $e) {
             DB::rollBack();
-            return response()->json($ucplanResponse->getData(), 500);
+            Log::error('Error al guardar el plan de estudio', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Hubo un error al guardar el plan de estudio'], 500);
         }
-
-        // Guardar CarreraPlan
-        $carreraPlanResponse = $this->CarreraPlan->guardarCarreraPlan($PE->id_plan, $id_carrera);
-
-        if ($carreraPlanResponse->getStatusCode() !== 201) {
-            DB::rollBack();
-            return response()->json($carreraPlanResponse->getData(), 500);
-        }
-
-        DB::commit();
-        return response()->json(['message' => 'Plan de estudio guardado con éxito'], 201);
-            
-    } catch (Exception $e) {
-        DB::rollBack();
-        Log::error('Error al guardar el plan de estudio: ' . $e->getMessage());
-        return response()->json(['error' => 'Hubo un error al guardar el plan de estudio'], 500);
     }
     
-}
 
 
     /**

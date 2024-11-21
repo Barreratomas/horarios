@@ -52,8 +52,8 @@ class UCPlanService implements UCPlanRepository
 
             foreach ($materias as $materiaId) {
                 $uCPlan = new UCPlan();
-                $uCPlan->id_plan_estudio = $id_plan;  
-                $uCPlan->id_materia = $materiaId;     
+                $uCPlan->id_plan = $id_plan;  
+                $uCPlan->id_uc = $materiaId;     
 
                 $uCPlan->save();
             }
@@ -94,6 +94,7 @@ class UCPlanService implements UCPlanRepository
     {
         try {
             $uCPlan = UCPlan::find($id);
+            
             if ($uCPlan) {
                 $uCPlan->delete();
                 return response()->json(['success' => 'Se eliminó el uCPlan'], 200);
