@@ -11,7 +11,7 @@ use App\Services\horarios\GradoService;
 use App\Models\horarios\Grado;
 use App\Models\Alumno;
 use App\Models\AlumnoUC;
-use App\Models\horarios\CarreraPlan;
+use App\Models\CarreraPlan;
 use App\Models\horarios\GradoUC;
 use App\Models\horarios\PlanEstudio;
 use Exception;
@@ -38,6 +38,49 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'Hubo un error al obtener los alumnosGrado'], 500);
         }
     }
+public function obtenerTodosAlumnoGradoConRelaciones()
+{
+    try {
+        // Cargar los registros de AlumnoGrado con sus relaciones, incluida la carrera
+        $alumnosGrado = AlumnoGrado::with(['alumno', 'grado', 'alumno.alumno_carrera'])->get();
+
+        // Transformar los datos para estructurarlos correctamente
+        $result = $alumnosGrado->map(function ($alumnoGrado) {
+            return [
+                'id_alumno' => $alumnoGrado->id_alumno,
+                'id_grado' => $alumnoGrado->id_grado,
+                'alumno' => $alumnoGrado->alumno ? [
+                    'id_alumno' => $alumnoGrado->alumno->id_alumno,
+                    'DNI' => $alumnoGrado->alumno->DNI,
+                    'nombre' => $alumnoGrado->alumno->nombre,
+                    'apellido' => $alumnoGrado->alumno->apellido,
+                    'email' => $alumnoGrado->alumno->email,
+                    'telefono' => $alumnoGrado->alumno->telefono,
+                    'genero' => $alumnoGrado->alumno->genero,
+                    'fecha_nac' => $alumnoGrado->alumno->fecha_nac,
+                    'nacionalidad' => $alumnoGrado->alumno->nacionalidad,
+                    'direccion' => $alumnoGrado->alumno->direccion,
+                    'id_localidad' => $alumnoGrado->alumno->id_localidad,
+                    'carrera' => $alumnoGrado->alumno->alumno_carrera->first()->carrera->carrera ?? 'No asignada',
+                ] : null,
+                'grado' => $alumnoGrado->grado ? [
+                    'id_grado' => $alumnoGrado->grado->id_grado,
+                    'grado' => $alumnoGrado->grado->grado,
+                    'division' => $alumnoGrado->grado->division,
+                    'detalle' => $alumnoGrado->grado->detalle,
+                    'capacidad' => $alumnoGrado->grado->capacidad,
+                ] : null,
+            ];
+        });
+
+        return response()->json($result, 200);
+    } catch (Exception $e) {
+        Log::error('Error al obtener los alumnosGrado con relaciones: ' . $e->getMessage());
+        return response()->json(['error' => 'Hubo un error al obtener los datos'], 500);
+    }
+}
+
+    
 
     public function obtenerAlumnoGradoPorIdAlumno($id_alumno)
     {
@@ -52,7 +95,19 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'Hubo un error al obtener el alumnoGrado'], 500);
         }
     }
-
+    public function obtenerAlumnoGradoPorIdAlumnoConRelaciones($id_alumno)
+    {
+        $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->get();
+        if (!$alumnoGrado) {
+            return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
+        }
+        try {
+            return response()->json($alumnoGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el alumnoGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el alumnoGrado'], 500);
+        }
+    }
     public function obtenerAlumnoGradoPorIdGrado($id_grado)
     {
         $alumnoGrado = AlumnoGrado::where('id_grado', $id_grado)->get();
@@ -92,20 +147,27 @@ class AlumnoGradoService implements AlumnoGradoRepository
         }
     }
 
-    public function eliminarAlumnoGradoPorIdAlumno($id_alumno)
+    public function eliminarAlumnoGradoPorIdAlumnoYIdGrado($id_alumno, $id_grado)
     {
-        $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->first();
-        if (!$alumnoGrado) {
-            return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
-        }
         try {
-            $alumnoGrado->delete();
-            return response()->json(['success' => 'AlumnoGrado eliminado correctamente'], 200);
+            // Usamos el Query Builder para realizar la eliminación con la clave compuesta
+            $deleted = DB::table('alumno_grado')
+                ->where('id_alumno', $id_alumno)
+                ->where('id_grado', $id_grado)
+                ->delete();
+    
+            if ($deleted) {
+                return response()->json(['success' => 'AlumnoGrado eliminado correctamente'], 200);
+            } else {
+                return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
+            }
         } catch (Exception $e) {
+            // Si ocurre un error, lo registramos
             Log::error('Error al eliminar el alumnoGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al eliminar el alumnoGrado'], 500);
         }
     }
+    
 
     public function eliminarAlumnoGradoPorIdGrado($id_grado)
     {

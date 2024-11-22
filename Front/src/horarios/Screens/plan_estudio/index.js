@@ -46,7 +46,7 @@ const Planes = () => {
     const fetchPlanes = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/planEstudio', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/planEstudio/relaciones', {
           headers: { Accept: 'application/json' }
         });
 

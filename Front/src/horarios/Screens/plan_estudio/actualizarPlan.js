@@ -19,9 +19,12 @@ const ActualizarPlan = () => {
   useEffect(() => {
     const fetchPlan = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/horarios/planEstudio/${planId}`, {
-          headers: { Accept: 'application/json' }
-        });
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/horarios/planEstudio/relaciones/${planId}`,
+          {
+            headers: { Accept: 'application/json' }
+          }
+        );
         if (!response.ok) throw new Error('Error al obtener plan de estudio');
         const data = await response.json();
         console.log(data);

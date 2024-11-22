@@ -60,7 +60,7 @@ class AlumnoPlanService implements AlumnoPlanRepository
     {
         try {
             $alumnoPlanData = $request->all();
-            $alumnoPlanModel = $this->alumnoPlanMapper->toAlumnoUC($alumnoPlanData);
+            $alumnoPlanModel = $this->alumnoPlanMapper->toAlumnoPlan($alumnoPlanData);
             $alumnoPlanModel->save();
             return response()->json($alumnoPlanModel, 201);
         } catch (Exception $e) {
