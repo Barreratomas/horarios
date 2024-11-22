@@ -5,7 +5,7 @@ namespace App\Models\horarios;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\horarios\CarreraPlan;
+use App\Models\CarreraPlan;
 use App\Models\AlumnoPlan;
 
 

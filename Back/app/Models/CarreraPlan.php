@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\horarios;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +36,9 @@ class CarreraPlan extends Model
     public $incrementing = false;
     public $timestamps = false;
 
+    // Especificar las claves compuestas
+    protected $primaryKey = ['id_carrera', 'id_plan'];
+
     // Una carrera_plan pertenece a una carrera
     public function carrera(): BelongsTo
     {
@@ -47,4 +50,7 @@ class CarreraPlan extends Model
     {
         return $this->belongsTo(PlanEstudio::class, 'id_plan', 'id_plan');
     }
+    
+
+    
 }

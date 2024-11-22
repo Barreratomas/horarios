@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import '../../css/acordeon.css';
+
+// Componente Accordion reutilizable
+const Accordion = ({ title, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleAccordion = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="accordion">
+      <div className="accordion-header" onClick={toggleAccordion}>
+        <h3>{title}</h3>
+      </div>
+      <div className={`accordion-body ${isOpen ? 'open' : ''}`}>{children}</div>
+    </div>
+  );
+};
 
 const Planes = () => {
   const navigate = useNavigate();
@@ -34,10 +53,10 @@ const Planes = () => {
         if (!response.ok) throw new Error('Error al obtener los planes');
 
         const data = await response.json();
+        console.log(data);
         setPlanes(data);
         setServerUp(true);
       } catch (error) {
-        console.error('Error al obtener los planes:', error);
         setErrors([error.message || 'Servidor fuera de servicio...']);
       } finally {
         setLoading(false);
@@ -108,6 +127,40 @@ const Planes = () => {
                 <p>Detalle: {plan.detalle}</p>
                 <p>Fecha Inicio: {new Date(plan.fecha_inicio).toLocaleDateString()}</p>
                 <p>Fecha Fin: {new Date(plan.fecha_fin).toLocaleDateString()}</p>
+
+                {/* Accordion para las unidades curriculares */}
+                <Accordion title="Ver Unidades Curriculares">
+                  {plan.unidades_curriculares.length > 0 ? (
+                    <ul>
+                      {plan.unidades_curriculares.map((uc) => (
+                        <li key={uc.id_uc}>
+                          <strong>{uc.unidad_curricular}</strong> - {uc.tipo} ({uc.formato})
+                          <br />
+                          <small>
+                            {uc.horas_sem} horas/semana, {uc.horas_anual} horas/año
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No hay unidades curriculares asociadas.</p>
+                  )}
+                </Accordion>
+
+                {/* Accordion para las carreras */}
+                <Accordion title="Ver Carrera Asociada">
+                  {plan.carreras.length > 0 ? (
+                    <ul>
+                      {plan.carreras.map((carrera) => (
+                        <li key={carrera.id_carrera}>
+                          <strong>{carrera.carrera}</strong> (Cupo: {carrera.cupo})
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No hay carreras asociadas.</p>
+                  )}
+                </Accordion>
 
                 <div className="botones">
                   <button
