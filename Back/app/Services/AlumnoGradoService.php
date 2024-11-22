@@ -265,8 +265,6 @@ public function obtenerTodosAlumnoGradoConRelaciones()
             ], 200);
     }
 
-<<<<<<< HEAD
-=======
     public function cambiarGradoRecursante($dni, $id_grado)
     {
         try {
@@ -334,5 +332,4 @@ public function obtenerTodosAlumnoGradoConRelaciones()
     }
     
 
->>>>>>> 8dba832801b4f05b180fbc80571d9f64cb6b460d
 }
