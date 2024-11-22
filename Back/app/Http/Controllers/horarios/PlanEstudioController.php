@@ -58,7 +58,10 @@ class PlanEstudioController extends Controller
     }
 
 
-
+    public function indexConRelaciones()
+    {
+        return $this->planEstudioService->obtenerPlanEstudioConRelaciones();
+    }
 
     /**
      * @OA\Get(
@@ -91,7 +94,11 @@ class PlanEstudioController extends Controller
     {
         return $this->planEstudioService->obtenerPlanEstudioPorId($id);
     }
-
+    
+    public function showConRelaciones($id)
+    {
+        return $this->planEstudioService->obtenerPlanEstudioPorIdConRelaciones($id);
+    }
 
     /**
      * @OA\Post(

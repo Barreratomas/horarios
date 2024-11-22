@@ -22,8 +22,17 @@ class PlanEstudioService implements PlanEstudioRepository
 
     }
 
-
     public function obtenerPlanEstudio()
+    {
+        try {
+            $planEstudios = PlanEstudio::all();
+            return response()->json($planEstudios, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener los planEstudios: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener los planEstudios'], 500);
+        }
+    }
+    public function obtenerPlanEstudioConRelaciones()
     {
         try {
             // Traer los planes con unidades curriculares y carreras
@@ -52,7 +61,19 @@ class PlanEstudioService implements PlanEstudioRepository
         }
     }
 
+
+
     public function obtenerPlanEstudioPorId($id)
+    {
+        try {
+            $planEstudios = PlanEstudio::find($id);
+            return response()->json($planEstudios, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el planEstudio: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el planEstudio'], 500);
+        }
+    }
+    public function obtenerPlanEstudioPorIdConRelaciones($id)
 {
     try {
         // Buscar el plan de estudio por id, con sus relaciones
@@ -88,18 +109,14 @@ class PlanEstudioService implements PlanEstudioRepository
     public function guardarPlanEstudio($data)
     {
         try {
-            // $data es el array con 'detalle', 'fecha_inicio', 'fecha_fin'
             $planEstudio = new PlanEstudio($data);  
             
             $planEstudioModel = $this->planEstudioMapper->toPlanEstudio($planEstudio);
             
-            // Guardar el modelo en la base de datos
             $planEstudioModel->save();
             
-            // Retornar la respuesta con el modelo guardado
             return response()->json($planEstudioModel, 201);
         } catch (Exception $e) {
-            // Loguear el error si ocurre
             Log::error('Error al guardar el planEstudio: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el planEstudio'], 500);
         }
@@ -108,24 +125,19 @@ class PlanEstudioService implements PlanEstudioRepository
 
     public function actualizarPlanEstudio($data, $id)
     {
-        // Buscar el plan de estudio por su ID
         $planEstudio = PlanEstudio::find($id);
         if (!$planEstudio) {
             return response()->json(['error' => 'Plan Estudio no encontrado'], 404);
         }
     
         try {
-            // Asignar los datos al modelo existente
-            $planEstudio->fill($data); // Esto asigna los valores de $data al modelo
+            $planEstudio->fill($data); 
     
-            // Guardar los cambios en la base de datos
             $planEstudio->save();
     
-            // Retornar la respuesta con el plan de estudio actualizado
             return response()->json($planEstudio, 200);
     
         } catch (Exception $e) {
-            // Loguear el error si ocurre
             Log::error('Error al actualizar el planEstudio: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al actualizar el planEstudio'], 500);
         }

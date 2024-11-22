@@ -143,7 +143,9 @@ Route::put('horarios/docente/actualizar-h_p_d/{h_p_d}', [HorarioPrevioDocenteCon
 
 // PlanEstudio
 Route::get('/horarios/planEstudio', [PlanEstudioController::class, 'index']);
+Route::get('/horarios/planEstudio/relaciones', [PlanEstudioController::class, 'indexConRelaciones']);
 Route::get('/horarios/planEstudio/{id}', [PlanEstudioController::class, 'show']);
+Route::get('/horarios/planEstudio/relaciones/{id}', [PlanEstudioController::class, 'showConRelaciones']);
 Route::post('/horarios/planEstudio/guardar', [PlanEstudioController::class, 'store']);
 Route::put('/horarios/planEstudio/actualizar/{id}', [PlanEstudioController::class, 'update']);
 Route::delete('/horarios/planEstudio/eliminar/{id}', [PlanEstudioController::class, 'destroy']);
