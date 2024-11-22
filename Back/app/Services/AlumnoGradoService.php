@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Controllers\horarios\GradoController;
+use App\Models\AlumnoCarrera;
 use App\Models\horarios\UCPlan;
 use App\Repositories\AlumnoGradoRepository;
 use App\Mappers\AlumnoGradoMapper;
@@ -121,7 +122,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
         }
     }
 
-    //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
+
     public function asignarAlumnosACarreras()
     {
         $alumnosUC = AlumnoUC::all();   // Relación alumnos con UCs
@@ -129,65 +130,76 @@ class AlumnoGradoService implements AlumnoGradoRepository
         $carrerasPlan = CarreraPlan::all();  // Relación Planes con Carreras
         $gradoUC = GradoUC::all();  // Relación entre grados y UCs
 
-        $dataToInsertAlumnoCarrera = [];
-        $dataToInsertAlumnoGrado = [];  // Para asociar alumnos con grados
+        $existentesAlumnoCarrera = collect(); // Son diccionarios con los alumnos que ya tienen asignada una carrera y su id
+        $existentesAlumnoGrado = collect();  // Son diccionarios con los alumnos que ya tienen asignado un grado y su id
 
-        // Recorrer los alumnosUC y sus relaciones
         foreach ($alumnosUC as $alumnoUC) {
             $id_alumno = $alumnoUC->id_alumno;
             $id_uc = $alumnoUC->id_uc;
 
-            // Buscar el id_plan relacionado con el id_uc
+            
             $ucPlan = $ucsPlan->firstWhere('id_uc', $id_uc);
-
-            if ($ucPlan) {
+            if($ucPlan){
                 $id_plan = $ucPlan->id_plan;
                 Log::info("Plan para UC $id_uc: $id_plan");
 
-                // Buscar la carrera relacionada con ese plan
                 $carreraPlan = $carrerasPlan->firstWhere('id_plan', $id_plan);
-
                 if ($carreraPlan) {
                     $id_carrera = $carreraPlan->id_carrera;
                     Log::info("Carrera para Plan $id_plan: $id_carrera");
 
-                    // Almacenar los datos para insertar en alumno_carrera
-                    $dataToInsertAlumnoCarrera[] = [
-                        'id_alumno' => $id_alumno,
-                        'id_carrera' => $id_carrera
-                    ];
 
-                    // Buscar el grado asociado a la UC del alumno
-                    $gradoUCEntry = $gradoUC->firstWhere('id_uc', $id_uc);
-
-                    if ($gradoUCEntry) {
-                        $id_grado = $gradoUCEntry->id_grado;
-                        Log::info("Grado para UC $id_uc: $id_grado");
-
-                        // Crear una nueva instancia de AlumnoGrado y guardarla
-                        AlumnoGrado::create([
+                    $alumnoCarreraExistente = AlumnoCarrera::where('id_alumno', $id_alumno)
+                                                        ->where('id_carrera', $id_carrera)
+                                                        ->exists();
+                    if($alumnoCarreraExistente != 2){
+                        AlumnoCarrera::create([
                             'id_alumno' => $id_alumno,
-                            'id_grado' => $id_grado
+                            'id_carrera' => $id_carrera
                         ]);
-
-                        Log::info("Alumno $id_alumno asignado al grado $id_grado.");
                     } else {
-                        Log::warning("No se encontró grado para UC: $id_uc");
+                        $existentesAlumnoCarrera->put("$id_alumno.$id_carrera", [$id_alumno, $id_carrera]);
+                        Log::info("Ya existe la carrera para el alumno $id_alumno y la carrera $id_carrera");
                     }
-                } else {
-                    Log::warning("No se encontró carrera para Plan: $id_plan");
+                    
+                    $gradoUCEntry = $gradoUC->firstWhere('id_uc', $id_uc);
+                        if ($gradoUCEntry) {
+                            $id_grado = $gradoUCEntry->id_grado;
+                            Log::info("Grado para UC $id_uc: $id_grado"); 
+
+                            $alumnoGradoExistente = AlumnoGrado::where('id_alumno', $id_alumno)
+                                                        ->where('id_grado', $id_grado)
+                                                        ->exists();
+                            if($alumnoGradoExistente != 2){
+                                AlumnoGrado::create([
+                                    'id_alumno' => $id_alumno,
+                                    'id_grado' => $id_grado
+                                ]);
+                            } else{
+                                $existentesAlumnoGrado->put("$id_alumno.$id_grado", [$id_alumno, $id_grado]);
+                                Log::info("Ya existe el grado para el alumno $id_alumno y el grado $id_grado");
+                            }
+                            
+                        }
+
+                        $existentesAlumnoCarrera->each(function ($item, $key) {
+                            Log::info("Key: " . (string)$key . ", Value: " . json_encode($item));
+                        });
+                        
                 }
-            } else {
-                Log::warning("No se encontró plan para UC: $id_uc");
             }
         }
-
-        // Insertar en la tabla alumno_carrera (aquí mantenemos la inserción en bloque)
-        if (!empty($dataToInsertAlumnoCarrera)) {
-            DB::table('alumno_carrera')->insert($dataToInsertAlumnoCarrera);
-            Log::info("Datos insertados en la tabla alumno_carrera correctamente.");
-        } else {
-            Log::warning("No se encontraron datos para insertar en alumno_carrera.");
-        }
+            return response()->json([
+                'success' => 'Alumno asignado a carrera y grado correctamente',
+                'data' => [
+                    'alumnoCarreraExistente' => $existentesAlumnoCarrera->mapWithKeys(function ($item, $key) {
+                        return [$key => $item];
+                    }),
+                    'alumnoGradoExistente' => $existentesAlumnoGrado->mapWithKeys(function ($item, $key) {
+                        return [$key => $item];
+                    }),
+                ]
+            ], 200);
     }
+
 }
