@@ -3,108 +3,179 @@
 namespace App\Http\Controllers\horarios;
 
 use App\Http\Requests\horarios\HorarioPrevioDocenteRequest;
-use App\Models\Docente;
-use App\Models\horarios\DocenteUC;
-use App\Models\horarios\HorarioPrevioDocente;
 use App\Services\horarios\HorarioPrevioDocenteService;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
-
+/**
+ * @OA\Tag(
+ *     name="HorarioPrevioDocente",
+ *     description="Gestión de horarios previos de docentes"
+ * )
+ */
 class HorarioPrevioDocenteController extends Controller
 {
-    protected $HorarioPrevioDocenteService;
+    protected $horarioPrevioDocenteService;
 
-
-    public function __construct(HorarioPrevioDocenteService $HorarioPrevioDocenteService)
+    public function __construct(HorarioPrevioDocenteService $horarioPrevioDocenteService)
     {
-        $this->HorarioPrevioDocenteService = $HorarioPrevioDocenteService;
+        $this->horarioPrevioDocenteService = $horarioPrevioDocenteService;
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/horarios/horariosPreviosDocentes",
+     *      summary="Obtener todos los horarios previos de docentes",
+     *      description="Devuelve una lista de horarios previos de docentes",
+     *      operationId="getHorariosPreviosDocentes",
+     *      tags={"HorarioPrevioDocente"},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Lista de horarios previos de docentes"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Error al obtener los horarios"
+     *      )
+     * )
+     */
     public function index()
     {
-        $horariosPreviosDocentes = $this->HorarioPrevioDocenteService->obtenerTodosHorariosPreviosDocentes();
-        return view('horarios_previos.index', compact('horariosPreviosDocentes'));
-
+        return $this->horarioPrevioDocenteService->obtenerTodosHorariosPreviosDocentes();
     }
 
-    public function mostrarHorarioPrevioDocente(Request $request)
+/**
+ * @OA\Get(
+ *     path="/api/horarios/horariosPreviosDocentes/{id}",
+ *     summary="Obtener un horario previo de docente por ID",
+ *     description="Devuelve un horario previo de docente por su ID",
+ *     operationId="getHorarioPrevioDocentePorId",
+ *     tags={"HorarioPrevioDocente"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID del horario previo de docente",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="integer"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Horario previo de docente obtenido correctamente"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="No se encontró el horario previo"
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Error al obtener el horario previo"
+ *     )
+ * )
+ */
+public function show($id_docente) 
+{
+    return $this->horarioPrevioDocenteService->obtenerHorarioPrevioDocentePorIdDocente($id_docente); // Llamo al método con el nombre correcto
+}
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/horarios/horariosPreviosDocentes",
+     *     summary="Crear un horario previo para un docente",
+     *     description="Crea un nuevo horario previo para un docente",
+     *     operationId="crearHorarioPrevioDocente",
+     *     tags={"HorarioPrevioDocente"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocenteRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Horario previo de docente creado correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Error al crear el horario previo"
+     *     )
+     * )
+     */
+    public function store(HorarioPrevioDocenteRequest $request)
     {
-        $id_h_p_d = $request->input("id_h_p_d");
-        $horarioPrevioDocente = $this->HorarioPrevioDocenteService->obtenerHorarioPrevioDocentePorId($id_h_p_d);
-        return view('horarios_previos.index', compact('horarioPrevioDocente'));
+        $id_docente = $request->input('id_docente');
+        $dia = $request->input('dia');
+        $hora = $request->input('hora');
+
+        return $this->horarioPrevioDocenteService->guardarHorarioPrevioDocente($id_docente, $dia, $hora);
     }
 
-
-    public function crear(Docente $docente)
+    /**
+     * @OA\Put(
+     *     path="/api/horarios/horariosPreviosDocentes/{id}",
+     *     summary="Actualizar un horario previo de docente",
+     *     description="Actualiza un horario previo de docente existente",
+     *     operationId="actualizarHorarioPrevioDocente",
+     *     tags={"HorarioPrevioDocente"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del horario previo de docente",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocenteRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Horario previo de docente actualizado correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Error al actualizar el horario previo"
+     *     )
+     * )
+     */
+    public function update(HorarioPrevioDocenteRequest $request, $id_h_p_d)
     {
-        return view('horarioPrevioDocente.crearHorarioPrevioDocente', compact('docente'));
+        $dia = $request->input('dia');
+        $hora = $request->input('hora');
+
+        return $this->horarioPrevioDocenteService->actualizarHorarioPrevioDocente($id_h_p_d, $dia, $hora);
     }
 
-
-
-    public function store(HorarioPrevioDocenteRequest $request, Docente $docente)
+    /**
+     * @OA\Delete(
+     *     path="/api/horarios/horariosPreviosDocentes/{id}",
+     *     summary="Eliminar un horario previo de docente",
+     *     description="Elimina un horario previo de docente por su ID",
+     *     operationId="eliminarHorarioPrevioDocente",
+     *     tags={"HorarioPrevioDocente"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del horario previo de docente",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Horario previo eliminado correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Error al eliminar el horario previo"
+     *     )
+     * )
+     */
+    public function destroy($id_h_p_d)
     {
-        $dni = $docente->dni;
-        $dni_docente = $dni;
-
-        $dia = $request->filled("dia") ? $request->input("dia") : null;
-        $hora = $request->input("hora");
-
-        // Validar si no se envió ninguna hora
-        if (empty($hora)) {
-            $hora = "17:00"; // Asignar 17:00 si no se envió ninguna hora
-        } else {
-            // Convertir la cadena de tiempo a un objeto DateTime
-            $hora = \DateTime::createFromFormat('H:i', $hora);
-            // Obtener solo la hora formateada en "HH:MM"
-            $hora = $hora->format('H:i');
-        }
-
-        $response = $this->HorarioPrevioDocenteService->guardarHorarioPrevioDocente($dni_docente, $dia, $hora);
-        if (isset($response['success'])) {
-            return redirect()->route('mostrarFormularioDocenteUC', ['docente' => $dni])->with('success', ['message' => $response['success']]);
-        } else {
-            return redirect()->route('mostrarFormularioHPD', ['docente' => $dni])->withErrors(['error' => $response['error']]);
-        }
-
+        return $this->horarioPrevioDocenteService->eliminarHorarioPrevioDocentePorId($id_h_p_d);
     }
-
-    public function formularioActualizar(HorarioPrevioDocente $h_p_d, DocenteUC $dUC)
-    {
-        return view('horarioPrevioDocente.actualizarHorarioPrevioDocente', compact('h_p_d', 'dUC'));
-    }
-
-    public function actualizar(HorarioPrevioDocenteRequest $request, HorarioPrevioDocente $h_p_d, DocenteUC $dUC)
-    {
-        $dia = $request->input("dia");
-        $hora = $request->input("hora");
-
-        $response = $this->HorarioPrevioDocenteService->actualizarHorarioPrevioDocente($dia, $hora, $h_p_d);
-
-        if (isset($response['success'])) {
-            return redirect()->route('mostrarActualizarDocenteUC', ['h_p_d' => $h_p_d->id_h_p_d, 'dUC' => $dUC->id_dUC])->with('success', ['message' => $response['success']]);
-        } else {
-            return redirect()->route('mostrarActualizarHPD', ['h_p_d' => $h_p_d->id_h_p_d, 'dUC' => $dUC->id_dUC])->withErrors(['error' => $response['error']]);
-        }
-
-    }
-
-    public function eliminar(Request $request)
-    {
-        $id_h_p_d = $request->input("id_h_p_d");
-        $horarioPrevioDocente = HorarioPrevioDocente::find($id_h_p_d);
-        $horarioPrevioDocente->delete();
-
-        $response = $this->HorarioPrevioDocenteService->eliminarHorarioPrevioDocentePorId($id_h_p_d);
-        if (isset($response['success'])) {
-            return redirect()->route('horarioPrevioDocente.index')->with('success', ['message' => $response['success']]);
-        } else {
-            return redirect()->route('horarioPrevioDocente.index')->withErrors(['error' => $response['error']]);
-        }
-        //return view('horarios_previos.index');
-
-    }
-
-
 }

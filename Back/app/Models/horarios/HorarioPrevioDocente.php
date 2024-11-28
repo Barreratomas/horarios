@@ -44,6 +44,7 @@ class HorarioPrevioDocente extends Model
     protected $fillable = ['id_docente', 'dia', 'hora'];
     protected $primaryKey = 'id_h_p_d';
 
+    public $timestamps = false;
 
     // Un horario previo docente pertenece a un docente
     public function docente():HasMany{
