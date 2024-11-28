@@ -135,11 +135,12 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 // Route::get('horario/crear-horario',[HorarioController::class,'crear'])->name('crearHorario');
 Route::get('/horarios/crear-horario', [HorarioController::class, 'store'])->name('storeHorario');
 
-// HorarioPrevioDocente(REVISAR LA LOGICA)
-// agregar index
-Route::get('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'crear'])->name('mostrarFormularioHPD');
-Route::post('horarios/docente/crear-h-p-d/{docente}', [HorarioPrevioDocenteController::class, 'store'])->name('storeHPD');
-Route::put('horarios/docente/actualizar-h_p_d/{h_p_d}', [HorarioPrevioDocenteController::class, 'actualizar'])->name('actualizarHPD');
+// HorarioPrevioDocente
+Route::get('/horarios/horariosPreviosDocentes', [HorarioPrevioDocenteController::class, 'index']);
+Route::get('/horarios/horariosPreviosDocentes/{id}', [HorarioPrevioDocenteController::class, 'show']);
+Route::post('/horarios/horariosPreviosDocentes/guardar', [HorarioPrevioDocenteController::class, 'store']);
+Route::put('/horarios/horariosPreviosDocentes/actualizar/{id}', [HorarioPrevioDocenteController::class, 'update']);
+Route::delete('/horarios/horariosPreviosDocentes/eliminar/{id}', [HorarioPrevioDocenteController::class, 'destroy']);
 
 // PlanEstudio
 Route::get('/horarios/planEstudio', [PlanEstudioController::class, 'index']);

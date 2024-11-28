@@ -6,8 +6,8 @@ namespace App\Repositories\horarios;
 interface HorarioPrevioDocenteRepository
 {
     public function obtenerTodosHorariosPreviosDocentes();
-    public function obtenerHorarioPrevioDocentePorId($id_h_p_d);
+    public function obtenerHorarioPrevioDocentePorIdDocente($id_docente);
     public function guardarHorarioPrevioDocente($id_docente,$dia,$hora);
-    public function actualizarHorarioPrevioDocente($dia,$hora,$h_p_d);
-    public function  eliminarHorarioPrevioDocentePorId($h_p_d);
+    public function actualizarHorarioPrevioDocente($id_h_p_d, $dia, $hora);
+    public function  eliminarHorarioPrevioDocentePorId($id_h_p_d);
 }
