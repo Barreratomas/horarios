@@ -73,6 +73,11 @@ class CarreraGradoController extends Controller
     {
         return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
     }
+    // trae el grado con su carrera y materias asignadas
+    public function showByCarreraConMaterias($id_carrera)
+    {
+        return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
+    }
     
 
     /*

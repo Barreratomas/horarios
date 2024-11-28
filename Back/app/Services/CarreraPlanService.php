@@ -54,6 +54,28 @@ class CarreraPlanService
         }
     }
 
+    public function obtenerCarreraPlanPorIdCarreraConMaterias($id_carrera)
+    {
+        try {
+            // Carga la relación 'planEstudio.ucPlan.unidadCurricular' para incluir las materias
+            $carreraPlan = CarreraPlan::with(['carrera', 'planEstudio.ucPlan.unidadCurricular'])
+                ->where('id_carrera', $id_carrera)
+                ->get();
+    
+            if ($carreraPlan->isEmpty()) {
+                return response()->json(['error' => 'CarreraPlan no encontrado'], 404);
+            }
+    
+            return response()->json($carreraPlan, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el carreraPlan: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el carreraPlan con materias'], 500);
+        }
+    }
+    
+    
+
+
     public function obtenerCarreraPlanPorIdPlan($id_plan)
     {
         try {

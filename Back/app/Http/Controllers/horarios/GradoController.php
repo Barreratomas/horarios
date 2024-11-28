@@ -8,17 +8,23 @@ use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\CarreraGradoService;
+use App\Services\horarios\GradoUcService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class GradoController extends Controller
 {
     protected $gradoService;
     protected $carreraGradoService; 
+    protected $gradoUcService; 
 
-    public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService)
+
+    public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService, GradoUcService $gradoUcService)
     {
         $this->gradoService = $gradoService;
         $this->carreraGradoService = $carreraGradoService;
+        $this->gradoUcService = $gradoUcService;
+
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -109,17 +115,44 @@ class GradoController extends Controller
      */
     public function store(GradoRequest $request)
     {
-        $gradoResponse = $this->gradoService->guardarGrados($request);
-        $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
+        DB::beginTransaction();
 
+        try {
+            // Guardar el grado (solo los campos necesarios para grado)
+            $gradoResponse = $this->gradoService->guardarGrados($request->only(['grado', 'division', 'detalle', 'capacidad']));
+            $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
         
-
-        $id_carrera = $request->input('id_carrera');
-       
-
-        $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado);
-        return response()->json(['message' => 'Grado creado y asignado a carrera exitosamente', 'data' => $grado], 201);
-
+            // Obtener el ID de la carrera
+            $id_carrera = $request->input('id_carrera');
+            
+            // Guardar la relación entre carrera y grado
+            $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado);
+            
+            // Guardar las materias relacionadas con el grado
+            $materias = $request->input('materias');
+            if ($materias) {
+                $this->gradoUcService->guardarGradoUC( $grado->id_grado, $materias);
+            }
+    
+            // Si todo va bien, hacer commit
+            DB::commit();
+    
+            // Responder con el mensaje de éxito
+            return response()->json([
+                'message' => 'Grado creado y asignado a carrera exitosamente', 
+                'data' => $grado
+            ], 201);
+    
+        } catch (\Exception $e) {
+            // Si ocurre un error, hacer rollback de la transacción
+            DB::rollBack();
+            
+            // Registrar el error
+            Log::error('Error al guardar el grado y las relaciones: ' . $e->getMessage());
+            
+            // Responder con un error
+            return response()->json(['error' => 'Hubo un error al guardar el grado y sus relaciones'], 500);
+        }
     }
 
     /**

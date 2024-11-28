@@ -53,19 +53,30 @@ class GradoUcService implements GradoUcRepository
         }
     }
 
-    public function guardarGradoUC($request)
+    public function guardarGradoUC($id_grado, array $materias)
     {
         try {
-            $gradoUCData = $request->all();
-            $gradoUC = new GradoUC($gradoUCData);
-            $gradoUCModel = $this->gradoUCMapper->toGradoUC($gradoUC);
-            $gradoUCModel->save();
-            return response()->json($gradoUC, 201);
+            foreach ($materias as $materiaId) {
+                // Preparar los datos para el mapeo
+                $gradoUCData = [
+                    'id_grado' => $id_grado,
+                    'id_uc' => $materiaId
+                ];
+    
+                // Usar el mapper para convertir los datos al modelo
+                $gradoUCModel = $this->gradoUCMapper->toGradoUC($gradoUCData);
+    
+                // Guardar la relación en la base de datos
+                $gradoUCModel->save();
+            }
+    
+            return response()->json(['message' => 'Materias asignadas al grado exitosamente'], 201);
         } catch (\Exception $e) {
             Log::error("Error al guardar el registro GradoUC: " . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el registro'], 500);
         }
     }
+    
 
     public function eliminarGradoUcPorIdGrado($id_grado)
     {

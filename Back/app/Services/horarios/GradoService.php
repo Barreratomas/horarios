@@ -73,7 +73,7 @@ class GradoService implements GradoRepository
     public function guardarGrados($request)
     {
         try {
-            $gradoData = $request->all();
+            $gradoData = $request;
             $grado = new Grado($gradoData);
             $gradoModel = $this->gradoMapper->toGrado($grado);
             $gradoModel->save();

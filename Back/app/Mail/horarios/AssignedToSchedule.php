@@ -15,16 +15,12 @@ class AssignedToSchedule extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
+    
     public function __construct(public $nombre)
     {
     }
 
-    /**
-     * Get the message envelope.
-     */
+    
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -34,13 +30,11 @@ class AssignedToSchedule extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
+   
     public function content(): Content
     {
         return new Content(
-            view: 'mail.assigned_to_schedule', // Nombre de la vista
+            view: 'mail.assigned_to_schedule', 
         );
     }
 

@@ -160,6 +160,7 @@ Route::delete('/horarios/uCPlan/eliminar/{id}', [UCPlanController::class, 'destr
 // CarreraPlan
 Route::get('/horarios/uCPlan', [CarreraPlanController::class, 'index']);
 Route::get('/horarios/uCPlan/{id}', [CarreraPlanController::class, 'obtenerCarreraPlanPorIdCarrera']);
+Route::get('/horarios/uCPlan/{id}/relaciones', [CarreraPlanController::class, 'obtenerCarreraPlanPorIdCarreraConMaterias']);
 Route::get('/horarios/uCPlan/{id}', [CarreraPlanController::class, 'obtenerCarreraPlanPorIdPlan']);
 Route::post('/horarios/uCPlan/guardar', [CarreraPlanController::class, 'store']);
 Route::delete('/horarios/uCPlan/eliminar/{id}', [CarreraPlanController::class, 'eliminarCarreraPlanPorIdCarreraYPlan']);
@@ -197,8 +198,10 @@ Route::get('/horarios/alumnoGrados/alumno/{id_alumno}', [AlumnoGradoController::
 Route::get('/horarios/alumnoGrados/grado/relaciones/{id_grado}', [AlumnoGradoController::class, 'showByGradoConRelaciones']);
 Route::get('/horarios/alumnoGrados/grado/{id_grado}', [AlumnoGradoController::class, 'showByGrado']);
 Route::post('/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'store']);
+Route::get('/horarios/alumnoGrados/asignarPrimero', [AlumnoGradoController::class, 'asignarAlumnosACarrerasPrimero']);
 Route::get('/horarios/alumnoGrados/asignar', [AlumnoGradoController::class, 'asignarAlumnosACarreras']);
-Route::delete('/horarios/alumnoGrados/{id_alumno}/{id_grado}', [AlumnoGradoController::class, 'destroy']);
+Route::put('/horarios/alumnoGrados/actualizar/{id_alumno}', [DocenteController::class, 'cambiarGrado']);
+Route::delete('/horarios/alumnoGrados/{id_alumno}', [AlumnoGradoController::class, 'destroy']);
 
 
 // Docente

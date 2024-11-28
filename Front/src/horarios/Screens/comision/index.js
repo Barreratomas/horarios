@@ -41,7 +41,7 @@ const Comisiones = () => {
         if (!response.ok) throw new Error('Error al obtener los grados');
 
         const data = await response.json();
-
+        console.log(data);
         const normalizedData = data.map((item) => ({
           carrera: {
             carrera: item.carrera.carrera,
@@ -53,7 +53,8 @@ const Comisiones = () => {
             detalle: item.grado.detalle,
             division: item.grado.division,
             grado: item.grado.grado,
-            id_grado: item.grado.id_grado
+            id_grado: item.grado.id_grado,
+            grado_uc: item.grado.grado_uc
           },
           id_carrera: item.id_carrera,
           id_grado: item.id_grado
@@ -203,6 +204,20 @@ const Comisiones = () => {
                   <p>Detalle: {grado.detalle}</p>
                   <p>Capacidad: {grado.capacidad}</p>
 
+                  {/* Displaying the associated materias */}
+                  <div>
+                    <h6>Materias:</h6>
+                    <ul>
+                      {grado.grado_uc && grado.grado_uc.length > 0 ? (
+                        grado.grado_uc.map((uc, index) => (
+                          <li key={index}>{uc.unidad_curricular.unidad_curricular}</li> // Accediendo correctamente al nombre de la unidad curricular
+                        ))
+                      ) : (
+                        <p>No hay materias asignadas</p>
+                      )}
+                    </ul>
+                  </div>
+
                   <div className="botones">
                     <button
                       type="button"
@@ -245,7 +260,7 @@ const Comisiones = () => {
           </div>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <p>No se pudo conectar al servidor.</p>
       )}
     </>
   );

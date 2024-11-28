@@ -81,27 +81,27 @@ class Grado extends Model
 
     // Un grado tiene uno o muchos disponibilidad
     public function disponibilidad():HasMany{
-        return $this->hasMany(Disponibilidad::class, 'Id_Grado', 'Id_Grado');
+        return $this->hasMany(Disponibilidad::class, 'id_grado', 'id_grado');
     }
 
     // Un grado tiene uno o muchos horarios
     public function horarios():HasMany{
-        return $this->hasMany(Horario::class, 'Id_Grado', 'Id_Grado');
+        return $this->hasMany(Horario::class, 'id_grado', 'id_grado');
     }
 
     // Un grado tiene uno o muchos alumno_grado
     public function alumno_grado():HasMany{
-        return $this->hasMany(AlumnoGrado::class, 'Id_Grado', 'Id_Grado');
+        return $this->hasMany(AlumnoGrado::class, 'id_grado', 'id_grado');
     }
 
     // Un grado tiene uno o muchos grado_uc
     public function grado_uc():HasMany{
-        return $this->hasMany(GradoUC::class, 'Id_Grado', 'Id_Grado');
+        return $this->hasMany(GradoUC::class, 'id_grado', 'id_grado');
     }
 
     // Un grado pertenece a una carrera. esto tiene que asociarse a la tabla intermedia(carreraGrado)
     public function carrera():BelongsTo{
-        return $this->belongsTo(Carrera::class, 'carrera_id', 'Id_Carrera');
+        return $this->belongsTo(Carrera::class, 'carrera_id', 'id_Carrera');
     }
 
      // Un grado tiene uno o muchos carrera_grado

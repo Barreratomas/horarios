@@ -81,6 +81,11 @@ class CarreraPlanController extends Controller
         return $this->carreraPlanService->obtenerCarreraPlanPorIdCarrera($id);
     }
 
+    public function obtenerCarreraPlanPorIdCarreraConMaterias($id){
+        return $this->carreraPlanService->obtenerCarreraPlanPorIdCarreraConMaterias($id);
+
+    }
+
     /**
      * @OA\Get(
      *     path="/api/horarios/carreraPlan/idPlan/{id}",

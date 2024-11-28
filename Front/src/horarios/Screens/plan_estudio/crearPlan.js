@@ -7,8 +7,8 @@ const CrearPlan = () => {
   const [fechaFin, setFechaFin] = useState('');
   const [materias, setMaterias] = useState([]);
   const [selectedMaterias, setSelectedMaterias] = useState([]);
-  const [carreras, setCarreras] = useState([]); // Estado para las carreras
-  const [selectedCarrera, setSelectedCarrera] = useState(''); // Carrera seleccionada
+  const [carreras, setCarreras] = useState([]);
+  const [selectedCarrera, setSelectedCarrera] = useState('');
   const [errors, setErrors] = useState([]);
 
   const navigate = useNavigate();

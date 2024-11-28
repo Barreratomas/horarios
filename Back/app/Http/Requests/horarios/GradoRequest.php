@@ -36,6 +36,8 @@ class GradoRequest extends FormRequest
         Log::info('Valor de detalle: ' . $this->detalle);
         Log::info('Valor de capacidad: ' . $this->capacidad);
         Log::info('Valor de id_carrera: ' . $this->id_carrera);
+        Log::info('Valor de materias: ' . json_encode($this->materias));
+
 
         // Validaciones para cada campo
         $gradoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
@@ -43,6 +45,7 @@ class GradoRequest extends FormRequest
         $detalleRules = $esCreacion ? ['required', 'string', 'max:70'] : ['nullable', 'string', 'max:70'];
         $capacidadRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $carreraRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
+        $materiasRules = $esCreacion ? ['required', 'array', 'min:1']:['nullable', 'array'];
 
         // Logueamos las reglas
         Log::info('Reglas de validación para grado: ', $gradoRules);
@@ -50,13 +53,17 @@ class GradoRequest extends FormRequest
         Log::info('Reglas de validación para detalle: ', $detalleRules);
         Log::info('Reglas de validación para capacidad: ', $capacidadRules);
         Log::info('Reglas de validación para carrera: ', $carreraRules);
+        Log::info('Reglas de validación para materias: ', $materiasRules);
+
 
         return [
             'grado' => $gradoRules,
             'division' => $divisionRules,
             'detalle' => $detalleRules,
             'capacidad' => $capacidadRules,
-            'id_carrera' => $carreraRules
+            'id_carrera' => $carreraRules,
+            'materias' => $materiasRules
+
         ];
     }
 }

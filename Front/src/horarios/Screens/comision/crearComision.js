@@ -7,36 +7,88 @@ const CrearComision = () => {
   const [detalle, setDetalle] = useState('');
   const [capacidad, setCapacidad] = useState('');
   const [carreraSeleccionada, setCarreraSeleccionada] = useState('');
-  const [carreras, setCarreras] = useState([]); // Estado para almacenar las carreras
+  const [materias, setMaterias] = useState([]);
+  const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
+  const [carreras, setCarreras] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [isLoadingCarreras, setIsLoadingCarreras] = useState(true);
+  const [isLoadingMaterias, setIsLoadingMaterias] = useState(false);
+  const [fetchError, setFetchError] = useState('');
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
 
-  // Obtener las carreras desde la API al montar el componente
+  // Cargar carreras
   useEffect(() => {
     const fetchCarreras = async () => {
+      setFetchError('');
+      setIsLoadingCarreras(true);
+
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras');
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
-          setCarreras(data); // Asume que `data` es un array de carreras
+          setCarreras(data);
         } else {
-          console.error('Error al obtener las carreras:', response.statusText);
+          setFetchError('Error al cargar las carreras.');
         }
       } catch (error) {
-        console.error('Error en la solicitud:', error);
+        setFetchError('Error de red al intentar cargar las carreras.');
+      } finally {
+        setIsLoadingCarreras(false);
       }
     };
 
     fetchCarreras();
   }, []);
 
-  // Función para manejar el envío del formulario
+  // Cargar materias asociadas a la carrera seleccionada
+  useEffect(() => {
+    const fetchMaterias = async () => {
+      if (!carreraSeleccionada) {
+        setMaterias([]);
+        return;
+      }
+
+      setFetchError('');
+      setIsLoadingMaterias(true);
+
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/horarios/uCPlan/${carreraSeleccionada}/relaciones`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setMaterias(data[0]?.plan_estudio?.uc_plan || []);
+        } else {
+          setFetchError('Error al cargar las materias.');
+        }
+      } catch (error) {
+        setFetchError('Error de red al intentar cargar las materias.');
+      } finally {
+        setIsLoadingMaterias(false);
+      }
+    };
+
+    fetchMaterias();
+  }, [carreraSeleccionada]);
+
+  // Manejar la selección de materias
+  const handleCheckboxChange = (idMateria) => {
+    setMateriasSeleccionadas((prev) =>
+      prev.includes(idMateria) ? prev.filter((id) => id !== idMateria) : [...prev, idMateria]
+    );
+  };
+
+  // Validar y enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors([]);
+
+    if (capacidad <= 0) {
+      setErrors(['La capacidad debe ser un número positivo.']);
+      return;
+    }
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/grados/guardar', {
@@ -49,13 +101,14 @@ const CrearComision = () => {
           division,
           detalle,
           capacidad,
-          id_carrera: carreraSeleccionada // Incluye la carrera seleccionada
+          id_carrera: carreraSeleccionada,
+          materias: materiasSeleccionadas
         })
       });
 
       if (response.ok) {
         navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Grado creado con éxito' }
+          state: { successMessage: 'Comisión creada con éxito' }
         });
       } else {
         const data = await response.json();
@@ -64,7 +117,8 @@ const CrearComision = () => {
         }
       }
     } catch (error) {
-      console.error('Error creando grado:', error);
+      console.error('Error creando la comisión:', error);
+      setErrors(['Hubo un error al intentar crear la comisión.']);
     }
   };
 
@@ -73,14 +127,15 @@ const CrearComision = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            {/* Selección de carrera */}
+            {fetchError && <div className="alert alert-danger">{fetchError}</div>}
+
             <label htmlFor="carrera">Seleccione una carrera</label>
-            <br />
             <select
               className="form-select"
               name="carrera"
               value={carreraSeleccionada}
               onChange={(e) => setCarreraSeleccionada(e.target.value)}
+              disabled={isLoadingCarreras}
               required
             >
               <option value="">Seleccione una carrera</option>
@@ -90,75 +145,80 @@ const CrearComision = () => {
                 </option>
               ))}
             </select>
-            <br />
-            <br />
+            {isLoadingCarreras && <p>Cargando carreras...</p>}
 
-            <label htmlFor="grado">Ingrese el grado</label>
+            {isLoadingMaterias ? (
+              <p>Cargando materias...</p>
+            ) : (
+              materias.length > 0 && (
+                <div className="materias-list">
+                  <h5>Seleccione las materias del plan:</h5>
+                  {materias.map((materia) => (
+                    <div key={materia.id_uc} className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        value={materia.id_uc}
+                        id={`materia-${materia.id_uc}`}
+                        onChange={() => handleCheckboxChange(materia.id_uc)}
+                      />
+                      <label className="form-check-label" htmlFor={`materia-${materia.id_uc}`}>
+                        {materia.unidad_curricular.unidad_curricular}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
             <br />
             <input
               type="number"
               name="grado"
               value={grado}
               onChange={(e) => setGrado(e.target.value)}
+              placeholder="Grado"
               required
             />
-            <br />
-            <br />
-
-            <label htmlFor="division">Ingrese la división</label>
-            <br />
             <input
               type="number"
               name="division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
+              placeholder="División"
               required
             />
-            <br />
-            <br />
-
-            <label htmlFor="detalle">Ingrese el detalle</label>
-            <br />
             <input
               type="text"
               name="detalle"
               value={detalle}
               onChange={(e) => setDetalle(e.target.value)}
+              placeholder="Detalle"
               maxLength="70"
             />
-            <br />
-            <br />
-
-            <label htmlFor="capacidad">Ingrese la capacidad</label>
-            <br />
             <input
               type="number"
               name="capacidad"
               value={capacidad}
               onChange={(e) => setCapacidad(e.target.value)}
+              placeholder="Capacidad"
               required
             />
-            <br />
-            <br />
 
-            <button type="submit" className="btn btn-primary me-2">
-              Crear
+            <button type="submit" className="btn btn-primary mt-3">
+              Crear Comisión
             </button>
           </form>
+          {errors.length > 0 && (
+            <div className="alert alert-danger mt-3">
+              <ul>
+                {errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
-
-      {errors.length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

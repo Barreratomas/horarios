@@ -27,34 +27,38 @@ class CarreraGradoService implements CarreraGradoRepository
     public function obtenerTodosCarreraGrado()
     {
         try {
-            // devolver las las carreras y grados
-            $carrerasGrados = CarreraGrado::with(['carrera', 'grado'])->get();
+            // Devolver las carreras, grados y las unidades curriculares asociadas
+            $carrerasGrados = CarreraGrado::with(['carrera', 'grado', 'grado.grado_uc.unidadCurricular'])->get();
+            
             return response()->json($carrerasGrados, 200);
         } catch (Exception $e) {
             Log::error('Error al obtener los carrerasGrados: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener los carrerasGrados'], 500);
         }
     }
+    
 
     public function obtenerCarreraGradoPorIdCarrera($id_carrera)
-{
-    try {
-        // Buscar registros con los detalles de las relaciones
-        $carreraGrado = CarreraGrado::with(['carrera', 'grado'])
-            ->where('id_carrera', $id_carrera)
-            ->get();
-
-        // Verificar si hay resultados
-        if ($carreraGrado->isEmpty()) {
-            return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+    {
+        try {
+            // Buscar registros con los detalles de las relaciones incluyendo las Unidades Curriculares (materias)
+            $carreraGrado = CarreraGrado::with(['carrera', 'grado', 'grado.grado_uc.unidadCurricular'])
+                ->where('id_carrera', $id_carrera)
+                ->get();
+    
+            // Verificar si hay resultados
+            if ($carreraGrado->isEmpty()) {
+                return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+            }
+    
+            return response()->json($carreraGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el carreraGrado'], 500);
         }
-
-        return response()->json($carreraGrado, 200);
-    } catch (Exception $e) {
-        Log::error('Error al obtener el carreraGrado: ' . $e->getMessage());
-        return response()->json(['error' => 'Hubo un error al obtener el carreraGrado'], 500);
     }
-}
+    
+
 
 
 public function obtenerCarreraGradoPorIdGrado($id_grado)
