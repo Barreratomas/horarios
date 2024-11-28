@@ -1,0 +1,38 @@
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+  padding: 0 10px; /* Inicialmente sin padding */
+}
+
+.accordion-body.open {
+  max-height: 500px; /* Ajusta según la altura máxima del contenido */
+  padding: 10px;
+}
+
+.accordion-header {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.accordion-header:hover {
+  background-color: #0056b3;
+}
+
+.accordion-header h3 {
+  margin: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.accordion {
+  margin-bottom: 20px;
+}
+
+.accordion-body ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}

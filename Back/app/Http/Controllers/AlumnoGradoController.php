@@ -48,6 +48,11 @@ class AlumnoGradoController extends Controller
         return $this->alumnoGradoService->obtenerTodosAlumnoGrado();
     }
 
+
+    public function indexConRelaciones()
+    {
+        return $this->alumnoGradoService->obtenerTodosAlumnoGradoConRelaciones();
+    }
     /**
      * @OA\Post(
      *      path="/api/horarios/alumnoGrados/guardar/{id_alumno}/{id_grado}",
@@ -116,6 +121,10 @@ class AlumnoGradoController extends Controller
         return $this->alumnoGradoService->obtenerAlumnoGradoPorIdAlumno($id_alumno);
     }
 
+    public function showByAlumnoConRelaciones($id_alumno)
+    {
+        return $this->alumnoGradoService->obtenerAlumnoGradoPorIdAlumnoConRelaciones($id_alumno);
+    }
 
     /**
      * @OA\Get(
@@ -175,9 +184,10 @@ class AlumnoGradoController extends Controller
      *      )
      * )
      */
-    public function destroy($id_alumno)
+    public function destroy($id_alumno,$id_grado)
     {
-        return $this->alumnoGradoService->eliminarAlumnoGradoPorIdAlumno($id_alumno);
+        return $this->alumnoGradoService->eliminarAlumnoGradoPorIdAlumnoYIdGrado($id_alumno,$id_grado);
+
     }
 
 

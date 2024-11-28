@@ -72,7 +72,7 @@ const CrearPlan = () => {
           detalle,
           fecha_inicio: fechaInicio,
           fecha_fin: fechaFin,
-          carrera_id: selectedCarrera,
+          id_carrera: selectedCarrera,
           materias: selectedMaterias
         })
       });

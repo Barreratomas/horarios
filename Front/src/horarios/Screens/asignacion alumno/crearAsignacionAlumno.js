@@ -25,7 +25,7 @@ const CrearAsignacionAlumno = () => {
   // Cargar grados y carreras desde la API
   const fetchGrados = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrado');
+      const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados');
       const data = await response.json();
       console.log(data);
       setGrados(data);
@@ -46,7 +46,7 @@ const CrearAsignacionAlumno = () => {
     console.log(`dni: ${dni}, grado: ${id_grado}, carrera: ${id_carrera}`);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${dni}/${id_grado}/${id_carrera}`,
+        `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${dni}/${id_grado}`,
         {
           method: 'POST',
           headers: {

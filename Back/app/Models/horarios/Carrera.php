@@ -79,17 +79,17 @@ class Carrera extends Model
 
     // Una carrera tiene uno o muchos alumno_carrera
     public function alumno_carrera():HasMany{
-        return $this->hasMany(AlumnoCarrera::class, 'Id_Carrera', 'Id_Carrera');
+        return $this->hasMany(AlumnoCarrera::class, 'id_carrera', 'id_carrera');
     }
 
      // Una carrera tiene uno o muchos carrera_uc
      public function carrera_uc():HasMany{
-        return $this->hasMany(CarreraUC::class, 'Id_Carrera', 'Id_Carrera');
+        return $this->hasMany(CarreraUC::class, 'id_carrera', 'id_carrera');
     }
 
     // Una carrera pertenece a un grado.esto tiene que asociarse a la tabla intermedia(carreraGrado)
     public function grado(){
-        return $this->belongsTo(Grado::class, 'Id_Grado', 'Id_Grado');
+        return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
     }
 
     // Una carrera tiene uno o muchos carrera_grado

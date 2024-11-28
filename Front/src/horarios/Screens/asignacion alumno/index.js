@@ -28,7 +28,7 @@ const AsignacionAlumno = () => {
 
     const fetchAlumnos = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnoGrados', {
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnoGrados/relaciones', {
           headers: { Accept: 'application/json' }
         });
 
@@ -49,18 +49,21 @@ const AsignacionAlumno = () => {
     fetchAlumnos();
   }, [location, navigate]);
 
-  const handleDelete = async (dni) => {
+  const handleDelete = async (id_alumno, id_grado) => {
     if (!window.confirm('¿Estás seguro de eliminar esta asignación?')) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/alumnos/eliminar/${dni}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/alumnoGrados/${id_alumno}/${id_grado}`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Error al eliminar la asignación');
 
-      setAlumnos(alumnos.filter((alumno) => alumno.dni !== dni));
+      setAlumnos(alumnos.filter((alumno) => alumno.id_alumno !== id_alumno));
       setSuccessMessage('Asignación eliminada correctamente');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -115,10 +118,9 @@ const AsignacionAlumno = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container">
-          <p>A espera de que se termine la API de asignación de alumnos</p>
           {alumnos.map((alumno) => (
             <div
-              key={alumno.dni}
+              key={alumno.id_alumno}
               style={{
                 border: '1px solid #ccc',
                 borderRadius: '5px',
@@ -127,23 +129,30 @@ const AsignacionAlumno = () => {
                 width: '30vw'
               }}
             >
-              <p>DNI: {alumno.dni}</p>
-              <p>Nombre: {alumno.nombre}</p>
+              <p>DNI: {alumno.alumno.DNI}</p>
               <p>
-                Grado: {alumno.grado}° {alumno.division}
+                Nombre: {alumno.alumno.nombre} {alumno.alumno.apellido}
               </p>
-              <p>Carrera: {alumno.carrera}</p>
+              <p>
+                Grado: {alumno.grado.grado}° {alumno.grado.division} ({alumno.grado.detalle})
+              </p>
+              <p>Carrera: {alumno.alumno.carrera}</p>
 
               <div className="botones">
                 <button
                   className="btn btn-primary me-2"
                   onClick={() =>
-                    navigate(`${routes.base}/${routes.asignacionesAlumno.actualizar(alumno.dni)}`)
+                    navigate(
+                      `${routes.base}/${routes.asignacionesAlumno.actualizar(alumno.id_alumno)}`
+                    )
                   }
                 >
                   Actualizar
                 </button>
-                <button className="btn btn-danger" onClick={() => handleDelete(alumno.dni)}>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleDelete(alumno.id_alumno, alumno.grado.id_grado)}
+                >
                   Eliminar
                 </button>
               </div>

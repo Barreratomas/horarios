@@ -76,7 +76,7 @@ class Alumno extends Model
 
     protected $fillable = ['DNI', 'Nombre', 'Apellido', 'Email', 'Telefono', 'Genero', 'Fecha_Nac', 'Nacionalidad', 'Direccion', 'id_localidad'];
     protected $table = 'alumno';
-    protected $primaryKey = 'Id_Alumno';
+    protected $primaryKey = 'id_alumno';
 
     // Un alumno pertenece a una localidad
     public function localidad():BelongsTo{
@@ -85,27 +85,27 @@ class Alumno extends Model
 
     // Un alumno tiene una o muchas alumno_grado
     public function alumno_grado():HasMany{
-        return $this->hasMany(AlumnoGrado::class, 'Id_Alumno', 'Id_Alumno');
+        return $this->hasMany(AlumnoGrado::class, 'id_alumno', 'id_alumno');
     }
 
     // Un alumno tiene una o muchos alumno_carrera
     public function alumno_carrera():HasMany{
-        return $this->hasMany(AlumnoCarrera::class, 'Id_Alumno', 'Id_Alumno');
+        return $this->hasMany(AlumnoCarrera::class, 'id_alumno', 'id_alumno');
     }
 
     // Un alumno tiene una o muchas alumno_uc
     public function alumno_uc():HasMany{
-        return $this->hasMany(AlumnoUC::class, 'Id_Alumno', 'Id_Alumno');
+        return $this->hasMany(AlumnoUC::class, 'id_alumno', 'id_alumno');
     }
     
     // Un alumno tiene una o muchas alumno_plan
     public function alumno_plan():HasMany{
-        return $this->hasMany(AlumnoPlan::class, 'Id_Alumno', 'Id_Alumno');
+        return $this->hasMany(AlumnoPlan::class, 'id_alumno', 'id_alumno');
     }
 
     // Un alumno tiene una o muchas inscripcion
     public function inscripcion():HasMany{
-        return $this->hasMany(Inscripcion::class, 'Id_Alumno', 'Id_Alumno');
+        return $this->hasMany(Inscripcion::class, 'id_alumno', 'id_alumno');
     }
 
     /*
