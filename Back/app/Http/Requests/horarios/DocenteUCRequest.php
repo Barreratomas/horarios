@@ -23,7 +23,7 @@ class DocenteUCRequest extends FormRequest
     public function rules(): array
     {
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/docenteUC/crear-docenteUC';
+        $esCreacion = $this->isMethod('post');
 
         $id_docenteRules = $esCreacion ? ['required', 'integer', 'min:1', Rule::unique('docente_uc', 'id_docente')] : [];
         $id_ucRules=$esCreacion ? ['required', 'integer', 'min:1', Rule::unique('docente_uc', 'id_uc')] : [];

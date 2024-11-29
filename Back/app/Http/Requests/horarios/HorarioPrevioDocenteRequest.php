@@ -22,7 +22,7 @@ class HorarioPrevioDocenteRequest extends FormRequest
     public function rules(): array
     {
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/crear-h-p-v';
+        $esCreacion = $this->isMethod('post');
         $trabajaInstitucion = $this->input('trabajaInstitucion') == 'si';
        
         // Definir las reglas de validación basadas en la condición

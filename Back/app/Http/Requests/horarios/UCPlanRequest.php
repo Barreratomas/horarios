@@ -24,7 +24,7 @@ class UCPlanRequest extends FormRequest
     {
         
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/uCPlan/crear-uCPlan';
+        $esCreacion = $this->isMethod('post');
 
         $idUcRules = $esCreacion ? ['required','integer',Rule::exists('unidad_curricular','id')] : ['nullable','integer',Rule::exists('unidad_curricular','id')];
         $idPlanRules = $esCreacion ? ['required','integer',Rule::exists('plan_estudio','id')] : ['nullable','integer',Rule::exists('plan_estudio','id')];

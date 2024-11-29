@@ -21,7 +21,7 @@ class CambioDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/cambioDocente/crear-cambioDocente';
+        $esCreacion = $this->isMethod('post');
 
         $docenteAnteriorRules = $esCreacion ? ['required','string','max:255'] : ['nullable','string','max:255'];
         $docenteNuevoRules = $esCreacion ? ['required','string','max:255'] : ['nullable','string','max:255'];

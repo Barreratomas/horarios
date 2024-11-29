@@ -24,7 +24,7 @@ class InscripcionRequest extends FormRequest
     {
         
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/horarios/inscripcion/guardar';
+        $esCreacion = $this->isMethod('post');
 
         $fechaHoraRules = $esCreacion ? ['required', 'date', 'date_format:Y-m-d H:i:s'] : ['nullable', 'date', 'date_format:Y-m-d H:i:s'];
         $idAlumnoRules = $esCreacion ? ['required','integer',Rule::exists('alumno','id_alumno')] : ['nullable','integer',Rule::exists('alumno','id_alumno')];

@@ -37,6 +37,8 @@ class CarreraGradoService implements CarreraGradoRepository
         }
     }
     
+   
+    
 
     public function obtenerCarreraGradoPorIdCarrera($id_carrera)
     {
@@ -58,7 +60,25 @@ class CarreraGradoService implements CarreraGradoRepository
         }
     }
     
-
+    public function obtenerCarreraGradoPorIdCarreraSinUC($id_carrera)
+    {
+        try {
+     
+            $carreraGrado = CarreraGrado::with(['carrera', 'grado'])
+                ->where('id_carrera', $id_carrera)
+                ->get();
+    
+            // Verificar si hay resultados
+            if ($carreraGrado->isEmpty()) {
+                return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
+            }
+    
+            return response()->json($carreraGrado, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el carreraGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el carreraGrado'], 500);
+        }
+    }
 
 
 public function obtenerCarreraGradoPorIdGrado($id_grado)

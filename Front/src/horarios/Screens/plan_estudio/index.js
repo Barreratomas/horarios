@@ -28,9 +28,11 @@ const Planes = () => {
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
   const [planes, setPlanes] = useState([]);
+  const [filteredPlanes, setFilteredPlanes] = useState([]);
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
+  const [filterText, setFilterText] = useState(''); // Nuevo estado para el texto de filtro
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -53,8 +55,8 @@ const Planes = () => {
         if (!response.ok) throw new Error('Error al obtener los planes');
 
         const data = await response.json();
-        console.log(data);
         setPlanes(data);
+        setFilteredPlanes(data); // Inicializamos el estado de planes filtrados
         setServerUp(true);
       } catch (error) {
         setErrors([error.message || 'Servidor fuera de servicio...']);
@@ -65,6 +67,19 @@ const Planes = () => {
 
     fetchPlanes();
   }, [location.state, navigate, location.pathname]);
+
+  useEffect(() => {
+    // Filtrar planes cuando el texto de filtro cambie
+    if (filterText === '') {
+      setFilteredPlanes(planes); // Si no hay texto de filtro, mostramos todos los planes
+    } else {
+      setFilteredPlanes(
+        planes.filter(
+          (plan) => plan.detalle.toLowerCase().includes(filterText.toLowerCase()) // Filtro por detalle
+        )
+      );
+    }
+  }, [filterText, planes]);
 
   const handleDelete = async (id_plan) => {
     if (!window.confirm('¿Estás seguro de eliminar este plan?')) return;
@@ -102,6 +117,16 @@ const Planes = () => {
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
             <div className="col-6 text-center">
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Filtrar por detalle"
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)} // Actualiza el estado del filtro
+                />
+              </div>
+
               <button
                 type="button"
                 className="btn btn-primary me-2"
@@ -113,7 +138,7 @@ const Planes = () => {
           </div>
 
           <div className="container">
-            {planes.map((plan) => (
+            {filteredPlanes.map((plan) => (
               <div
                 key={plan.id_plan}
                 style={{

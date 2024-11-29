@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import '../../css/acordeon.css';
+
+const Accordion = ({ title, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleAccordion = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div className="accordion">
+      <div className="accordion-header" onClick={toggleAccordion}>
+        <h3>{title}</h3>
+      </div>
+      <div className={`accordion-body ${isOpen ? 'open' : ''}`}>{children}</div>
+    </div>
+  );
+};
 
 const Comisiones = () => {
   const navigate = useNavigate();
@@ -14,7 +32,7 @@ const Comisiones = () => {
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
   const [grados, setGrados] = useState([]);
-  const [carreras, setCarreras] = useState([]); // Lista única de carreras
+  const [carreras, setCarreras] = useState([]);
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
@@ -206,16 +224,17 @@ const Comisiones = () => {
 
                   {/* Displaying the associated materias */}
                   <div>
-                    <h6>Materias:</h6>
-                    <ul>
-                      {grado.grado_uc && grado.grado_uc.length > 0 ? (
-                        grado.grado_uc.map((uc, index) => (
-                          <li key={index}>{uc.unidad_curricular.unidad_curricular}</li> // Accediendo correctamente al nombre de la unidad curricular
-                        ))
-                      ) : (
-                        <p>No hay materias asignadas</p>
-                      )}
-                    </ul>
+                    <Accordion title="Ver materias">
+                      <ul>
+                        {grado.grado_uc && grado.grado_uc.length > 0 ? (
+                          grado.grado_uc.map((uc, index) => (
+                            <li key={index}>{uc.unidad_curricular.unidad_curricular}</li> // Accediendo correctamente al nombre de la unidad curricular
+                          ))
+                        ) : (
+                          <p>No hay materias asignadas</p>
+                        )}
+                      </ul>
+                    </Accordion>
                   </div>
 
                   <div className="botones">

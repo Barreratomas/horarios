@@ -24,7 +24,7 @@ class CarreraUCRequest extends FormRequest
     {
         
         
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/horarios/carreraUC/guardar';
+        $esCreacion = $this->isMethod('post');
 
         $idCarreaRules = $esCreacion ? ['required','integer',Rule::exists('carrera','id')] : ['nullable','integer',Rule::exists('carrera','id')];
         $idUCRules = $esCreacion ? ['required','integer',Rule::exists('unidad_curricular','id')] : ['nullable','integer',Rule::exists('unidad_curricular','id')];

@@ -32,6 +32,7 @@ class AlumnoGrado extends Model
 
     protected $fillable= ['id_alumno', 'id_grado'];
     protected $table = 'alumno_grado';
+    
     public $autoincrement = false;
     public $timestamps = false;
 

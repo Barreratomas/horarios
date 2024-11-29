@@ -23,7 +23,7 @@ class DocenteRequest extends FormRequest
     public function rules(): array
     {
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/docente/crear-docente';
+        $esCreacion = $this->isMethod('post');
 
         $dniRules = $esCreacion ? ['required', 'integer', 'min:1', Rule::unique('docentes', 'dni')] : [];
         $nombreRules=$esCreacion ? ['required', 'string'] : ['nullable','string'];

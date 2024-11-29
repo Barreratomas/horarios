@@ -38,6 +38,25 @@ class GradoUcService implements GradoUcRepository
             return response()->json(['error' => 'Hubo un error al obtener el registro'], 500);
         }
     }
+    public function obtenerGradoUcPorIdGradoConRelaciones($id_grado)
+    {
+        try {
+            // Obtén los registros de grado_uc junto con las relaciones grado y unidadCurricular
+            $gradoUC = GradoUC::with(['grado', 'unidadCurricular'])
+                ->where('id_grado', $id_grado)
+                ->get();
+    
+            if ($gradoUC->isEmpty()) {
+                return response()->json(['error' => 'Registro no encontrado'], 404);
+            }
+    
+            return response()->json($gradoUC, 200);
+        } catch (\Exception $e) {
+            Log::error("Error al obtener el registro GradoUC: " . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el registro'], 500);
+        }
+    }
+    
 
     public function obtenerGradoUcPorIdUC($id_uc)
     {
@@ -77,6 +96,46 @@ class GradoUcService implements GradoUcRepository
         }
     }
     
+    public function actualizarGradoUC($id_grado, array $materias)
+    {
+        try {
+
+    
+            // Recuperar las materias actuales asociadas al grado
+            $materiasExistentes = GradoUC::where('id_grado', $id_grado)->pluck('id_uc')->toArray();
+    
+            // Determinar qué materias deben actualizarse
+            $materiasAEliminar = array_diff($materiasExistentes, $materias);
+            $materiasAInsertar = array_diff($materias, $materiasExistentes);
+    
+            // Actualizar las materias asociadas al grado sin eliminar las existentes
+            foreach ($materiasAEliminar as $materiaId) {
+                // Eliminar la materia de la relación
+                GradoUC::where('id_grado', $id_grado)
+                    ->where('id_uc', $materiaId)
+                    ->delete();
+            }
+    
+            foreach ($materiasAInsertar as $materiaId) {
+                // Insertar las nuevas materias
+                GradoUC::create([
+                    'id_grado' => $id_grado,
+                    'id_uc' => $materiaId
+                ]);
+            }
+    
+         
+    
+            return response()->json(['message' => 'Materias actualizadas para el grado exitosamente'], 200);
+    
+        } catch (\Exception $e) {
+        
+            Log::error("Error al actualizar el registro GradoUC: " . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al actualizar el registro'], 500);
+        }
+    }
+    
+
 
     public function eliminarGradoUcPorIdGrado($id_grado)
     {

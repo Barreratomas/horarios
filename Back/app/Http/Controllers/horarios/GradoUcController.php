@@ -67,10 +67,18 @@ class GradoUcController extends Controller
         *     )
         * )
     */
+
+
     public function obtenerGradoUcPorIdGrado($id_grado){
         return $this->gradoUCService->obtenerGradoUcPorIdGrado($id_grado);
     }
 
+
+    
+
+    public function obtenerGradoUcPorIdGradoConRelaciones($id_grado){
+        return $this->gradoUCService->obtenerGradoUcPorIdGradoConRelaciones($id_grado);
+    }
     /**
         * @OA\Get(
         *     path="/api/horarios/gradoUC/idUC/{id}",
@@ -127,7 +135,9 @@ class GradoUcController extends Controller
     */
     public function store(Request $request)
     {
-        return $this->gradoUCService->guardarGradoUC($request);
+        $id_grado = $request->input('id_grado'); 
+        $materias = $request->input('materias');
+        return $this->gradoUCService->guardarGradoUC($id_grado, $materias);
     }
 
     /**

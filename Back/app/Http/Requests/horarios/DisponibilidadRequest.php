@@ -22,7 +22,7 @@ class DisponibilidadRequest extends FormRequest
     public function rules(): array
     {
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/disponibilidad/crear-disponibilidad';
+        $esCreacion = $this->isMethod('post');
 
         $idUCRules = $esCreacion ? ['required','integer'] : ['nullable','integer'];
         $idDocenteRules = $esCreacion ? ['required','integer'] : ['nullable','integer'];

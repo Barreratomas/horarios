@@ -185,18 +185,18 @@ class AlumnoGradoController extends Controller
      *      )
      * )
      */
-    public function destroy($id_alumno)
+    public function destroy($id_alumno,$id_grado)
     {
-        return $this->alumnoGradoService->eliminarAlumnoGradoPorIdAlumno($id_alumno);
+        return $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno,$id_grado);
 
     }
 
 
 
     
-    public function asignarAlumnosACarrerasPrimero()
+    public function asignarAlumnosACarrerasIngresante()
     {
-        return $this->alumnoGradoService->asignarAlumnosACarrerasPrimero();
+        return $this->alumnoGradoService->asignarAlumnosACarrerasIngresante();
     }
 
     public function asignarAlumnosACarreras()
@@ -204,9 +204,9 @@ class AlumnoGradoController extends Controller
         return $this->alumnoGradoService->asignarAlumnosACarreras();
     }
 
-    public function cambiarGrado(Request $request)
+    public function cambiarGrado($id_alumno ,$id_grado_actual, $id_grado)
     {
-        return $this->alumnoGradoService->actualizarAlumnoGrado($request->id_alumno, $request->id_grado);
+        return $this->alumnoGradoService->actualizarAlumnoGrado($id_alumno, $id_grado_actual,$id_grado);
     }
     public function cambiarGradoRecursante(Request $request)
     {

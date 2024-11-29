@@ -141,57 +141,72 @@ public function obtenerTodosAlumnoGradoConRelaciones()
         }
     }
 
-    public function actualizarAlumnoGrado($id_alumno, $id_grado_nuevo)
+    public function actualizarAlumnoGrado($id_alumno, $id_grado_actual, $id_grado_nuevo)
+    {
+        try {
+            // Verificar si el alumno está asignado al grado actual
+            $alumnoGradoActual = AlumnoGrado::where('id_alumno', $id_alumno)
+                                             ->where('id_grado', $id_grado_actual)
+                                             ->first();
+    
+            if (!$alumnoGradoActual) {
+                return response()->json(['error' => 'El alumno no está asignado a este grado'], 404);
+            }
+    
+            // Verificar la capacidad del nuevo grado
+            $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado_nuevo);
+            $gradoNuevo = $gradoResponse->getData();
+            Log::info('Grado nuevo:', (array)$gradoNuevo);
+    
+            $capacidad = $gradoNuevo->capacidad;
+    
+            // Verificar si el nuevo grado ya alcanzó su capacidad
+            $alumnosEnNuevoGrado = AlumnoGrado::where('id_grado', $id_grado_nuevo)->count();
+    
+            if ($alumnosEnNuevoGrado >= $capacidad) {
+                return response()->json(['error' => 'El nuevo grado ya alcanzó su capacidad máxima'], 400);
+            }
+    
+            // Actualizar el grado del alumno usando update con where
+            $updated = AlumnoGrado::where('id_alumno', $id_alumno)
+                                  ->where('id_grado', $id_grado_actual)
+                                  ->update(['id_grado' => $id_grado_nuevo]);
+    
+            if ($updated) {
+                return response()->json(['message' => 'El grado del alumno se actualizó correctamente'], 200);
+            } else {
+                return response()->json(['error' => 'No se pudo actualizar el grado del alumno'], 500);
+            }
+        } catch (Exception $e) {
+            Log::error('Error al actualizar el grado del alumno: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al actualizar el grado del alumno'], 500);
+        }
+    }
+    
+    
+
+    public function eliminarAlumnoGrado($id_alumno, $id_grado)
 {
     try {
-        // Obtener la relación actual del alumno con el grado
-        $alumnoGradoActual = AlumnoGrado::where('id_alumno', $id_alumno)->first();
+        // Intentar eliminar el registro con la clave compuesta
+        $deletedCount = AlumnoGrado::where('id_alumno', $id_alumno)
+                                   ->where('id_grado', $id_grado)
+                                   ->delete();
 
-        if (!$alumnoGradoActual) {
-            return response()->json(['error' => 'El alumno no está asignado a ningún grado'], 404);
+        // Verificar si se eliminó algún registro
+        if ($deletedCount === 0) {
+            return response()->json(['message' => 'AlumnoGrado no encontrado'], 404);
         }
 
-        // Verificar la capacidad del nuevo grado
-        $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado_nuevo);
-        $gradoNuevo = $gradoResponse->getData();
-        $capacidad = $gradoNuevo->capacidad;
+        return response()->json(['message' => 'Relación AlumnoGrado eliminada correctamente'], 200);
 
-        $alumnosEnNuevoGrado = AlumnoGrado::where('id_grado', $id_grado_nuevo)->count();
-
-        if ($alumnosEnNuevoGrado >= $capacidad) {
-            return response()->json(['error' => 'El nuevo grado ya alcanzó su capacidad máxima'], 400);
-        }
-
-        // Actualizar el grado del alumno
-        $alumnoGradoActual->id_grado = $id_grado_nuevo;
-        $alumnoGradoActual->save();
-
-        return response()->json(['message' => 'El grado del alumno se actualizó correctamente', 'alumnoGrado' => $alumnoGradoActual], 200);
     } catch (Exception $e) {
-        Log::error('Error al actualizar el grado del alumno: ' . $e->getMessage());
-        return response()->json(['error' => 'Hubo un error al actualizar el grado del alumno'], 500);
+        // Registrar el error
+        Log::error('Error al eliminar el AlumnoGrado: ' . $e->getMessage());
+        return response()->json(['error' => 'Hubo un error al eliminar la relación AlumnoGrado'], 500);
     }
 }
 
-    public function eliminarAlumnoGradoPorIdAlumno($id_alumno)
-    {
-        try {
-            // Eliminar todos los registros de CarreraPlan que corresponden al id_plan
-            $deletedCount = AlumnoGrado::where('id_alumno', $id_alumno)->delete();
-    
-            // Si no se eliminaron registros, retornar un mensaje informativo
-            if ($deletedCount === 0) {
-                return response()->json(['message' => 'AlumnoGrado no encontrado'], 404);
-            } 
-                return response()->json(['error' => 'Se eliminaron las relaciones de AlumnoGrado'], 202);
-            
-        } catch (Exception $e) {
-            // Si ocurre un error, lo registramos
-            Log::error('Error al eliminar el alumnoGrado: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al eliminar el alumnoGrado'], 500);
-        }
-    }
-    
 
     public function eliminarAlumnoGradoPorIdGrado($id_grado)
     {
@@ -209,7 +224,7 @@ public function obtenerTodosAlumnoGradoConRelaciones()
     }
 
 
-    public function asignarAlumnosACarrerasPrimero()
+    public function asignarAlumnosACarrerasIngresante()
     {
         // Iniciar la transacción
         DB::beginTransaction();

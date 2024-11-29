@@ -15,7 +15,6 @@ export const getRoutes = () => ({
   carreras: {
     main: 'carreras',
     crear: 'carreras/crear',
-    plan: (carreraId) => `carreras/plan/${carreraId}`,
     actualizar: (carreraId) => `carreras/actualizar/${carreraId}`
   },
   comisiones: {
@@ -45,6 +44,7 @@ export const getRoutes = () => ({
   asignacionesAlumno: {
     main: 'asignacion-alumno',
     crear: 'asignacion-alumno/crear',
-    actualizar: (alumnoId) => `asignaciones-alumno/actualizar/${alumnoId}`
+    actualizar: (alumnoId, idGradoActual) =>
+      `asignaciones-alumno/actualizar/${alumnoId}/${idGradoActual}`
   }
 });

@@ -187,8 +187,41 @@ class GradoController extends Controller
      */
     public function update(GradoRequest $request, $id)
     {
-        return $this->gradoService->actualizarGrados($request, $id);
+        // Iniciar la transacción para asegurar la atomicidad
+        DB::beginTransaction();
+    
+        try {
+            // Primero, actualizamos el grado con la información de la solicitud
+            $gradoResponse = $this->gradoService->actualizarGrados($request, $id);
+    
+            if ($gradoResponse->getStatusCode() != 200) {
+                DB::rollBack();
+                return response()->json(['error' => 'Hubo un error al actualizar el grado'], 500);
+            }
+    
+            // Obtenemos el objeto de grado actualizado
+            $grado = $gradoResponse->getData();
+    
+            // Validamos si hay materias para actualizar
+            $materias = $request->input('materias');
+            if ($materias) {
+                // Actualizamos las materias asociadas al grado
+                $this->gradoUcService->actualizarGradoUC($grado->id_grado, $materias);
+            }
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Grado y materias actualizados exitosamente'], 200);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+    
+            Log::error("Error al actualizar el grado y sus materias: " . $e->getMessage());
+    
+            return response()->json(['error' => 'Hubo un error al actualizar el grado'], 500);
+        }
     }
+    
 
     /**
      * @OA\Delete(

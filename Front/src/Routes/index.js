@@ -39,7 +39,6 @@ import { getRoutes } from '../horarios/Routes';
 import Planes from '../horarios/Screens/plan_estudio';
 import CrearPlan from '../horarios/Screens/plan_estudio/crearPlan';
 import ActualizarPlan from '../horarios/Screens/plan_estudio/actualizarPlan';
-import PlanCarrera from '../horarios/Screens/carrera/verPlanCarrera';
 import AsignacionAlumno from '../horarios/Screens/asignacion alumno';
 import ActualizarAsignarAlumno from '../horarios/Screens/asignacion alumno/actualizarAsignacionAlumno';
 import CrearAsignacionAlumno from '../horarios/Screens/asignacion alumno/crearAsignacionAlumno';
@@ -95,7 +94,6 @@ const RoutesLanding = () => {
         {/* Carreras */}
         <Route path={routes.carreras.main} element={<Carreras />} />
         <Route path={routes.carreras.crear} element={<CrearCarrera />} />
-        <Route path={routes.carreras.plan(':carreraId')} element={<PlanCarrera />} />
         <Route path={routes.carreras.actualizar(':carreraId')} element={<ActualizarCarrera />} />
         {/* Comisiones */}
         <Route path={routes.comisiones.main} element={<Comisiones />} />
@@ -126,7 +124,7 @@ const RoutesLanding = () => {
         <Route path={routes.asignacionesAlumno.main} element={<AsignacionAlumno />} />
         <Route path={routes.asignacionesAlumno.crear} element={<CrearAsignacionAlumno />} />
         <Route
-          path={routes.asignacionesAlumno.actualizar(':alummnoId')}
+          path={routes.asignacionesAlumno.actualizar(':alumnoId', ':idGradoActual')}
           element={<ActualizarAsignarAlumno />}
         />
         {/* disponibilidad */}

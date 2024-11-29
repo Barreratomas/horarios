@@ -23,7 +23,7 @@ class CarreraRequest extends FormRequest
     public function rules(): array
     {
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/carrera/crear-carrera';
+        $esCreacion = $this->isMethod('post');
 
 
         $carreraRules = $esCreacion ? ['required', 'string', 'max:70', Rule::unique('carrera')] : ['nullable', 'string', 'max:70', Rule::unique('carrera')];

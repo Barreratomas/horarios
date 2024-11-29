@@ -6,6 +6,9 @@ const AsignacionAlumno = () => {
   const { routes } = useOutletContext();
   const location = useLocation();
 
+  const [filteredAlumnos, setFilteredAlumnos] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [alumnos, setAlumnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
@@ -35,8 +38,8 @@ const AsignacionAlumno = () => {
         if (!response.ok) throw new Error('Error al obtener los alumnos');
 
         const data = await response.json();
-        console.log(data);
         setAlumnos(data);
+        setFilteredAlumnos(data);
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener los alumnos:', error);
@@ -48,6 +51,19 @@ const AsignacionAlumno = () => {
 
     fetchAlumnos();
   }, [location, navigate]);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = alumnos.filter(
+      (alumno) =>
+        alumno.alumno.DNI.toString().includes(query) ||
+        `${alumno.alumno.nombre} ${alumno.alumno.apellido}`.toLowerCase().includes(query)
+    );
+
+    setFilteredAlumnos(filtered);
+  };
 
   const handleDelete = async (id_alumno, id_grado) => {
     if (!window.confirm('¿Estás seguro de eliminar esta asignación?')) return;
@@ -64,6 +80,8 @@ const AsignacionAlumno = () => {
       if (!response.ok) throw new Error('Error al eliminar la asignación');
 
       setAlumnos(alumnos.filter((alumno) => alumno.id_alumno !== id_alumno));
+      setFilteredAlumnos(filteredAlumnos.filter((alumno) => alumno.id_alumno !== id_alumno));
+
       setSuccessMessage('Asignación eliminada correctamente');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -76,15 +94,18 @@ const AsignacionAlumno = () => {
     }
   };
 
-  const handleAssignStudent = async () => {
+  const handleAssignIngresantes = async () => {
+    // Mostrar notificación al iniciar
+    setSuccessMessage('Comenzó el proceso de asignación de ingresantes');
+    setHideMessage(false);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/asignar-alumno', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          /* Aquí puedes incluir los datos necesarios para la asignación */
-        })
-      });
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/horarios/alumnoGrados/asignarIngresantes',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Error al asignar alumno');
 
@@ -93,6 +114,34 @@ const AsignacionAlumno = () => {
       navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, { replace: true });
     } catch (error) {
       setErrors([error.message || 'Error al asignar el alumno']);
+    } finally {
+      setTimeout(() => {
+        setHideMessage(true);
+        setSuccessMessage('');
+      }, 3500);
+    }
+  };
+  const handleAssignNoIngresantes = async () => {
+    setSuccessMessage('Comenzó el proceso de asignación de no ingresantes');
+    setHideMessage(false);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnoGrados/asignar', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) throw new Error('Error al asignar alumnos no ingresantes');
+
+      const data = await response.json();
+      setSuccessMessage(data.message || 'Alumnos no ingresantes asignados correctamente');
+      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, { replace: true });
+    } catch (error) {
+      setErrors([error.message || 'Error al asignar alumnos no ingresantes']);
+    } finally {
+      setTimeout(() => {
+        setHideMessage(true);
+        setSuccessMessage('');
+      }, 3500);
     }
   };
 
@@ -100,8 +149,21 @@ const AsignacionAlumno = () => {
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
-          <button className="btn btn-primary me-2" onClick={handleAssignStudent}>
-            Asignacion masiva
+          <div className="filter mb-2 d-flex flex-wrap align-items-center">
+            {/* Input ocupa el 70% del espacio */}
+            <input
+              type="text"
+              className="form-control mb-2 mb-md-0 me-md-2"
+              placeholder="Buscar por DNI o Nombre y Apellido"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </div>
+          <button className="btn btn-primary me-2" onClick={handleAssignNoIngresantes}>
+            Asignar alumnos no ingresantes
+          </button>
+          <button className="btn btn-primary me-2" onClick={handleAssignIngresantes}>
+            Asignacion masiva ingresantes
           </button>
           <button
             type="button"
@@ -118,7 +180,7 @@ const AsignacionAlumno = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container">
-          {alumnos.map((alumno) => (
+          {filteredAlumnos.map((alumno) => (
             <div
               key={alumno.id_alumno}
               style={{
@@ -137,15 +199,16 @@ const AsignacionAlumno = () => {
                 Grado: {alumno.grado.grado}° {alumno.grado.division} ({alumno.grado.detalle})
               </p>
               <p>Carrera: {alumno.alumno.carrera}</p>
-
               <div className="botones">
                 <button
                   className="btn btn-primary me-2"
-                  onClick={() =>
-                    navigate(
-                      `${routes.base}/${routes.asignacionesAlumno.actualizar(alumno.id_alumno)}`
-                    )
-                  }
+                  onClick={() => {
+                    const url = `${routes.base}/${routes.asignacionesAlumno.actualizar(
+                      alumno.id_alumno,
+                      alumno.grado.id_grado
+                    )}`;
+                    navigate(url);
+                  }}
                 >
                   Actualizar
                 </button>

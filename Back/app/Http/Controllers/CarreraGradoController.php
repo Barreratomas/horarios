@@ -43,7 +43,7 @@ class CarreraGradoController extends Controller
         return $this->carreraGradoService->obtenerTodosCarreraGrado();
     }
     
-
+    
     /*
     * @OA\Get(
     *      path="/api/horarios/carreraGrados/carrera/{id_carrera}",
@@ -69,12 +69,12 @@ class CarreraGradoController extends Controller
     *      )
     * )
     */
-    public function showByCarrera($id_carrera)
+    public function showByCarreraSinUC($id_carrera)
     {
-        return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
+        return $this->carreraGradoService->obtenerCarreraGradoPorIdCarreraSinUC($id_carrera);
     }
     // trae el grado con su carrera y materias asignadas
-    public function showByCarreraConMaterias($id_carrera)
+    public function showByCarrera($id_carrera)
     {
         return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
     }

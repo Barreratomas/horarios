@@ -10,11 +10,11 @@ interface AlumnoGradoRepository
     public function obtenerAlumnoGradoPorIdAlumnoConRelaciones($id_alumno);
     public function obtenerAlumnoGradoPorIdGrado($id_grado);
     //public function guardarAlumnoGrado($id_alumno, $id_gradoo);
-    public function eliminarAlumnoGradoPorIdAlumno($id_alumno);
+    public function eliminarAlumnoGrado($id_alumno, $id_grado);
     public function eliminarAlumnoGradoPorIdGrado($id_grado);
 
     //asignar todos los alumnos a sus respectivas carreras partiendo de la tabla de alumnos_uc
-    public function asignarAlumnosACarrerasPrimero();
+    public function asignarAlumnosACarrerasIngresante();
     //cambiar de comision a alumno recursante
     public function cambiarGradoRecursante($dni, $id_grado);
 

@@ -122,14 +122,6 @@ const Carreras = () => {
                 >
                   Actualizar
                 </button>
-                <button
-                  className="btn btn-info me-2"
-                  onClick={() =>
-                    navigate(`${routes.base}/${routes.carreras.plan(carrera.id_carrera)}`)
-                  }
-                >
-                  Ver plan
-                </button>
                 <button className="btn btn-danger" onClick={() => handleDelete(carrera.id_carrera)}>
                   Eliminar
                 </button>

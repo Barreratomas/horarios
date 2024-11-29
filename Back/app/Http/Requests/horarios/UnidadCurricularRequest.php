@@ -24,7 +24,7 @@ class UnidadCurricularRequest extends FormRequest
     {
 
 
-        $esCreacion = $this->url() == 'http://127.0.0.1:8000/api/horarios/unidadCurricular/guardar';
+        $esCreacion = $this->isMethod('post');
 
         $unidadCurricularRules = $esCreacion ? ['required', 'string', 'max:60', Rule::unique('unidad_curricular')] : ['nullable', 'string', 'max:60', Rule::unique('unidad_curricular')];
         $tipoRules = $esCreacion ? ['required', 'string', 'max:20'] : ['nullable', 'string', 'max:20'];
