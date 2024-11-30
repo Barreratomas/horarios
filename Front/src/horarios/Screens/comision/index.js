@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
 import '../../css/acordeon.css';
 
 const Accordion = ({ title, children }) => {
@@ -20,6 +21,7 @@ const Accordion = ({ title, children }) => {
 };
 
 const Comisiones = () => {
+  const usuario = sessionStorage.getItem('userType');
   const navigate = useNavigate();
   const { routes } = useOutletContext(); // Acceder a las rutas definidas
   const location = useLocation(); // Manejar el estado de navegación
@@ -36,6 +38,10 @@ const Comisiones = () => {
   const [errors, setErrors] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [gradoToDelete, setGradoToDelete] = useState(null);
+  const [detallesEliminacion, setDetallesEliminacion] = useState(''); // Estado para los detalles
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -98,19 +104,24 @@ const Comisiones = () => {
     fetchGrados();
   }, [location.state, navigate, location.pathname]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     if (!window.confirm('¿Estás seguro de eliminar este grado?')) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/eliminar/${id}`, {
-        method: 'DELETE'
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/grados/eliminar/${gradoToDelete}`,
+        {
+          method: 'DELETE',
+          body: JSON.stringify({ detalles: detallesEliminacion, usuario }), // Enviar detalles con la eliminación
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Error al eliminar el grado');
 
-      setGrados(grados.filter((grado) => grado.grado.id_grado !== id));
+      setGrados(grados.filter((grado) => grado.grado.id_grado !== gradoToDelete));
       setFilteredComisiones(
-        filteredComisiones.filter((comision) => comision.grado.id_grado !== id)
+        filteredComisiones.filter((comision) => comision.grado.id_grado !== gradoToDelete)
       );
       setSuccessMessage('Grado eliminado correctamente');
 
@@ -120,6 +131,7 @@ const Comisiones = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       console.error('Error al eliminar grado:', error);
       setErrors([error.message || 'Error al eliminar el grado']);
@@ -248,9 +260,11 @@ const Comisiones = () => {
                       Actualizar
                     </button>
                     <button
-                      type="button"
                       className="btn btn-danger"
-                      onClick={() => handleDelete(id_grado)}
+                      onClick={() => {
+                        setGradoToDelete(grado.id_grado); // Establecer el grado a eliminar
+                        setShowModal(true); // Mostrar el modal
+                      }}
                     >
                       Eliminar
                     </button>
@@ -261,6 +275,34 @@ const Comisiones = () => {
               <p>No se encontraron comisiones que coincidan con la búsqueda.</p>
             )}
           </div>
+
+          {/* Modal de confirmación */}
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Confirmar eliminación</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>¿Estás seguro de que quieres eliminar este grado?</p>
+              <div className="form-group">
+                <label htmlFor="detallesEliminacion">Detalles:</label>
+                <textarea
+                  id="detallesEliminacion"
+                  className="form-control"
+                  rows="3"
+                  value={detallesEliminacion}
+                  onChange={(e) => setDetallesEliminacion(e.target.value)}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={handleDelete}>
+                Eliminar
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
           <div
             id="messages-container"

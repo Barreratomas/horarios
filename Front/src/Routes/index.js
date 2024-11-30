@@ -44,6 +44,7 @@ import ActualizarAsignarAlumno from '../horarios/Screens/asignacion alumno/actua
 import CrearAsignacionAlumno from '../horarios/Screens/asignacion alumno/crearAsignacionAlumno';
 import Comisiones from '../horarios/Screens/comision';
 import HorarioPrevio from '../horarios/Screens/horarioPrevioDocente';
+import Logs from '../horarios/Screens/logs/logs';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
@@ -130,6 +131,9 @@ const RoutesLanding = () => {
         {/* disponibilidad */}
         <Route path={routes.disponibilidad.main} element={<Planes />} />
         {/* <Route path={routes.planes.actualizar(':planId')} element={<ActualizarPlan />} /> */}
+
+        {/* logs */}
+        <Route path={routes.logs.main} element={<Logs />} />
       </Route>
     </Routes>
   );

@@ -24,6 +24,7 @@ use App\Http\Controllers\AlumnoGradoController;
 use App\Http\Controllers\CarreraGradoController;
 use App\Http\Controllers\CarreraPlanController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\LogModificacionEliminacionController;
 use App\Models\AlumnoGrado;
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -221,3 +222,8 @@ Route::get('/horarios/carreraGrados/carrera/SinUC/{id_carrera}', [CarreraGradoCo
 Route::get('/horarios/carreraGrados/grado/{id_grado}', [CarreraGradoController::class, 'showByGrado']);
 Route::post('/horarios/carreraGrados/guardar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'store']);
 Route::delete('/horarios/carreraGrados/eliminar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'destroy']);
+
+
+// Logs
+Route::get('/horarios/logs',[LogModificacionEliminacionController::class,'index']);
+Route::post('/horarios/logs',[LogModificacionEliminacionController::class,'store']);

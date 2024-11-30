@@ -46,7 +46,7 @@ const Aulas = () => {
           headers: { Accept: 'application/json' }
         });
 
-        if (!response.ok) throw new Error(' ');
+        if (!response.ok) throw new Error('Error al obtener aulas');
 
         const data = await response.json();
         console.log(data);
@@ -55,7 +55,6 @@ const Aulas = () => {
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener aulas:', error);
-        alert('Servidor fuera de servicio...');
       } finally {
         setLoading(false);
       }
@@ -125,7 +124,6 @@ const Aulas = () => {
           <div className="row align-items-center justify-content-center mb-3">
             <div className="col-12 text-center">
               <div className="filter mb-2 d-flex flex-wrap align-items-center">
-                {/* Input ocupa el 70% del espacio */}
                 <input
                   type="text"
                   className="form-control mb-2 mb-md-0 me-md-2"
@@ -133,10 +131,9 @@ const Aulas = () => {
                   name="nombre"
                   value={searchCriteria.nombre}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 50%' }} // El input ocupa el 70%
+                  style={{ flex: '0 0 50%' }} // El input ocupa el 50%
                 />
 
-                {/* Select tipo ocupa el 15% del espacio */}
                 <select
                   className="form-select mb-2 mb-md-0 me-md-2"
                   name="tipo"

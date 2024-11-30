@@ -7,23 +7,26 @@ use App\Models\horarios\Grado;
 use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
 use App\Services\CarreraGradoService;
 use App\Services\horarios\GradoUcService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
 class GradoController extends Controller
 {
     protected $gradoService;
     protected $carreraGradoService; 
     protected $gradoUcService; 
+    protected $logModificacionEliminacionController; 
 
+    
 
-    public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService, GradoUcService $gradoUcService)
+    public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService, GradoUcService $gradoUcService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->gradoService = $gradoService;
         $this->carreraGradoService = $carreraGradoService;
         $this->gradoUcService = $gradoUcService;
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
 
     }
 
@@ -249,8 +252,39 @@ class GradoController extends Controller
      * )
      * )
      */
-    public function destroy($id)
+        public function destroy($id, Request $request)
     {
-        return $this->gradoService->eliminarGrados($id);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            $gradoResponse = $this->gradoService->eliminarGrados($id);
+            
+            $grado = $gradoResponse->getData();
+            if (!isset($grado->nombre_grado)) {
+                throw new \Exception('No se pudo obtener el nombre del grado.');
+            }
+
+            $nombreGrado = $grado->nombre_grado;
+            $accion = "Eliminación del grado " . $nombreGrado;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Grado eliminado correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar el grado: ' . $e->getMessage()
+            ], 500);
+        }
     }
+
 }

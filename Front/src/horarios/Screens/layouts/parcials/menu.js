@@ -181,6 +181,14 @@ const Menu = () => {
                       Asignacion alumnos a grados
                     </button>
                   </li>
+                  <li className="nav-item">
+                    <button
+                      className="nav-link"
+                      onClick={() => navigate(`${routes.base}/${routes.logs.main}`)}
+                    >
+                      Logs
+                    </button>
+                  </li>
                 </>
               )}
             </ul>

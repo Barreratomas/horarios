@@ -104,8 +104,12 @@ class GradoService implements GradoRepository
         try {
             $grado = Grado::find($id);
             if ($grado) {
+                $nombreGrado = $grado->detalle;
+
                 $grado->delete();
-                return response()->json(['success' => 'Se eliminó el grado'], 200);
+                return response()->json([
+                    'nombre_grado' => $nombreGrado,
+                ], 200);            
             } else {
                 return response()->json(['error' => 'No existe el grado'], 404);
             }

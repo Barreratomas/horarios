@@ -46,5 +46,8 @@ export const getRoutes = () => ({
     crear: 'asignacion-alumno/crear',
     actualizar: (alumnoId, idGradoActual) =>
       `asignaciones-alumno/actualizar/${alumnoId}/${idGradoActual}`
+  },
+  logs: {
+    main: 'logs'
   }
 });
