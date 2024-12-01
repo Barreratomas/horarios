@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
+import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarComision = () => {
   const usuario = sessionStorage.getItem('userType'); // Obtener el usuario del sessionStorage
@@ -104,8 +104,8 @@ const ActualizarComision = () => {
           body: JSON.stringify({
             capacidad,
             materias: materiasSeleccionadas,
-            detalles, // Incluir detalle de actualización
-            usuario // Incluir usuario
+            detalles,
+            usuario
           })
         }
       );
@@ -117,7 +117,7 @@ const ActualizarComision = () => {
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors); // Mostrar errores de validación si los hay
+          setErrors(data.errors);
         }
       }
     } catch (error) {
@@ -127,10 +127,12 @@ const ActualizarComision = () => {
       setShowModal(false); // Cerrar el modal de confirmación
     }
   };
+
   // Cancelar la actualización
   const handleCancelUpdate = () => {
     setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
   };
+
   if (isLoading) return <p>Cargando datos de la comisión...</p>;
 
   return (
@@ -170,7 +172,7 @@ const ActualizarComision = () => {
             </div>
 
             <button type="submit" className="btn btn-primary mt-3">
-              {isSubmitting ? 'Actualizando...' : 'Actualizar Comisión'}
+              {isSubmitting ? 'Actualizando...' : 'Actualizar grado'}
             </button>
           </form>
 
@@ -185,6 +187,7 @@ const ActualizarComision = () => {
           )}
         </div>
       </div>
+
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>

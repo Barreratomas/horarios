@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const Carreras = () => {
+  const [detalles, setDetalles] = useState('');
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false);
+  const [carreraToDelete, setCarreraToDelete] = useState(null);
+
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const location = useLocation();
@@ -57,19 +63,20 @@ const Carreras = () => {
     fetchCarreras();
   }, [location, navigate]);
 
-  const handleDelete = async (idCarrera) => {
+  const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/carreras/eliminar/${idCarrera}`,
+        `http://127.0.0.1:8000/api/horarios/carreras/eliminar/${carreraToDelete}`,
         {
           method: 'DELETE',
+          body: JSON.stringify({ detalles: detalles, usuario }),
           headers: { 'Content-Type': 'application/json' }
         }
       );
 
       if (!response.ok) throw new Error('Error al eliminar carrera');
 
-      setCarreras(carreras.filter((carrera) => carrera.id_carrera !== idCarrera));
+      setCarreras(carreras.filter((carrera) => carrera.id_carrera !== carreraToDelete));
       setSuccessMessage('Carrera eliminada con éxito');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -122,7 +129,14 @@ const Carreras = () => {
                 >
                   Actualizar
                 </button>
-                <button className="btn btn-danger" onClick={() => handleDelete(carrera.id_carrera)}>
+
+                <button
+                  className="btn btn-danger"
+                  onClick={() => {
+                    setCarreraToDelete(carrera.id_carrera); // Establecer el grado a eliminar
+                    setShowModal(true); // Mostrar el modal
+                  }}
+                >
                   Eliminar
                 </button>
               </div>
@@ -132,7 +146,33 @@ const Carreras = () => {
       ) : (
         <h1>Este módulo no está disponible en este momento</h1>
       )}
-
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>¿Estás seguro de que quieres eliminar esta carrera?</p>
+          <div className="form-group">
+            <label htmlFor="detalles">Detalles:</label>
+            <textarea
+              id="detalles"
+              className="form-control"
+              rows="3"
+              value={detalles}
+              onChange={(e) => setDetalles(e.target.value)}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={handleDelete}>
+            Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <div id="messages-container" className={`container ${hideMessage ? 'hide-messages' : ''}`}>
         {errors.length > 0 && (
           <div className="alert alert-danger">

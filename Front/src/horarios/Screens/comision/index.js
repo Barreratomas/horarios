@@ -41,7 +41,7 @@ const Comisiones = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [gradoToDelete, setGradoToDelete] = useState(null);
-  const [detalles, setDetalles] = useState(''); // Estado para los detalles
+  const [detalles, setDetalles] = useState('');
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -105,8 +105,6 @@ const Comisiones = () => {
   }, [location.state, navigate, location.pathname]);
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de eliminar este grado?')) return;
-
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/grados/eliminar/${gradoToDelete}`,
@@ -234,7 +232,6 @@ const Comisiones = () => {
                   <p>Detalle: {grado.detalle}</p>
                   <p>Capacidad: {grado.capacidad}</p>
 
-                  {/* Displaying the associated materias */}
                   <div>
                     <Accordion title="Ver materias">
                       <ul>

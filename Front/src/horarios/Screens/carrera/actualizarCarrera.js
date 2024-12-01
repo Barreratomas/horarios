@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarCarrera = () => {
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [detalles, setDetalles] = useState('');
+
   const [carrera, setCarrera] = useState('');
   const [cupo, setCupo] = useState('');
   const [errors, setErrors] = useState({});
@@ -29,10 +35,12 @@ const ActualizarCarrera = () => {
 
     fetchCarrera();
   }, [carreraId]);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors({});
+    setShowModal(true); // Mostrar el modal de confirmación
+  };
+  const handleConfirmUpdate = async () => {
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -42,7 +50,7 @@ const ActualizarCarrera = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ carrera, cupo })
+          body: JSON.stringify({ carrera, cupo, detalles, usuario })
         }
       );
 
@@ -58,7 +66,13 @@ const ActualizarCarrera = () => {
       }
     } catch (error) {
       console.error('Error actualizando carrera:', error);
+    } finally {
+      setIsSubmitting(false); // Finalizar el proceso de envío
+      setShowModal(false); // Cerrar el modal de confirmación
     }
+  };
+  const handleCancelUpdate = () => {
+    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
   };
 
   return (
@@ -88,8 +102,8 @@ const ActualizarCarrera = () => {
             <br />
             {errors.cupo && <div className="text-danger">{errors.cupo}</div>}
             <br />
-            <button type="submit" className="btn btn-primary me-2">
-              Actualizar
+            <button type="submit" className="btn btn-primary mt-3">
+              {isSubmitting ? 'Actualizando...' : 'Actualizar carrera'}
             </button>
           </form>
         </div>
@@ -106,6 +120,30 @@ const ActualizarCarrera = () => {
           </div>
         </div>
       )}
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={handleCancelUpdate}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar actualización</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label htmlFor="detalles">Detalles:</label>
+          <textarea
+            name="detalles"
+            value={detalles}
+            onChange={(e) => setDetalles(e.target.value)}
+            required
+            className="form-control"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelUpdate}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleConfirmUpdate}>
+            Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

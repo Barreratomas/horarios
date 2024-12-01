@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarMateria = () => {
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [detalles, setDetalles] = useState(''); // Detalle de actualización
+
   const { materiaId } = useParams(); // Obtener ID de la materia desde la URL
   const [unidadCurricular, setUnidadCurricular] = useState('');
   const [tipo, setTipo] = useState('');
@@ -38,10 +44,13 @@ const ActualizarMateria = () => {
     obtenerMateria();
   }, [materiaId]);
 
-  // Manejar el envío del formulario
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors({});
+    setShowModal(true); // Mostrar el modal de confirmación
+  };
+  // Manejar el envío del formulario
+  const handleConfirmUpdate = async () => {
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -56,7 +65,9 @@ const ActualizarMateria = () => {
             tipo,
             horas_sem: horasSem,
             horas_anual: horasAnual,
-            formato
+            formato,
+            usuario,
+            detalles
           })
         }
       );
@@ -73,7 +84,14 @@ const ActualizarMateria = () => {
       }
     } catch (error) {
       console.error('Error al actualizar la materia:', error);
+    } finally {
+      setIsSubmitting(false); // Finalizar el proceso de envío
+      setShowModal(false); // Cerrar el modal de confirmación
     }
+  };
+  // Cancelar la actualización
+  const handleCancelUpdate = () => {
+    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
   };
 
   return (
@@ -145,8 +163,8 @@ const ActualizarMateria = () => {
             <br />
             <br />
 
-            <button type="submit" className="btn btn-primary">
-              Actualizar
+            <button type="submit" className="btn btn-primary mt-3">
+              {isSubmitting ? 'Actualizando...' : 'Actualizar materia'}
             </button>
           </form>
         </div>
@@ -163,6 +181,30 @@ const ActualizarMateria = () => {
           </div>
         </div>
       )}
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={handleCancelUpdate}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar actualización</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label htmlFor="detalles">Detalles:</label>
+          <textarea
+            name="detalles"
+            value={detalles}
+            onChange={(e) => setDetalles(e.target.value)}
+            required
+            className="form-control"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelUpdate}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleConfirmUpdate}>
+            Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
