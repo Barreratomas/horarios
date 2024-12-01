@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
 
 const ActualizarComision = () => {
+  const usuario = sessionStorage.getItem('userType'); // Obtener el usuario del sessionStorage
   const { comisionId } = useParams(); // Obtener ID de la comisión desde la URL
   const [capacidad, setCapacidad] = useState('');
   const [materias, setMaterias] = useState([]);
   const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
+  const [detalles, setDetalles] = useState(''); // Detalle de actualización
   const [errors, setErrors] = useState({});
   const [fetchError, setFetchError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
@@ -46,13 +51,14 @@ const ActualizarComision = () => {
         );
         const gradoUCData = await gradoUCResponse.json();
 
-        if (!gradoUCResponse.ok) {
-          throw new Error('Error al cargar las materias asociadas al grado.');
+        if (!gradoUCResponse.ok || !Array.isArray(gradoUCData)) {
+          console.log('No hay materias asociadas al grado o error en los datos.');
+          setMateriasSeleccionadas([]); // Dejar materias seleccionadas vacías
+        } else {
+          // Extraer IDs de las materias asociadas al grado
+          const materiasAsociadas = gradoUCData.map((item) => item.unidad_curricular.id_uc);
+          setMateriasSeleccionadas(materiasAsociadas);
         }
-
-        // Extraer IDs de las materias asociadas al grado
-        const materiasAsociadas = gradoUCData.map((item) => item.unidad_curricular.id_uc);
-        setMateriasSeleccionadas(materiasAsociadas);
 
         // Obtener todas las materias disponibles
         const materiasResponse = await fetch('http://127.0.0.1:8000/api/horarios/unidadCurricular');
@@ -79,11 +85,13 @@ const ActualizarComision = () => {
       prev.includes(idMateria) ? prev.filter((id) => id !== idMateria) : [...prev, idMateria]
     );
   };
-
-  // Manejar la actualización
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors({}); // Limpiar errores previos
+    setShowModal(true); // Mostrar el modal de confirmación
+  };
+  // Manejar la actualización
+  const handleConfirmUpdate = async () => {
+    setIsSubmitting(true); // Iniciar el proceso de envío
 
     try {
       const response = await fetch(
@@ -95,7 +103,9 @@ const ActualizarComision = () => {
           },
           body: JSON.stringify({
             capacidad,
-            materias: materiasSeleccionadas
+            materias: materiasSeleccionadas,
+            detalles, // Incluir detalle de actualización
+            usuario // Incluir usuario
           })
         }
       );
@@ -112,9 +122,15 @@ const ActualizarComision = () => {
       }
     } catch (error) {
       setFetchError('Error al intentar actualizar la comisión.');
+    } finally {
+      setIsSubmitting(false); // Finalizar el proceso de envío
+      setShowModal(false); // Cerrar el modal de confirmación
     }
   };
-
+  // Cancelar la actualización
+  const handleCancelUpdate = () => {
+    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
+  };
   if (isLoading) return <p>Cargando datos de la comisión...</p>;
 
   return (
@@ -154,7 +170,7 @@ const ActualizarComision = () => {
             </div>
 
             <button type="submit" className="btn btn-primary mt-3">
-              Actualizar Comisión
+              {isSubmitting ? 'Actualizando...' : 'Actualizar Comisión'}
             </button>
           </form>
 
@@ -169,6 +185,30 @@ const ActualizarComision = () => {
           )}
         </div>
       </div>
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={handleCancelUpdate}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar actualización</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label htmlFor="detalles">Detalles:</label>
+          <textarea
+            name="detalles"
+            value={detalles}
+            onChange={(e) => setDetalles(e.target.value)}
+            required
+            className="form-control"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelUpdate}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleConfirmUpdate}>
+            Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
