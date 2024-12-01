@@ -190,6 +190,9 @@ class GradoController extends Controller
      */
     public function update(GradoRequest $request, $id)
     {
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        
         // Iniciar la transacción para asegurar la atomicidad
         DB::beginTransaction();
     
@@ -211,6 +214,11 @@ class GradoController extends Controller
                 // Actualizamos las materias asociadas al grado
                 $this->gradoUcService->actualizarGradoUC($grado->id_grado, $materias);
             }
+
+            $nombreGrado = $grado->nombre_grado;
+            $accion = "Actualizacion del grado " . $nombreGrado;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
     
             DB::commit();
     

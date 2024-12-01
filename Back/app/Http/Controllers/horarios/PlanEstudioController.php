@@ -5,9 +5,11 @@ namespace App\Http\Controllers\horarios;
 use App\Services\horarios\PlanEstudioService;
 use App\Http\Requests\horarios\PlanEstudioRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
 use App\Services\CarreraPlanService;
 use App\Services\horarios\UCPlanService;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -16,12 +18,14 @@ class PlanEstudioController extends Controller
     protected $planEstudioService;
     protected $UCPlanService;
     protected $CarreraPlanService;
+    protected $logModificacionEliminacionController;
 
-    public function __construct(PlanEstudioService $planEstudioService, UCPlanService $UCPlanService, CarreraPlanService $CarreraPlanService)
+    public function __construct(PlanEstudioService $planEstudioService, UCPlanService $UCPlanService, CarreraPlanService $CarreraPlanService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->planEstudioService = $planEstudioService;
         $this->UCPlanService = $UCPlanService;
         $this->CarreraPlanService = $CarreraPlanService;
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
 
     }
 
@@ -225,6 +229,9 @@ class PlanEstudioController extends Controller
      */
     public function update(PlanEstudioRequest $request, $id)
     {
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        
         DB::beginTransaction(); // Inicia la transacción
 
         try {
@@ -277,6 +284,13 @@ class PlanEstudioController extends Controller
                 }
             }
 
+            $planEstudio = $planEstudioResponse->getData();
+
+            $nombrePlanEstudio = $planEstudio->nombre_planEstudio;
+            $accion = "actualizacion del plan de estudio " . $nombrePlanEstudio;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
             DB::commit(); // Si todo fue bien, commit de la transacción
             return response()->json(['message' => 'Plan de estudio actualizado con éxito'], 200);
 
@@ -319,10 +333,39 @@ class PlanEstudioController extends Controller
      *     )
      * )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        return $this->planEstudioService->eliminarPlanEstudio($id);
-    }
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
 
+        DB::beginTransaction();
+
+        try {
+            $planEstudioResponse = $this->planEstudioService->eliminarPlanEstudio($id);
+            
+            $planEstudio = $planEstudioResponse->getData();
+            if (!isset($planEstudio->nombre_planEstudio)) {
+                throw new \Exception('No se pudo obtener el nombre del plan de estudio.');
+            }
+
+            $nombrePlanEstudio = $planEstudio->nombre_planEstudio;
+            $accion = "Eliminación del plan de estudio " . $nombrePlanEstudio;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Plan de estudio eliminado correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar el plan de estudio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
 }

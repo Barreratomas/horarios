@@ -5,17 +5,22 @@ namespace App\Http\Controllers\horarios;
 use App\Services\horarios\UnidadCurricularService;
 use App\Http\Requests\horarios\UnidadCurricularRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 
 class UnidadCurricularController extends Controller
 {
     protected $unidadCurricularService;
+    protected $logModificacionEliminacionController;
 
-    public function __construct(UnidadCurricularService $unidadCurricularService)
+    public function __construct(UnidadCurricularService $unidadCurricularService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->unidadCurricularService = $unidadCurricularService;
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
 
     }
 
@@ -145,7 +150,38 @@ class UnidadCurricularController extends Controller
      */
     public function update(UnidadCurricularRequest $request, $id)
     {
-        return $this->unidadCurricularService->actualizarUnidadCurricular($request, $id);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            
+            $unidadCurricularResponse  = $this->unidadCurricularService->actualizarUnidadCurricular($request, $id);
+    
+            if ($unidadCurricularResponse->getStatusCode() != 200) {
+                DB::rollBack();
+                return response()->json(['error' => 'Hubo un error al actualizar la unidad curricular'], 500);
+            }
+
+            $unidadCurricular = $unidadCurricularResponse->getData();
+    
+            $nombreUnidadCurricular = $unidadCurricular->nombre_unidadCurricular;
+            $accion = "Actualizacion de la unidad curricular " . $nombreUnidadCurricular;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+    
+            return response()->json(['message' => 'Unidad curricular actualizada exitosamente'], 200);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+    
+            Log::error("Error al actualizar la unidad curricular: " . $e->getMessage());
+    
+            return response()->json(['error' => 'Hubo un error al actualizar la unidad curricular'], 500);
+        }
     }
 
 
@@ -175,9 +211,40 @@ class UnidadCurricularController extends Controller
      *      @OA\Response(response=500, description="Internal Server Error")
      *     )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        return $this->unidadCurricularService->eliminarUnidadCurricular($id);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            $unidadCurricularResponse = $this->unidadCurricularService->eliminarUnidadCurricular($id);
+            
+            $unidadCurricular = $unidadCurricularResponse->getData();
+            if (!isset($unidadCurricular->nombre_unidadCurricular)) {
+                throw new \Exception('No se pudo obtener el nombre de la unidad curricular.');
+            }
+
+            $nombreUnidadCurricular = $unidadCurricular->nombre_unidadCurricular;
+            $accion = "Eliminación de la unidad curricular " . $nombreUnidadCurricular;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Unidad curricular eliminada correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar la unidad curricular: ' . $e->getMessage()
+            ], 500);
+        }
+
     }
 
 }

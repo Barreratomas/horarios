@@ -6,18 +6,22 @@ use App\Http\Requests\horarios\CarreraRequest;
 use App\Models\Carrera;
 use App\Services\horarios\CarreraService;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
 
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CarreraController extends Controller
 {
     protected $carreraService;
+    protected $logModificacionEliminacionController; 
 
-    public function __construct(CarreraService $carreraService)
+    public function __construct(CarreraService $carreraService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->carreraService = $carreraService;
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
 
     }
 
@@ -209,7 +213,37 @@ class CarreraController extends Controller
      */
     public function update(CarreraRequest $request, $id)
     {
-        return $this->carreraService->actualizarCarrera($request, $id);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        DB::beginTransaction();
+
+        try {
+    
+            $carreraResponse  = $this->carreraService->actualizarCarrera($request, $id);
+    
+            if ($carreraResponse->getStatusCode() != 200) {
+                DB::rollBack();
+                return response()->json(['error' => 'Hubo un error al actualizar la carrera'], 500);
+            }
+            
+            $carrera = $carreraResponse->getData();
+
+            $nombreCarrera = $carrera->nombre_carrera;
+            $accion = "actualizacion de la carrera " . $nombreCarrera;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+    
+            return response()->json(['message' => 'Carrera actualizada exitosamente'], 200);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+    
+            Log::error("Error al actualizar la carrera: " . $e->getMessage());
+    
+            return response()->json(['error' => 'Hubo un error al actualizar la carrera'], 500);
+        }
     }
 
     /**
@@ -242,8 +276,39 @@ class CarreraController extends Controller
      * )
      * )
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        return $this->carreraService->eliminarCarreraPorId($id);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            $carreraResponse = $this->carreraService->eliminarCarreraPorId($id);
+            
+            $carrera = $carreraResponse->getData();
+            if (!isset($carrera->nombre_carrera)) {
+                throw new \Exception('No se pudo obtener el nombre de la carrera.');
+            }
+
+            $nombreCarrera = $carrera->nombre_carrera;
+            $accion = "Eliminación de la carrea " . $nombreCarrera;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Carrera eliminada correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar la carrera: ' . $e->getMessage()
+            ], 500);
+        }
     }
+
 }

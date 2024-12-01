@@ -4,20 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\AlumnoGrado;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
 use App\Services\AlumnoGradoService;
 use App\Services\CarreraGradoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AlumnoGradoController extends Controller
 {
     private $alumnoGradoService;
     private $carreraGradoService;
+    protected $logModificacionEliminacionController;
 
-    public function __construct(AlumnoGradoService $alumnoGradoService, CarreraGradoService $carreraGradoService)
+    public function __construct(AlumnoGradoService $alumnoGradoService, CarreraGradoService $carreraGradoService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->alumnoGradoService = $alumnoGradoService;
         
         $this->carreraGradoService = $carreraGradoService;
+
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -185,9 +191,40 @@ class AlumnoGradoController extends Controller
      *      )
      * )
      */
-    public function destroy($id_alumno,$id_grado)
+    public function destroy($id_alumno,$id_grado,  Request $request)
     {
-        return $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno,$id_grado);
+
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            $alumnoGradoResponse = $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno,$id_grado);
+            
+            $alumnoGrado = $alumnoGradoResponse->getData();
+            if (!isset($alumnoGrado->nombre_alumnoGrado)) {
+                throw new \Exception('No se pudo obtener el nombre del alumno del grado.');
+            }
+
+            $nombreAlumnoGrado = $alumnoGrado->nombre_alumnoGrado;
+            $accion = "Eliminación del alumno del grado " . $nombreAlumnoGrado;
+            
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Alumno eliminado correctamente del grado.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar al alumno del grado: ' . $e->getMessage()
+            ], 500);
+        }
 
     }
 
