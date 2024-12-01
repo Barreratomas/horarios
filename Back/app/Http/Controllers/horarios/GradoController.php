@@ -193,8 +193,6 @@ class GradoController extends Controller
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
-        $detalle = $request->input('detalles');
-        $usuario = $request->input('usuario');
         
         // Iniciar la transacción para asegurar la atomicidad
         DB::beginTransaction();
