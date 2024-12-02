@@ -80,8 +80,9 @@ class UnidadCurricularService implements UnidadCurricularRepository
         try {
             $unidadCurricular = UnidadCurricular::find($id);
             if ($unidadCurricular) {
+                $nombreUC=$unidadCurricular->id_uc;
                 $unidadCurricular->delete();
-                return response()->json(['success' => 'Se eliminó el unidadCurricular'], 200);
+                return response()->json(['nombre_uc' => $nombreUC], 200);
             } else {
                 return response()->json(['error' => 'No existe el unidadCurricular'], 404);
             }

@@ -110,6 +110,7 @@ const Planes = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       setErrors([error.message || 'Error al eliminar el plan']);
     }
@@ -121,8 +122,8 @@ const Planes = () => {
         <p>Cargando...</p>
       ) : serverUp ? (
         <div className="container py-3">
-          <div className="row align-items-center justify-content-center">
-            <div className="col-6 text-center">
+          <div className="row align-items-center justify-content-center col-11">
+            <div className="w-50 text-center  mx-1">
               <div className="mb-3">
                 <input
                   type="text"
@@ -132,7 +133,6 @@ const Planes = () => {
                   onChange={(e) => setFilterText(e.target.value)} // Actualiza el estado del filtro
                 />
               </div>
-
               <button
                 type="button"
                 className="btn btn-primary me-2"

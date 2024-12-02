@@ -87,6 +87,7 @@ const Materias = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       setErrors([error.message || 'Error al eliminar materia']);
     }

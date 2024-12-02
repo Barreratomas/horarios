@@ -5,6 +5,7 @@ namespace App\Http\Requests\horarios;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\LogsRequest;
 
 class PlanEstudioRequest extends FormRequest
 {
@@ -24,7 +25,8 @@ class PlanEstudioRequest extends FormRequest
     public function rules(): array
     {
         $esCreacion = $this->isMethod('post');
-
+        $logsRequest= new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
         // Logueamos la decisión del método
         Log::info('Método de solicitud: ' . $this->getMethod());
         Log::info('Es una creación (POST): ' . ($esCreacion ? 'Sí' : 'No'));
@@ -42,16 +44,19 @@ class PlanEstudioRequest extends FormRequest
         $materiasRules = $esCreacion ? ['required', 'array', 'min:1']  : ['nullable', 'array'];
         $materiasItemRules = ['integer'];
 
-        $rules = [
-            'detalle' => $detalleRules,
-            'id_carrera' => $carreraRules,
-            'fecha_inicio' => $fechaInicioRules,
-            'fecha_fin' => $fechaFinRules,
-            'materias' => $materiasRules,
-            'materias.*' => $materiasItemRules,
-        ];
+      
 
-        return $rules;
+        return array_merge(
+            $logsRules,  // Reglas de LogsRequest
+            [
+                'detalle' => $detalleRules,
+                'id_carrera' => $carreraRules,
+                'fecha_inicio' => $fechaInicioRules,
+                'fecha_fin' => $fechaFinRules,
+                'materias' => $materiasRules,
+                'materias.*' => $materiasItemRules,
+            ]
+        );        
     }
 
     /**

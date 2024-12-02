@@ -142,8 +142,9 @@ class CarreraService implements CarreraRepository
         try {
             $carrera = Carrera::find($id);
             if ($carrera) {
+                $nombreCarrera=$carrera->carrera;
                 $carrera->delete();
-                return response()->json(['success' => 'Se eliminó la carrera'], 200);
+                return response()->json(['nombre_carrera' => $nombreCarrera], 200);
             } else {
                 return response()->json(['error' => 'No existe la carrera'], 404);
             }

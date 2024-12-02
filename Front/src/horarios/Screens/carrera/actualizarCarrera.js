@@ -50,7 +50,7 @@ const ActualizarCarrera = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ carrera, cupo, detalles, usuario })
+          body: JSON.stringify({ carrera, cupo, usuario, detalles })
         }
       );
 

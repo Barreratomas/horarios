@@ -95,6 +95,7 @@ const AsignacionAlumno = () => {
         setSuccessMessage('');
         setHideMessage(false);
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       setErrors([error.message || 'Error al eliminar la asignación']);
     }

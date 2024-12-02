@@ -23,10 +23,12 @@ class GradoRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {   $logsRequest= new LogsRequest();
-        $logsRules = $logsRequest->rules();
+    {  
 
         $esCreacion = $this->isMethod('post');
+        $logsRequest= new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
+
         
         Log::info('Método de solicitud: ' . $this->getMethod());
         Log::info('Es una creación (POST): ' . ($esCreacion ? 'Sí' : 'No'));
@@ -54,16 +56,17 @@ class GradoRequest extends FormRequest
         Log::info('Reglas de validación para materias: ', $materiasRules);
 
 
-        // return [
-        //     'grado' => $gradoRules,
-        //     'division' => $divisionRules,
-        //     'detalle' => $detalleRules,
-        //     'capacidad' => $capacidadRules,
-        //     'id_carrera' => $carreraRules,
-        //     'materias' => $materiasRules
-
-        // ];
-        return array_merge($logsRules, $gradoRules);
+        return array_merge(
+            $logsRules,  // Reglas de LogsRequest
+            [
+                'grado' => $gradoRules,
+                'division' => $divisionRules,
+                'detalle' => $detalleRules,
+                'capacidad' => $capacidadRules,
+                'id_carrera' => $carreraRules,
+                'materias' => $materiasRules
+            ]
+        );
 
     }
 }

@@ -6,6 +6,7 @@ use App\Services\horarios\UnidadCurricularService;
 use App\Http\Requests\horarios\UnidadCurricularRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LogModificacionEliminacionController;
+use App\Http\Requests\LogsRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -166,8 +167,8 @@ class UnidadCurricularController extends Controller
 
             $unidadCurricular = $unidadCurricularResponse->getData();
     
-            $nombreUnidadCurricular = $unidadCurricular->nombre_unidadCurricular;
-            $accion = "Actualizacion de la unidad curricular " . $nombreUnidadCurricular;
+            $nombreUnidadCurricular = $unidadCurricular->unidad_curricular;
+            $accion = "Actualizacion de la unidad curricular " . $nombreUnidadCurricular."(id:".$unidadCurricular->id_uc.")";
             
             $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
 
@@ -211,7 +212,7 @@ class UnidadCurricularController extends Controller
      *      @OA\Response(response=500, description="Internal Server Error")
      *     )
      */
-    public function destroy($id, Request $request)
+    public function destroy($id, LogsRequest $request)
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
@@ -222,12 +223,12 @@ class UnidadCurricularController extends Controller
             $unidadCurricularResponse = $this->unidadCurricularService->eliminarUnidadCurricular($id);
             
             $unidadCurricular = $unidadCurricularResponse->getData();
-            if (!isset($unidadCurricular->nombre_unidadCurricular)) {
+            if (!isset($unidadCurricular->nombre_uc)) {
                 throw new \Exception('No se pudo obtener el nombre de la unidad curricular.');
             }
 
-            $nombreUnidadCurricular = $unidadCurricular->nombre_unidadCurricular;
-            $accion = "Eliminación de la unidad curricular " . $nombreUnidadCurricular;
+            $nombreUnidadCurricular = $unidadCurricular->nombre_uc;
+            $accion = "Eliminación de la unidad curricular " . $nombreUnidadCurricular."(id:".$id.")";
             
             $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
 

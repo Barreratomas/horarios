@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests\horarios;
+use App\Http\Requests\LogsRequest;
 
 use App\Models\Aula;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,7 +28,8 @@ class AulaRequest extends FormRequest
         
         $esCreacion = $this->isMethod('post');
 
-        
+        $logsRequest= new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
 
 
         $nombreRules = $esCreacion ? ['required','string','max:255',Rule::unique('aula')] : ['nullable','string','max:255',Rule::unique('aula')];
@@ -35,11 +37,15 @@ class AulaRequest extends FormRequest
         $capacidadRules = $esCreacion ? ['required ',' integer' ]:[ 'nullable ',' integer'];
 
 
-        return [
-            'nombre' => $nombreRules,
-            'tipo_aula' => $tipoAulaRules,
-            'capacidad' => $capacidadRules
-
-        ];
+      
+        return array_merge(
+            $logsRules,  // Reglas de LogsRequest
+            [
+                'nombre' => $nombreRules,
+                'tipo_aula' => $tipoAulaRules,
+                'capacidad' => $capacidadRules,
+             
+            ]
+        );
     }
 }

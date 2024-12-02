@@ -24,10 +24,10 @@ const CrearMateria = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          unidadCurricular,
+          unidad_curricular: unidadCurricular,
           tipo,
-          horasSem,
-          horasAnual,
+          horas_sem: horasSem,
+          horas_anual: horasAnual,
           formato
         })
       });

@@ -20,16 +20,16 @@ class LogsRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules($esCreacion = false): array
     {
-      
+
         // Logueamos los valores de los campos
         Log::info('Valor de usuario: ' . $this->usuario);
         Log::info('Valor de detalles: ' . $this->detalles);
 
-        // Definimos reglas de validación para cada campo
-        $usuarioRules =  ['required', 'string', 'max:50'];
-        $detallesRules =  ['required', 'string', 'max:255'];
+        $usuarioRules = $esCreacion ? ['nullable', 'string', 'max:50'] : ['required', 'string', 'max:50'];
+        $detallesRules = $esCreacion ? ['nullable', 'string', 'max:255'] : ['required', 'string', 'max:255'];
+
 
         // Logueamos las reglas
         Log::info('Reglas de validación para usuario: ', $usuarioRules);

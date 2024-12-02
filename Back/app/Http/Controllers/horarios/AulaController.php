@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LogModificacionEliminacionController;
 use App\DTO;
- 
+use App\Http\Requests\LogsRequest;
 
 class AulaController extends Controller
 {
@@ -219,7 +219,7 @@ class AulaController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $id)
+    public function update(AulaRequest $request, $id)
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
@@ -237,8 +237,8 @@ class AulaController extends Controller
     
             $aula = $aulaResponse->getData();
     
-            $nombreAula = $aula->nombre_aula;
-            $accion = "Actualizacion del aula " . $nombreAula;
+            $nombreAula = $aula->nombre;
+            $accion = "Actualizacion del aula " . $nombreAula."(id:".$aula->id_aula.")";
             
             $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
 
@@ -282,7 +282,7 @@ class AulaController extends Controller
      * )
      * )
      */
-    public function destroy($id, Request $request)
+    public function destroy($id, LogsRequest $request)
     {
 
         $detalle = $request->input('detalles');
@@ -299,7 +299,7 @@ class AulaController extends Controller
             }
 
             $nombreAula = $aula->nombre_aula;
-            $accion = "Eliminación del aula " . $nombreAula;
+            $accion = "Eliminación del aula " . $nombreAula."(id:".$id.")";
             
             $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
 
