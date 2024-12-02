@@ -3,7 +3,6 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import '../../css/acordeon.css';
 import { Modal, Button } from 'react-bootstrap';
 
-// Componente Accordion reutilizable
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
 

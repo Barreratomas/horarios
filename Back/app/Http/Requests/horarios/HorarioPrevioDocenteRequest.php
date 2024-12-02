@@ -21,21 +21,26 @@ class HorarioPrevioDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
-        
+
         $esCreacion = $this->isMethod('post');
         $trabajaInstitucion = $this->input('trabajaInstitucion') == 'si';
-       
+
         // Definir las reglas de validación basadas en la condición
         $rules = [];
 
         if ($trabajaInstitucion) {
-            $diaRules = $esCreacion ? ['required','in:lunes,martes,miercoles,jueves,viernes'] : ['nullable','in:lunes,martes,miercoles,jueves,viernes'];
-            $horaRules = $esCreacion ? ['required','date_format:H:i','before:22:20'] : ['nullable','date_format:H:i','before:22:20'];
-            
+            $diaRules = $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'array'];
+            $horaRules = $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'array'];
+
+            // Regla para cada elemento de los arrays de días y horas
             $rules = [
-                'dia' => $diaRules,
-                'hora' => $horaRules,
+                'dia' => array_merge($diaRules, ['in:lunes,martes,miercoles,jueves,viernes']),
+                'hora' => array_merge($horaRules, ['date_format:H:i', 'before:22:30']),
             ];
+
+            // Reglas de validación para cada día y hora en el array
+            $rules['dia.*'] = ['in:lunes,martes,miercoles,jueves,viernes'];
+            $rules['hora.*'] = ['date_format:H:i', 'before:22:30'];
         }
 
         return $rules;

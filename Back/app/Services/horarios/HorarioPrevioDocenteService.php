@@ -13,7 +13,6 @@ class HorarioPrevioDocenteService implements HorarioPrevioDocenteRepository
     public function obtenerTodosHorariosPreviosDocentes()
     {
         try {
-            Log::info('Obteniendo todos los horarios previos de los docentes.');
             return HorarioPrevioDocente::all();
         } catch (Exception $e) {
             Log::error('Error al obtener los horarios previos de los docentes: ' . $e->getMessage());
