@@ -10,8 +10,8 @@ interface DisponibilidadRepository
     public function obtenerDisponibilidadPorId($id);
     */
     public function horaPrevia($id_h_p_d);
-    public function modulosRepartidos($modulos_semanales,$moduloPrevio,$id_uc,$id_grado,$id_aula,$diaInstituto);
-    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc,$id_grado,$id_aula);
+    public function modulosRepartidos($modulos_semanales,$moduloPrevio,$id_uc,$id_grado,$diaInstituto);
+    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc,$id_grado);
    
     public function guardarDisponibilidad($params);
     public function actualizarDisponibilidad($params);

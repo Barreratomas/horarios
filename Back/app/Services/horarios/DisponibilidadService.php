@@ -48,11 +48,8 @@ class DisponibilidadService implements DisponibilidadRepository
     }
     */
 
-    public function horaPrevia($id_h_p_d)
+    public function horaPrevia($horaPrevia)
     {
-
-        $modelo = HorarioPrevioDocente::find($id_h_p_d);
-        $horaPrevia = $modelo->hora;
 
         $horaLimite = new DateTime('18:50');
         $horaLimite = $horaLimite->format('H:i');
@@ -66,267 +63,277 @@ class DisponibilidadService implements DisponibilidadRepository
             '22:10' => 6,
             '22:50' => 7,
         ];
+        // Asegurando que la hora previa esté en el formato correcto (H:i)
+        if (strpos($horaPrevia, ':') !== false) {
+            $horaPrevia = substr($horaPrevia, 0, 5); // Recortamos los segundos si los hay
+        }
 
+
+        // Verificando si la hora previa es mayor que la hora límite
         if ($horaPrevia > $horaLimite) {
+
             $horarioSiguiente = false;
-            // se suman 30 min (el tiempo que tiene el docente despues de salir de otro instituto)
+
+            // Intentando crear un objeto DateTime con el formato esperado
             $hora_datetime = DateTime::createFromFormat('H:i', $horaPrevia);
+
+            if ($hora_datetime === false) {
+                Log::error("Formato de hora inválido: {$horaPrevia}");
+                return null;  // Retornar null si el formato es inválido
+            }
 
             // Sumar 30 minutos
             $hora_datetime->modify('+30 minutes');
-
             $horaPrevia = $hora_datetime->format('H:i');
+
+
+            // Recorriendo las horas permitidas para buscar el módulo
             foreach ($horasPermitidas as $horaPermitida => $modulo) {
 
                 if ($horarioSiguiente) {
                     $modulo--;
-
                     return $modulo;
                 }
 
                 if ($horaPrevia == $horaPermitida) {
-
-
                     return $modulo;
                 } elseif ($horaPrevia < $horaPermitida) {
                     $horarioSiguiente = true;
                 }
-
             }
-            dd($horaPrevia);
         } else {
             return null;
         }
-
-
-
     }
 
-    public function modulosRepartidos($modulos_semanales, $moduloPrevio, $id_uc, $id_grado, $id_aula, $diaInstituto)
+
+    public function modulosRepartidos($modulos_semanales, $id_docente, $id_grado, $moduloPrevio = null, $diaInstituto = null)
     {
-
-        $modulosPermitidos = range(1, 7);
-        $distribucion = [];
+        Log::info('Iniciando la asignación de módulos', [
+            'modulos_semanales' => $modulos_semanales,
+            'id_docente' => $id_docente,
+            'id_grado' => $id_grado,
+            'moduloPrevio' => $moduloPrevio,
+            'diaInstituto' => $diaInstituto,
+        ]);
+    
         $diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-        $siguienteDia = false;
-
-
-        foreach ($diasSemana as $dia) {
-
-            // SI EL DIA DE LA SEMANA NO ES IGUAL A EL DIA O DIAS QUE EL DOCENTE TRABAJA EN  OTRA EN OTRA INSTITUCION
-            if ($dia !== $diaInstituto) {
-
-                // RECORRE LOS MODULOS 
-                foreach ($modulosPermitidos as $modulo) {
-
-                    $modulo_inicio = $modulo;
-                    if ($modulo_inicio >= 7) {
-                        continue; // Saltar este módulo y pasar al siguiente dia
-                    }
-
-                    // cantidad de modulos semandales que tiene el docente
-                    switch ($modulos_semanales) {
-                        case 1:
-                        case 2:
-                        case 3:
-
-                            $modulo_fin = min($modulo_inicio + $modulos_semanales, 7);
-
-                            $disponible = $this->verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc, $id_grado, $id_aula);
-                            // si no hay superposicion de horarios se almacena el horario para el docente
-                            if ($disponible) {
-                                $distribucion[] = [
-                                    'dia' => $dia,
-                                    'modulo_inicio' => $modulo_inicio,
-                                    'modulo_fin' => $modulo_fin
-                                ];
-                                return $distribucion;
-
-                            }
-                            break;
-                        case 4:
-                        case 5:
-                        case 6:
-                            // si ya se asignaron horarios para el docente y se avanzo al otro dia aplica la condicion
-                            if ($siguienteDia && $modulos_semanales == 5) {
-
-                                $modulos_semanales = 4;
-                            }
-
-                            $mitadModulos = ($modulos_semanales % 2 == 0) ? $modulos_semanales / 2 : intval(ceil($modulos_semanales / 2));
-
-                            $modulo_fin = min($modulo_inicio + $mitadModulos, 7);
-                            $disponible = $this->verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc, $id_grado, $id_aula);
-
-                            if ($disponible) {
-                                if ($siguienteDia) {
-                                    $distribucion[] = [
-                                        'dia' => $dia,
-                                        'modulo_inicio' => $modulo_inicio,
-                                        'modulo_fin' => $modulo_fin
-                                    ];
-                                    return $distribucion;
-
-                                } else {
-                                    $distribucion[] = [
-                                        'dia' => $dia,
-                                        'modulo_inicio' => $modulo_inicio,
-                                        'modulo_fin' => $modulo_fin
-                                    ];
-                                    $siguienteDia = true;
-                                    break 2;
-
-                                }
-                            }
-                            break;
-                    }
+    
+        // Inicializar la distribución de módulos por día
+        $distribucion = array_fill_keys($diasSemana, [
+            'modulos' => [],
+            'modulo_inicio' => null,
+            'modulo_fin' => null,
+        ]);
+    
+        // Determinar el índice de inicio según diaInstituto
+        $indiceDiaInstituto = $diaInstituto ? array_search($diaInstituto, $diasSemana) : 0;
+    
+        // Validar si diaInstituto es inválido
+        if ($diaInstituto && $indiceDiaInstituto === false) {
+            Log::error("Error: El día del instituto no es válido.", [
+                'diaInstituto' => $diaInstituto,
+                'dias_validos' => $diasSemana,
+            ]);
+            return null;
+        }
+    
+        $contadorDia = $indiceDiaInstituto; // Iniciar desde el díaInstituto o lunes
+        $intentos = 0; // Contador para limitar el número de iteraciones
+    
+        // Determinar el número de módulos a asignar
+        $modulosAsignados = 0;
+        $maxModulosPorDia = 3;
+    
+        while ($modulos_semanales > 0) {
+            $dia = $diasSemana[$contadorDia];
+            $asignado = false; // Variable para saber si se asignaron módulos este día
+    
+            // Calcular la cantidad de módulos a asignar según el número restante
+            $modulosHoy = min($modulos_semanales, $maxModulosPorDia); // Asignar hasta 3 módulos o el resto
+    
+            // Intentar asignar módulos para el día actual
+            for ($inicio = 1; $inicio <= 6; $inicio++) {
+                $fin = min($inicio + $modulosHoy - 1, 8); // Asignar hasta $modulosHoy módulos por día
+    
+                // Si es el día del instituto, respetar moduloPrevio (si está definido)
+                if ($diaInstituto && $dia === $diaInstituto && $moduloPrevio !== null && $inicio <= $moduloPrevio) {
+                    Log::info("Respetando módulo previo para el día $dia", [
+                        'inicio' => $inicio,
+                        'moduloPrevio' => $moduloPrevio,
+                    ]);
+                    continue;
                 }
-                // si el dia de la semana es igual a el dia de la semana que el docente trabaja en otra institucion
-            } else {
-
-                //modulo inicio toma el valor de modulo previo, es decir, desde que modulo el docente puede empezar a dar clases. $moduloPrevio se obtiene en la funcion horaPrevia()
-                $modulo_inicio = $moduloPrevio;
-
-                switch ($modulos_semanales) {
-                    case 1:
-                    case 2:
-                    case 3:
-                        $modulo_fin = min($modulo_inicio + $modulos_semanales, 7);
-                        $disponible = $this->verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc, $id_grado, $id_aula);
-                        if ($disponible) {
-                            $distribucion[] = [
-                                'dia' => $dia,
-                                'modulo_inicio' => $modulo_inicio,
-                                'modulo_fin' => $modulo_fin
-                            ];
-                            return $distribucion;
-
-                        }
-                        break;
-                    case 4:
-                    case 5:
-                    case 6:
-                        if ($siguienteDia && $modulos_semanales == 5) {
-                            $modulos_semanales = 4;
-                        }
-                        $mitadModulos = ($modulos_semanales % 2 == 0) ? $modulos_semanales / 2 : intval(ceil($modulos_semanales / 2));
-
-                        $modulo_fin = min($modulo_inicio + $mitadModulos, 7);
-
-                        $disponible = $this->verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc, $id_grado, $id_aula);
-                        if ($disponible) {
-
-                            if ($siguienteDia) {
-                                $distribucion[] = [
-                                    'dia' => $dia,
-                                    'modulo_inicio' => $modulo_inicio,
-                                    'modulo_fin' => $modulo_fin
-                                ];
-                                return $distribucion;
-
-                            } else {
-                                $distribucion[] = [
-                                    'dia' => $dia,
-                                    'modulo_inicio' => $modulo_inicio,
-                                    'modulo_fin' => $modulo_fin
-                                ];
-                                $siguienteDia = true;
-                                break;
-                            }
-                        }
-                        break;
+    
+                // Verificar disponibilidad en la base de datos
+                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_grado);
+    
+                // Si están disponibles, asignar los módulos y descontar los módulos semanales
+                if ($disponible) {
+                    $modulosAsignados = range($inicio, $fin);
+                    $distribucion[$dia]['modulos'] = $modulosAsignados;
+                    $distribucion[$dia]['modulo_inicio'] = $inicio;
+                    $distribucion[$dia]['modulo_fin'] = $fin;
+                    $distribucion[$dia]['aula'] = $disponible;
+    
+                    Log::info("Aula asignada para el día $dia", [
+                        'aula' => $disponible,
+                        'modulo_inicio' => $inicio,
+                        'modulo_fin' => $fin,
+                    ]);
+    
+                    // Descontar los módulos asignados
+                    $modulos_semanales -= count($modulosAsignados);
+                    Log::info("modulo semanales  $modulos_semanales");
+                    // Verificar que no haya módulos negativos
+                    if ($modulos_semanales < 0) {
+                        Log::warning("El número de módulos semanales se volvió negativo. Corrigiendo el valor.", [
+                            'modulos_semanales' => $modulos_semanales,
+                        ]);
+                        $modulos_semanales = 0; // Asegurarse de que no sea negativo
+                    }
+    
+                    $asignado = true; // Se logró asignar módulo
+    
+                    break; // Salir del bucle si se asignó correctamente
+                } else {
+                    Log::warning("No se pudo asignar módulos para el día $dia", [
+                        'inicio' => $inicio,
+                        'fin' => $fin,
+                        'id_docente' => $id_docente,
+                        'id_grado' => $id_grado,
+                    ]);
                 }
             }
-
+    
+            // Cambiar al siguiente día si no quedan módulos disponibles para el actual
+            $contadorDia++;
+            if ($contadorDia >= count($diasSemana)) {
+                $contadorDia = 0; // Reiniciar la semana si se acaban los días
+                $intentos++; // Incrementar el contador de intentos por semana
+            }
+    
+            // Detener si todos los módulos semanales se han asignado
+            if (!$asignado && $intentos >= 2) { // Número máximo de intentos
+                Log::warning("No se pudieron asignar más módulos después de 2 intentos.", [
+                    'modulos_restantes' => $modulos_semanales,
+                    'intentos' => $intentos,
+                ]);
+                break;
+            }
         }
-
-
-        return $distribucion = null;
-        ;
+     // Filtrar días sin asignaciones
+     $distribucion = array_filter($distribucion, function($dia) {
+        return !empty($dia['modulos']);
+    });
+        // Log del resultado final
+        Log::info('Distribución final de módulos', [
+            'distribucion' => json_encode($distribucion),
+            'modulos_restantes' => $modulos_semanales,
+        ]);
+    
+        return $distribucion;
     }
+    
 
-    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc, $id_grado, $id_aula)
+
+
+    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_grado)
     {
-        $dUC = DocenteUC::find($id_uc);
 
-        // verificar si ya existe disponibilidad con el mismo dia, grado y en horarios superpuestos
-        $existeSuperposicionGrado = Disponibilidad::where('dia', $dia)
-            ->whereExists(function ($query) use ($id_grado, $modulo_inicio, $modulo_fin) {
-                // verificar si ya existe id_uc y id_grado
-                $query->selectRaw(1)
-                    ->from('docentes_uc')
-                    ->whereColumn('disponibilidades.id_uc', 'docentes_uc.id_uc')
-                    ->where('docente_uc.id_grado', $id_grado)
-                    ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
-                    $query->whereBetween('disponibilidades.modulo_inicio', [$modulo_inicio, $modulo_fin])
-                        ->orWhereBetween(DB::raw('disponibilidades.modulo_fin -1'), [$modulo_inicio, $modulo_fin]);
-                });
-            })->exists();
-        // verificar si se superponen los horarios
-
-        // verificar si ya existe aula con horarios superpuestos el mismo dia
-        $existeSuperposicionAula = Disponibilidad::where('dia', $dia)
-            ->whereExists(function ($query) use ($id_aula, $modulo_inicio, $modulo_fin, $dia) {
-                $query->selectRaw(1)
-                    ->from('docentes_uc as dUC2')
-                    ->join('disponibilidades as d2', 'dUC2.id_uc', '=', 'd2.id_uc')
-                    ->where('dUC2.id_aula', $id_aula)
-                    ->where('d2.dia', $dia) // Condición para verificar el mismo día
-                    ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
-                        $query->whereBetween('d2.modulo_inicio', [$modulo_inicio, $modulo_fin])
-                            ->orWhereBetween(DB::raw('d2.modulo_fin - 1'), [$modulo_inicio, $modulo_fin]);
-                    });
-            })->exists();
-
-
-        // Verificar si el docente ya tiene disponibilidad en el mismo día y horarios superpuestos
-        $existeSuperposicionDocente = Disponibilidad::where('dia', $dia)
-            ->whereExists(function ($query) use ($dUC, $dia, $modulo_inicio, $modulo_fin) {
-                $query->selectRaw(1)
-                    ->from('docentes_uc as dUC2')
-                    ->join('disponibilidades as d2', 'dUC2.id_uc', '=', 'd2.id_uc')
-                    ->where('dUC2.DNI', $dUC->DNI) // Condición para verificar el mismo docente
-                    ->where('d2.dia', $dia) // Condición para verificar el mismo día
-                    ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
-                        $query->whereBetween('d2.modulo_inicio', [$modulo_inicio, $modulo_fin])
-                            ->orWhereBetween(DB::raw('d2.modulo_fin - 1'), [$modulo_inicio, $modulo_fin]);
+        // Verificar si el docente está asignado en el rango de módulos
+        $disponibilidadDocente = DB::table('disponibilidad')
+            ->where('id_docente', $id_docente) // Filtrar por el docente
+            ->where('dia', $dia)               // Filtrar por el día
+            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                // Verificar si hay superposición de módulos
+                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
+                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
+                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                        $query->where('modulo_inicio', '<=', $modulo_inicio)
+                            ->where('modulo_fin', '>=', $modulo_fin);
                     });
             })
             ->exists();
 
-        if ($existeSuperposicionGrado) {
-            session(['error' => 'La grado seleccionada ya no tiene horarios disponibles']);
-
+        // retornar si existe una disponibilidad (es decir, el docente no está  disponible)
+        if ($disponibilidadDocente) {
+            Log::info("docente {$id_docente} ya está asignada en este rango de tiempo.");
             return false;
-
-
-        } elseif ($existeSuperposicionAula) {
-            session(['error' => 'El aula seleccionada ya no tiene horarios disponibles']);
-            return false;
-
-        } elseif ($existeSuperposicionDocente) {
-            session(['error' => 'El docente seleccionado ya no tiene horarios disponibles']);
-            return false;
-
+        } else {
+            Log::info("docente {$id_docente} está disponible para este rango de tiempo.");
         }
-        session()->forget('error'); // Limpiar cualquier mensaje de error existente
 
-        return true;
+
+        // Verificar las asignaciones para el grado en el mismo día y en el rango de módulos
+        $disponibilidadGrado = DB::table('disponibilidad')
+            ->where('id_grado', $id_grado)    // Filtrar por el grado
+            ->where('dia', $dia)               // Filtrar por el día
+            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                // Verificar si hay superposición de módulos para el grado
+                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])  // Verificar si el inicio se solapa
+                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])  // Verificar si el fin se solapa
+                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                        // Verificar si la asignación cubre todo el rango
+                        $query->where('modulo_inicio', '<=', $modulo_inicio)
+                            ->where('modulo_fin', '>=', $modulo_fin);
+                    });
+            })
+            ->exists();
+
+        // retornar si existe una disponibilidad (es decir, el grado no está  disponible)
+        if ($disponibilidadDocente) {
+            Log::info("grado {$id_grado} ya está asignada en este rango de tiempo.");
+            return false;
+        } else {
+            Log::info("grado {$id_docente} está disponible para este rango de tiempo.");
+        }
+
+
+        $aulas = Aula::all();
+
+        foreach ($aulas as $aula) {
+            // Verificar si el aula tiene asignaciones en el mismo día con los módulos solicitados
+            $disponibilidadAula = DB::table('disponibilidad')
+                ->where('id_aula', $aula->id_aula)
+                ->where('dia', $dia)
+                ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                    // Verificar si hay coincidencia de los módulos
+                    $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
+                        ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
+                        ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                            $query->where('modulo_inicio', '<=', $modulo_inicio)
+                                ->where('modulo_fin', '>=', $modulo_fin);
+                        });
+                })
+                ->exists();  // Verifica si existe alguna asignación con los parámetros dados
+
+            // retornar si no existe una disponibilidad (es decir, el aula está disponible)
+            if ($disponibilidadAula) {
+                Log::info("Aula {$aula->id_aula} ya está asignada en este rango de tiempo.");
+            } else {
+                Log::info("Aula {$aula->id_aula} está disponible para este rango de tiempo.");
+                return $aula->id_aula;
+            }
+        }
+        return false;
+
+        // return 1;
+
     }
-    
+
 
     public function guardarDisponibilidad($params)
     {
-        
+
         $disponibilidad = new Disponibilidad();
         foreach ($params as $key => $value) {
             $disponibilidad->{$key} = $value;
         }
 
-        if ($disponibilidad->save()) 
-        {
-            
-            Mail::to($disponibilidad->docenteUC->docente->email)->send(new AssignedToSchedule($disponibilidad->docenteUC->docente->nombre));
+        if ($disponibilidad->save()) {
+
+            // Mail::to($disponibilidad->docenteUC->docente->email)->send(new AssignedToSchedule($disponibilidad->docenteUC->docente->nombre));
 
             return ['success' => 'Disponibilidad guardada correctamente'];
         } else {
@@ -334,18 +341,17 @@ class DisponibilidadService implements DisponibilidadRepository
         }
     }
 
-    
+
     public function actualizarDisponibilidad($params)
     {
-        
+
         $disponibilidad = new Disponibilidad();
         foreach ($params as $key => $value) {
             $disponibilidad->{$key} = $value;
         }
-        
 
-        if ($disponibilidad->save()) 
-        {
+
+        if ($disponibilidad->save()) {
             return ['success' => 'Disponibilidad actualizada correctamente'];
         } else {
             return ['error' => 'Hubo un error al guardar la disponibilidad'];
@@ -358,7 +364,6 @@ class DisponibilidadService implements DisponibilidadRepository
             $disponibilidad = Disponibilidad::find($id);
             if (!$disponibilidad) {
                 return ['error' => 'hubo un error al buscar disponibilidad'];
-                
             }
             $disponibilidad->delete();
             return ['success' => 'Disponibilidad eliminada correctamente'];
@@ -367,10 +372,10 @@ class DisponibilidadService implements DisponibilidadRepository
         }
     }
 
-    
+
     //------------------------------------------------------------------------------------------------------------------
     // swagger
-/*
+    /*
     public function obtenerTodasDisponibilidades()
     {
         try {
@@ -438,8 +443,3 @@ class DisponibilidadService implements DisponibilidadRepository
     }
         */
 }
-
-
-
-
-
