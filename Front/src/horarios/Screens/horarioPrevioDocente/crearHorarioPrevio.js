@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 
 const CrearHorarioPrevio = () => {
-  const [trabajaOtraInstitucion, setTrabajaOtraInstitucion] = useState('');
   const [docenteSeleccionado, setDocenteSeleccionado] = useState('');
   const [docentes, setDocentes] = useState([]);
   const [errors, setErrors] = useState([]);
-  const [fechasYHoras, setFechasYHoras] = useState([{ fecha: '', hora: '' }]); // Al menos un formulario
+  const [diasYHoras, setDiasYHoras] = useState([{ dia: '', hora: '' }]); // Al menos un formulario
 
   const [fetchError, setFetchError] = useState('');
 
@@ -42,10 +41,9 @@ const CrearHorarioPrevio = () => {
     try {
       // Estructurar los datos para enviar los arrays 'dia' y 'hora'
       const data = {
-        docente: docenteSeleccionado,
-        trabajaInstitucion: trabajaOtraInstitucion,
-        dia: fechasYHoras.map((item) => item.fecha),
-        hora: fechasYHoras.map((item) => item.hora)
+        id_docente: docenteSeleccionado,
+        dia: diasYHoras.map((item) => item.dia),
+        hora: diasYHoras.map((item) => item.hora)
       };
 
       const response = await fetch(
@@ -60,8 +58,8 @@ const CrearHorarioPrevio = () => {
       );
 
       if (response.ok) {
-        navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Comisión creada con éxito' }
+        navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`, {
+          state: { successMessage: 'Horario previo creado con éxito' }
         });
       } else {
         const data = await response.json();
@@ -70,28 +68,28 @@ const CrearHorarioPrevio = () => {
         }
       }
     } catch (error) {
-      console.error('Error creando la comisión:', error);
-      setErrors(['Hubo un error al intentar crear la comisión.']);
+      console.error('Error creando el horario previo:', error);
+      setErrors(['Hubo un error al intentar crear el horario previo del docente.']);
     }
   };
 
-  // Función para agregar un formulario de fecha y hora
-  const agregarFormularioFechaHora = () => {
-    setFechasYHoras([...fechasYHoras, { fecha: '', hora: '' }]);
+  // Función para agregar un formulario de día y hora
+  const agregarFormularioDiaHora = () => {
+    setDiasYHoras([...diasYHoras, { dia: '', hora: '' }]);
   };
 
-  // Función para manejar cambios en los formularios de fecha y hora
-  const manejarCambioFechaHora = (index, event) => {
-    const newFechasYHoras = [...fechasYHoras];
-    newFechasYHoras[index][event.target.name] = event.target.value;
-    setFechasYHoras(newFechasYHoras);
+  // Función para manejar cambios en los formularios de día y hora
+  const manejarCambioDiaHora = (index, event) => {
+    const newDiasYHoras = [...diasYHoras];
+    newDiasYHoras[index][event.target.name] = event.target.value;
+    setDiasYHoras(newDiasYHoras);
   };
 
-  // Función para eliminar un formulario de fecha y hora, pero asegurando que al menos quede uno
-  const eliminarFormularioFechaHora = (index) => {
-    if (fechasYHoras.length > 1) {
-      const newFechasYHoras = fechasYHoras.filter((_, i) => i !== index);
-      setFechasYHoras(newFechasYHoras);
+  // Función para eliminar un formulario de día y hora, pero asegurando que al menos quede uno
+  const eliminarFormularioDiaHora = (index) => {
+    if (diasYHoras.length > 1) {
+      const newDiasYHoras = diasYHoras.filter((_, i) => i !== index);
+      setDiasYHoras(newDiasYHoras);
     }
   };
 
@@ -122,76 +120,57 @@ const CrearHorarioPrevio = () => {
             {/* Mostrar opciones solo si se seleccionó un docente */}
             {docenteSeleccionado && (
               <>
-                <label>¿Trabaja en otra institución?</label>
-                <div className="mb-3 d-flex justify-content-center align-items-center gap-5">
-                  <div>
-                    <input
-                      type="radio"
-                      name="trabajaInstitucion"
-                      value="si"
-                      checked={trabajaOtraInstitucion === 'si'}
-                      onChange={(e) => setTrabajaOtraInstitucion(e.target.value)}
-                    />
-                    <label>Sí</label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      name="trabajaInstitucion"
-                      value="no"
-                      checked={trabajaOtraInstitucion === 'no'}
-                      onChange={(e) => setTrabajaOtraInstitucion(e.target.value)}
-                    />
-                    <label>No</label>
-                  </div>
-                </div>
-                {trabajaOtraInstitucion === 'si' && (
-                  <>
-                    {/* Mostrar múltiples formularios de fecha y hora */}
-                    {fechasYHoras.map((_, index) => (
-                      <div key={index}>
-                        <div className="mb-3">
-                          <label htmlFor={`fecha-${index}`}>Seleccione la fecha</label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            id={`fecha-${index}`}
-                            name="fecha"
-                            value={fechasYHoras[index].fecha}
-                            onChange={(e) => manejarCambioFechaHora(index, e)}
-                            required
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label htmlFor={`hora-${index}`}>Seleccione la hora</label>
-                          <input
-                            type="time"
-                            className="form-control"
-                            id={`hora-${index}`}
-                            name="hora"
-                            value={fechasYHoras[index].hora}
-                            onChange={(e) => manejarCambioFechaHora(index, e)}
-                            required
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          onClick={() => eliminarFormularioFechaHora(index)}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    ))}
+                {/* Mostrar múltiples formularios de día y hora */}
+                {diasYHoras.map((_, index) => (
+                  <div key={index}>
+                    <div className="mb-3">
+                      <label htmlFor={`dia-${index}`}>Seleccione el día</label>
+                      <select
+                        className="form-select"
+                        id={`dia-${index}`}
+                        name="dia"
+                        value={diasYHoras[index].dia}
+                        onChange={(e) => manejarCambioDiaHora(index, e)}
+                        required
+                      >
+                        <option value="">Seleccione un día</option>
+                        <option value="lunes">Lunes</option>
+                        <option value="martes">Martes</option>
+                        <option value="miercoles">Miércoles</option>
+                        <option value="jueves">Jueves</option>
+                        <option value="viernes">Viernes</option>
+                      </select>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor={`hora-${index}`}>Seleccione la hora</label>
+                      <input
+                        type="time"
+                        className="form-control"
+                        id={`hora-${index}`}
+                        name="hora"
+                        value={diasYHoras[index].hora}
+                        onChange={(e) => manejarCambioDiaHora(index, e)}
+                        required
+                        min="18:50"
+                        max="22:30"
+                      />
+                    </div>
                     <button
                       type="button"
-                      className="btn btn-secondary mt-3"
-                      onClick={agregarFormularioFechaHora}
+                      className="btn btn-danger"
+                      onClick={() => eliminarFormularioDiaHora(index)}
                     >
-                      Agregar otra fecha y hora
+                      Eliminar
                     </button>
-                  </>
-                )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="btn btn-secondary mt-3"
+                  onClick={agregarFormularioDiaHora}
+                >
+                  Agregar otro día y hora
+                </button>
               </>
             )}
 

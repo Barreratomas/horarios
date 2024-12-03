@@ -65,7 +65,6 @@ const Comisiones = () => {
         if (!response.ok) throw new Error('Error al obtener los grados');
 
         const data = await response.json();
-        console.log(data);
         const normalizedData = data.map((item) => ({
           carrera: {
             carrera: item.carrera.carrera,
@@ -237,7 +236,7 @@ const Comisiones = () => {
                       <ul>
                         {grado.grado_uc && grado.grado_uc.length > 0 ? (
                           grado.grado_uc.map((uc, index) => (
-                            <li key={index}>{uc.unidad_curricular.unidad_curricular}</li> // Accediendo correctamente al nombre de la unidad curricular
+                            <li key={index}>{uc.unidad_curricular.unidad_curricular}</li>
                           ))
                         ) : (
                           <p>No hay materias asignadas</p>
@@ -259,8 +258,8 @@ const Comisiones = () => {
                     <button
                       className="btn btn-danger"
                       onClick={() => {
-                        setGradoToDelete(grado.id_grado); // Establecer el grado a eliminar
-                        setShowModal(true); // Mostrar el modal
+                        setGradoToDelete(grado.id_grado);
+                        setShowModal(true);
                       }}
                     >
                       Eliminar
