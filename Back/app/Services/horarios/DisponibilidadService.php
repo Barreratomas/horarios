@@ -27,7 +27,7 @@ class DisponibilidadService implements DisponibilidadRepository
         $this->disponibilidadMapper = $disponibilidadMapper;
     }
 
-    /*
+    
     public function obtenerTodasDisponibilidades()
     {
         
@@ -46,7 +46,7 @@ class DisponibilidadService implements DisponibilidadRepository
         return $disponibilidad;
         
     }
-    */
+    
 
     public function horaPrevia($horaPrevia)
     {
@@ -157,14 +157,16 @@ class DisponibilidadService implements DisponibilidadRepository
                 $fin = min($inicio + $modulosHoy - 1, 8); // Asignar hasta $modulosHoy módulos por día
     
                 // Si es el día del instituto, respetar moduloPrevio (si está definido)
-                if ($diaInstituto && $dia === $diaInstituto && $moduloPrevio !== null && $inicio <= $moduloPrevio) {
+                if ($diaInstituto && $dia === $diaInstituto && $moduloPrevio !== null && $inicio <= $moduloPrevio-1) {
                     Log::info("Respetando módulo previo para el día $dia", [
                         'inicio' => $inicio,
                         'moduloPrevio' => $moduloPrevio,
                     ]);
                     continue;
                 }
-    
+                Log::info("
+                    'inicio' es $inicio,
+               ");
                 // Verificar disponibilidad en la base de datos
                 $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_grado);
     
@@ -342,19 +344,103 @@ class DisponibilidadService implements DisponibilidadRepository
     }
 
 
-    public function actualizarDisponibilidad($params)
+    public function verificarModulosDiaIndividual($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_grado,$id_aula)
     {
 
-        $disponibilidad = new Disponibilidad();
-        foreach ($params as $key => $value) {
-            $disponibilidad->{$key} = $value;
+        // Verificar si el docente está asignado en el rango de módulos
+        $disponibilidadDocente = DB::table('disponibilidad')
+            ->where('id_docente', $id_docente) // Filtrar por el docente
+            ->where('dia', $dia)               // Filtrar por el día
+            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                // Verificar si hay superposición de módulos
+                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
+                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
+                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                        $query->where('modulo_inicio', '<=', $modulo_inicio)
+                            ->where('modulo_fin', '>=', $modulo_fin);
+                    });
+            })
+            ->exists();
+
+        // retornar si existe una disponibilidad (es decir, el docente no está  disponible)
+        if ($disponibilidadDocente) {
+            Log::info("docente {$id_docente} ya está asignada en este rango de tiempo.");
+            return false;
+        } else {
+            Log::info("docente {$id_docente} está disponible para este rango de tiempo.");
         }
 
 
-        if ($disponibilidad->save()) {
-            return ['success' => 'Disponibilidad actualizada correctamente'];
+        // Verificar las asignaciones para el grado en el mismo día y en el rango de módulos
+        $disponibilidadGrado = DB::table('disponibilidad')
+            ->where('id_grado', $id_grado)    // Filtrar por el grado
+            ->where('dia', $dia)               // Filtrar por el día
+            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                // Verificar si hay superposición de módulos para el grado
+                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])  // Verificar si el inicio se solapa
+                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])  // Verificar si el fin se solapa
+                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                        // Verificar si la asignación cubre todo el rango
+                        $query->where('modulo_inicio', '<=', $modulo_inicio)
+                            ->where('modulo_fin', '>=', $modulo_fin);
+                    });
+            })
+            ->exists();
+
+        // retornar si existe una disponibilidad (es decir, el grado no está  disponible)
+        if ($disponibilidadDocente) {
+            Log::info("grado {$id_grado} ya está asignada en este rango de tiempo.");
+            return false;
         } else {
-            return ['error' => 'Hubo un error al guardar la disponibilidad'];
+            Log::info("grado {$id_docente} está disponible para este rango de tiempo.");
+        }
+
+
+        $aulas = Aula::all();
+
+        foreach ($aulas as $aula) {
+            // Verificar si el aula tiene asignaciones en el mismo día con los módulos solicitados
+            $disponibilidadAula = DB::table('disponibilidad')
+                ->where('id_aula', $aula->id_aula)
+                ->where('dia', $dia)
+                ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                    // Verificar si hay coincidencia de los módulos
+                    $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
+                        ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
+                        ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                            $query->where('modulo_inicio', '<=', $modulo_inicio)
+                                ->where('modulo_fin', '>=', $modulo_fin);
+                        });
+                })
+                ->exists();  // Verifica si existe alguna asignación con los parámetros dados
+
+            // retornar si no existe una disponibilidad (es decir, el aula está disponible)
+            if ($disponibilidadAula) {
+                Log::info("Aula {$aula->id_aula} ya está asignada en este rango de tiempo.");
+            } else {
+                Log::info("Aula {$aula->id_aula} está disponible para este rango de tiempo.");
+                return $aula->id_aula;
+            }
+        }
+        return false;
+
+        // return 1;
+
+    }
+        public function actualizarDisponibilidad($request, $id)
+
+    {
+
+        $disponibilidad = Disponibilidad::find($id);
+        if (!$disponibilidad) {
+            return response()->json(['error' => 'No existe la disponibilidad'], 404);
+        }
+        try {
+            $disponibilidad->update($request->all());
+            return response()->json($disponibilidad, 200);
+        } catch (Exception $e) {
+            Log::error('Error al actualizar la disponibilidad: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al actualizar la disponibilidad'], 500);
         }
     }
 

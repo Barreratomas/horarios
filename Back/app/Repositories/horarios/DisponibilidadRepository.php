@@ -14,7 +14,7 @@ interface DisponibilidadRepository
     public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_uc,$id_grado);
    
     public function guardarDisponibilidad($params);
-    public function actualizarDisponibilidad($params);
+    public function actualizarDisponibilidad($params,$id);
     public function  eliminarDisponibilidadPorId($id);
 
 
