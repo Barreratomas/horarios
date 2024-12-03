@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\horarios;
 
+use App\Http\Requests\LogsRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
@@ -22,15 +23,16 @@ class GradoRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        // Verificamos si la solicitud es un POST
+    {  
+
         $esCreacion = $this->isMethod('post');
+        $logsRequest= new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
+
         
-        // Logueamos la decisión del método
         Log::info('Método de solicitud: ' . $this->getMethod());
         Log::info('Es una creación (POST): ' . ($esCreacion ? 'Sí' : 'No'));
 
-        // Verificamos los valores de los campos
         Log::info('Valor de grado: ' . $this->grado);
         Log::info('Valor de división: ' . $this->division);
         Log::info('Valor de detalle: ' . $this->detalle);
@@ -39,15 +41,13 @@ class GradoRequest extends FormRequest
         Log::info('Valor de materias: ' . json_encode($this->materias));
 
 
-        // Validaciones para cada campo
         $gradoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $divisionRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $detalleRules = $esCreacion ? ['required', 'string', 'max:70'] : ['nullable', 'string', 'max:70'];
-        $capacidadRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
+        $capacidadRules = $esCreacion ? ['required', 'integer','min:0'] : ['nullable', 'integer','min:0'];
         $carreraRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $materiasRules = $esCreacion ? ['required', 'array', 'min:1']:['nullable', 'array'];
 
-        // Logueamos las reglas
         Log::info('Reglas de validación para grado: ', $gradoRules);
         Log::info('Reglas de validación para división: ', $divisionRules);
         Log::info('Reglas de validación para detalle: ', $detalleRules);
@@ -56,14 +56,17 @@ class GradoRequest extends FormRequest
         Log::info('Reglas de validación para materias: ', $materiasRules);
 
 
-        return [
-            'grado' => $gradoRules,
-            'division' => $divisionRules,
-            'detalle' => $detalleRules,
-            'capacidad' => $capacidadRules,
-            'id_carrera' => $carreraRules,
-            'materias' => $materiasRules
+        return array_merge(
+            $logsRules,  // Reglas de LogsRequest
+            [
+                'grado' => $gradoRules,
+                'division' => $divisionRules,
+                'detalle' => $detalleRules,
+                'capacidad' => $capacidadRules,
+                'id_carrera' => $carreraRules,
+                'materias' => $materiasRules
+            ]
+        );
 
-        ];
     }
 }

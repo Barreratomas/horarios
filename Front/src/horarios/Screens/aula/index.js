@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const Aulas = () => {
+  const [detalles, setDetalles] = useState('');
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false);
+  const [aulaToDelete, setAulaToDelete] = useState(null);
+
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const location = useLocation();
@@ -27,7 +33,7 @@ const Aulas = () => {
 
       // Mostrar el mensaje durante 3 segundos
       setTimeout(() => {
-        setHideMessage(true); // Ocultar con la clase CSS
+        setHideMessage(true);
       }, 3000);
 
       // Limpiar después de la transición
@@ -63,17 +69,21 @@ const Aulas = () => {
     fetchAulas();
   }, [location.state, navigate, location.pathname]);
 
-  const handleDelete = async (id_aula) => {
+  const handleDelete = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/horarios/aulas/eliminar/${id_aula}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/aulas/eliminar/${aulaToDelete}`,
+        {
+          method: 'DELETE',
+          body: JSON.stringify({ detalles: detalles, usuario }),
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Error al eliminar aula');
 
-      setAulas(aulas.filter((aula) => aula.id_aula !== id_aula));
-      setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== id_aula));
+      setAulas(aulas.filter((aula) => aula.id_aula !== aulaToDelete));
+      setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== aulaToDelete));
       setSuccessMessage('Aula eliminada correctamente');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -82,6 +92,7 @@ const Aulas = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       setErrors([error.message || 'Error al eliminar aula']);
     }
@@ -199,7 +210,10 @@ const Aulas = () => {
                     <button
                       type="button"
                       className="btn btn-danger"
-                      onClick={() => handleDelete(aula.id_aula)}
+                      onClick={() => {
+                        setAulaToDelete(aula.id_aula); // Establecer el grado a eliminar
+                        setShowModal(true); // Mostrar el modal
+                      }}
                     >
                       Eliminar
                     </button>
@@ -210,6 +224,33 @@ const Aulas = () => {
               <p>No se encontraron aulas que coincidan con la búsqueda.</p>
             )}
           </div>
+          {/* Modal de confirmación */}
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Confirmar eliminación</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>¿Estás seguro de que quieres eliminar este aula?</p>
+              <div className="form-group">
+                <label htmlFor="detalles">Detalles:</label>
+                <textarea
+                  id="detalles"
+                  className="form-control"
+                  rows="3"
+                  value={detalles}
+                  onChange={(e) => setDetalles(e.target.value)}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={handleDelete}>
+                Eliminar
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
           <div
             id="messages-container"

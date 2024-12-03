@@ -79,19 +79,7 @@ class AulaService implements AulaRepository
             return response()->json(['error' => 'Hubo un error al obtener el aula'], 500);
         }
     }
-    /*
-        public function guardarAulas($request)
-        {
-            try {
-                $aula = $this->aulaMapper->toAula($request);
-                $aula->save();
-                return response()->json($aula, 201);
-            } catch (Exception $e) {
-                Log::error('Error al guardar el aula: ' . $e->getMessage());
-                return response()->json(['error' => 'Hubo un error al guardar el aula'], 500);
-            }
-        }
-            */
+   
 
     public function guardarAulas($request)
     {
@@ -130,8 +118,9 @@ class AulaService implements AulaRepository
         try {
             $aula = Aula::find($id);
             if ($aula) {
+                $nombreAula=$aula->nombre;
                 $aula->delete();
-                return response()->json(['success' => 'Se eliminó el aula'], 200);
+                return response()->json(['nombre_aula' => $nombreAula], 200);
             } else {
                 return response()->json(['error' => 'No existe el aula'], 404);
             }

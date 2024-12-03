@@ -41,7 +41,7 @@ const Comisiones = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [gradoToDelete, setGradoToDelete] = useState(null);
-  const [detallesEliminacion, setDetallesEliminacion] = useState(''); // Estado para los detalles
+  const [detalles, setDetalles] = useState('');
 
   useEffect(() => {
     if (location.state && location.state.successMessage) {
@@ -105,14 +105,12 @@ const Comisiones = () => {
   }, [location.state, navigate, location.pathname]);
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de eliminar este grado?')) return;
-
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/grados/eliminar/${gradoToDelete}`,
         {
           method: 'DELETE',
-          body: JSON.stringify({ detalles: detallesEliminacion, usuario }), // Enviar detalles con la eliminación
+          body: JSON.stringify({ detalles: detalles, usuario }), // Enviar detalles con la eliminación
           headers: { 'Content-Type': 'application/json' }
         }
       );
@@ -234,7 +232,6 @@ const Comisiones = () => {
                   <p>Detalle: {grado.detalle}</p>
                   <p>Capacidad: {grado.capacidad}</p>
 
-                  {/* Displaying the associated materias */}
                   <div>
                     <Accordion title="Ver materias">
                       <ul>
@@ -284,13 +281,13 @@ const Comisiones = () => {
             <Modal.Body>
               <p>¿Estás seguro de que quieres eliminar este grado?</p>
               <div className="form-group">
-                <label htmlFor="detallesEliminacion">Detalles:</label>
+                <label htmlFor="detalles">Detalles:</label>
                 <textarea
-                  id="detallesEliminacion"
+                  id="detalles"
                   className="form-control"
                   rows="3"
-                  value={detallesEliminacion}
-                  onChange={(e) => setDetallesEliminacion(e.target.value)}
+                  value={detalles}
+                  onChange={(e) => setDetalles(e.target.value)}
                 />
               </div>
             </Modal.Body>

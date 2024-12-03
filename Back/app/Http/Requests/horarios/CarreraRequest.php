@@ -4,6 +4,7 @@ namespace App\Http\Requests\horarios;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\LogsRequest;
 
 class CarreraRequest extends FormRequest
 {
@@ -24,15 +25,20 @@ class CarreraRequest extends FormRequest
     {
 
         $esCreacion = $this->isMethod('post');
+        $logsRequest= new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
 
-
-        $carreraRules = $esCreacion ? ['required', 'string', 'max:70', Rule::unique('carrera')] : ['nullable', 'string', 'max:70', Rule::unique('carrera')];
+        $carreraRules = $esCreacion ? ['required', 'string', 'max:70'] : ['nullable', 'string', 'max:70'];
         $cupoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
 
 
-        return [
-            'carrera' => $carreraRules,
-            'cupo' => $cupoRules
-        ];
+      
+        return array_merge(
+            $logsRules,  // Reglas de LogsRequest
+            [
+               'carrera' => $carreraRules,
+                'cupo' => $cupoRules
+            ]
+        );
     }
 }

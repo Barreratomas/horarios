@@ -4,20 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\AlumnoGrado;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LogModificacionEliminacionController;
+use App\Http\Requests\LogsRequest;
 use App\Services\AlumnoGradoService;
 use App\Services\CarreraGradoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AlumnoGradoController extends Controller
 {
     private $alumnoGradoService;
     private $carreraGradoService;
+    protected $logModificacionEliminacionController;
 
-    public function __construct(AlumnoGradoService $alumnoGradoService, CarreraGradoService $carreraGradoService)
+    public function __construct(AlumnoGradoService $alumnoGradoService, CarreraGradoService $carreraGradoService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->alumnoGradoService = $alumnoGradoService;
-        
+
         $this->carreraGradoService = $carreraGradoService;
+
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -88,7 +95,6 @@ class AlumnoGradoController extends Controller
     public function store($id_alumno, $id_grado)
     {
         return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);
-        
     }
 
 
@@ -185,15 +191,46 @@ class AlumnoGradoController extends Controller
      *      )
      * )
      */
-    public function destroy($id_alumno,$id_grado)
+    public function destroy($id_alumno, $id_grado,  LogsRequest $request)
     {
-        return $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno,$id_grado);
 
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+
+        DB::beginTransaction();
+
+        try {
+            $alumnoGradoResponse = $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno, $id_grado);
+
+            $alumnoGrado = $alumnoGradoResponse->getData();
+            $dniAlumno = $alumnoGrado->dni_alumno;
+            $nombreGrado = $alumnoGrado->detalle_grado;
+
+            if (!isset($dniAlumno) || !isset($nombreGrado)) {
+                throw new \Exception('No se pudo obtener el nombre del alumno del grado.');
+            }
+
+            $accion = "Eliminación del alumno de dni " . $dniAlumno . " del grado " . $nombreGrado . "(id: " . $id_grado . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Alumno eliminado correctamente del grado.'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar al alumno del grado: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 
 
-    
+
     public function asignarAlumnosACarrerasIngresante()
     {
         return $this->alumnoGradoService->asignarAlumnosACarrerasIngresante();
@@ -204,13 +241,64 @@ class AlumnoGradoController extends Controller
         return $this->alumnoGradoService->asignarAlumnosACarreras();
     }
 
-    public function cambiarGrado($id_alumno ,$id_grado_actual, $id_grado)
+    public function cambiarGrado($id_alumno, $id_grado_actual, $id_grado, LogsRequest $request)
     {
-        return $this->alumnoGradoService->actualizarAlumnoGrado($id_alumno, $id_grado_actual,$id_grado);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        
+        // Iniciar transacción
+        DB::beginTransaction();
+    
+        try {
+           
+    
+            $alumnoGradoResponse = $this->alumnoGradoService->actualizarAlumnoGrado($id_alumno, $id_grado_actual, $id_grado);
+            
+            // Verificación de respuesta
+            if (!$alumnoGradoResponse || !$alumnoGradoResponse->getData()) {
+                Log::error("Error: La respuesta de la actualización del grado es nula o vacía para el alumno con ID $id_alumno.");
+                throw new \Exception('Error al obtener los datos del alumno y los grados.');
+            }
+    
+            $alumnoGrado = $alumnoGradoResponse->getData();
+            $dniAlumno = $alumnoGrado->dni_alumno;
+            $gradoActual = $alumnoGrado->detalle_grado_actual;
+            $gradoNuevo = $alumnoGrado->detalle_grado_nuevo;
+    
+            // Verificar si los valores obtenidos son válidos
+            if (!isset($dniAlumno) || !isset($gradoActual) || !isset($gradoNuevo)) {
+                Log::error("Error: No se pudieron obtener los detalles necesarios. DNI: $dniAlumno, Grado Actual: $gradoActual, Grado Nuevo: $gradoNuevo.");
+                throw new \Exception('No se pudo obtener el nombre del alumno del grado.');
+            }
+    
+           
+    
+            $accion = "Actualización del alumno de dni " . $dniAlumno . " de " . $gradoActual . "(id: " . $id_grado_actual . ")" . " hacia " . $gradoNuevo . "(id:" . $id_grado . ")";
+    
+            // Guardar log de modificación
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
+    
+            // Commit de la transacción
+            DB::commit();
+            
+          
+            return response()->json([
+                'message' => 'Grado del alumno actualizado correctamente.'
+            ], 200);
+        } catch (\Exception $e) {
+            // Rollback de la transacción
+            DB::rollBack();
+            
+            // Log del error
+            Log::error("Error al actualizar el grado del alumno. Excepción: " . $e->getMessage());
+            
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar al alumno del grado: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function cambiarGradoRecursante(Request $request)
     {
         return $this->alumnoGradoService->cambiarGradoRecursante($request->id_alumno, $request->id_grado);
     }
-    
 }

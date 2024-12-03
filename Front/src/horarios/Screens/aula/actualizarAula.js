@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom'; // Para redirigir después de la actualización
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarAula = () => {
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [detalles, setDetalles] = useState('');
+
   const [nombre, setNombre] = useState('');
   const [tipoAula, setTipoAula] = useState('');
   const [capacidad, setCapacidad] = useState('');
@@ -10,9 +16,13 @@ const ActualizarAula = () => {
   const { routes } = useOutletContext();
   const { aulaId } = useParams();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors({});
+    setShowModal(true); // Mostrar el modal de confirmación
+  };
+
+  const handleConfirmUpdate = async () => {
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -22,7 +32,7 @@ const ActualizarAula = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad })
+          body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad, detalles, usuario })
         }
       );
 
@@ -33,14 +43,20 @@ const ActualizarAula = () => {
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors); // Manejar errores de validación
+          setErrors(data.errors);
         }
       }
     } catch (error) {
       console.error('Error actualizando aula:', error);
+    } finally {
+      setIsSubmitting(false); // Finalizar el proceso de envío
+      setShowModal(false); // Cerrar el modal de confirmación
     }
   };
-
+  // Cancelar la actualización
+  const handleCancelUpdate = () => {
+    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
+  };
   return (
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
@@ -79,8 +95,8 @@ const ActualizarAula = () => {
             <br />
             <br />
             {errors.capacidad && <div className="text-danger">{errors.capacidad}</div>}
-            <button type="submit" className="btn btn-primary me-2">
-              Actualizar
+            <button type="submit" className="btn btn-primary mt-3">
+              {isSubmitting ? 'Actualizando...' : 'Actualizar aula'}
             </button>
           </form>
         </div>
@@ -97,6 +113,30 @@ const ActualizarAula = () => {
           </div>
         </div>
       )}
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={handleCancelUpdate}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar actualización</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <label htmlFor="detalles">Detalles:</label>
+          <textarea
+            name="detalles"
+            value={detalles}
+            onChange={(e) => setDetalles(e.target.value)}
+            required
+            className="form-control"
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelUpdate}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleConfirmUpdate}>
+            Confirmar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

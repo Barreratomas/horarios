@@ -37,8 +37,10 @@ form {
     color: black;
   
 }
-  
-select.form-control option {
+.form-control {
+    color: black; 
+}
+.form-control option {
     color: black; 
 }
 

@@ -8,6 +8,7 @@ use App\Services\horarios\GradoService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LogModificacionEliminacionController;
+use App\Http\Requests\LogsRequest;
 use App\Services\CarreraGradoService;
 use App\Services\horarios\GradoUcService;
 use Illuminate\Support\Facades\DB;
@@ -190,6 +191,9 @@ class GradoController extends Controller
      */
     public function update(GradoRequest $request, $id)
     {
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        
         // Iniciar la transacción para asegurar la atomicidad
         DB::beginTransaction();
     
@@ -204,13 +208,17 @@ class GradoController extends Controller
     
             // Obtenemos el objeto de grado actualizado
             $grado = $gradoResponse->getData();
-    
+
             // Validamos si hay materias para actualizar
             $materias = $request->input('materias');
             if ($materias) {
                 // Actualizamos las materias asociadas al grado
                 $this->gradoUcService->actualizarGradoUC($grado->id_grado, $materias);
             }
+            $nombreGrado = $grado->detalle;
+            $accion = "Actualización del grado " . $nombreGrado."(id:".$grado->id_grado.")";
+            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+
     
             DB::commit();
     
@@ -252,7 +260,7 @@ class GradoController extends Controller
      * )
      * )
      */
-        public function destroy($id, Request $request)
+        public function destroy($id, LogsRequest $request)
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
@@ -268,7 +276,7 @@ class GradoController extends Controller
             }
 
             $nombreGrado = $grado->nombre_grado;
-            $accion = "Eliminación del grado " . $nombreGrado;
+            $accion = "Eliminación del grado " . $nombreGrado."(id:".$id.")";
             
             $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
 

@@ -153,9 +153,12 @@ class PlanEstudioService implements PlanEstudioRepository
             $planEstudio = PlanEstudio::find($id);
 
             if ($planEstudio) {
+                $nombrePlanEstudio=$planEstudio->detalle;
+                // Eliminar relacion con carreras del plan de estudio
                 $this->CarreraPlanService->eliminarCarreraPlanPorIdPlan($id);
+
                 $planEstudio->delete();
-                return response()->json(['success' => 'Se eliminó el planEstudio'], 200);
+                return response()->json(['nombre_plan_estudio' => $nombrePlanEstudio], 200);
             } else {
                 return response()->json(['error' => 'No existe el planEstudio'], 404);
             }

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const Materias = () => {
+  const [detalles, setDetalles] = useState(''); // Estado para los detalles
+  const usuario = sessionStorage.getItem('userType');
+  const [showModal, setShowModal] = useState(false);
+  const [materiaToDelete, setMateriaToDelete] = useState(null);
+
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const location = useLocation();
@@ -58,20 +64,21 @@ const Materias = () => {
     fetchMaterias();
   }, [location.state, navigate, location.pathname]);
 
-  const handleDelete = async (id_uc) => {
+  const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/unidadCurricular/eliminar/${id_uc}`,
+        `http://127.0.0.1:8000/api/horarios/unidadCurricular/eliminar/${materiaToDelete}`,
         {
           method: 'DELETE',
+          body: JSON.stringify({ detalles: detalles, usuario }),
           headers: { 'Content-Type': 'application/json' }
         }
       );
 
       if (!response.ok) throw new Error('Error al eliminar materia');
 
-      setMaterias(materias.filter((materia) => materia.id_uc !== id_uc));
-      setFilteredMaterias(filteredMaterias.filter((materia) => materia.id_uc !== id_uc));
+      setMaterias(materias.filter((materia) => materia.id_uc !== materiaToDelete));
+      setFilteredMaterias(filteredMaterias.filter((materia) => materia.id_uc !== materiaToDelete));
       setSuccessMessage('Materia eliminada correctamente');
 
       setTimeout(() => setHideMessage(true), 3000);
@@ -80,6 +87,7 @@ const Materias = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
+      setShowModal(false); // Cerrar el modal
     } catch (error) {
       setErrors([error.message || 'Error al eliminar materia']);
     }
@@ -219,7 +227,10 @@ const Materias = () => {
                     <button
                       type="button"
                       className="btn btn-danger"
-                      onClick={() => handleDelete(materia.id_uc)}
+                      onClick={() => {
+                        setMateriaToDelete(materia.id_uc); // Establecer el grado a eliminar
+                        setShowModal(true); // Mostrar el modal
+                      }}
                     >
                       Eliminar
                     </button>
@@ -230,7 +241,33 @@ const Materias = () => {
               <p>No se encontraron materias que coincidan con la búsqueda.</p>
             )}
           </div>
-
+          {/* Modal de confirmación */}
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Confirmar eliminación</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>¿Estás seguro de que quieres eliminar esta materia?</p>
+              <div className="form-group">
+                <label htmlFor="detalles">Detalles:</label>
+                <textarea
+                  id="detalles"
+                  className="form-control"
+                  rows="3"
+                  value={detalles}
+                  onChange={(e) => setDetalles(e.target.value)}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={handleDelete}>
+                Eliminar
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <div
             id="messages-container"
             className={`container ${hideMessage ? 'hide-messages' : ''}`}
