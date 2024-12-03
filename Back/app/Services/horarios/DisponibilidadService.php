@@ -370,7 +370,7 @@ class DisponibilidadService implements DisponibilidadRepository
     
     //------------------------------------------------------------------------------------------------------------------
     // swagger
-
+/*
     public function obtenerTodasDisponibilidades()
     {
         try {
@@ -436,6 +436,7 @@ class DisponibilidadService implements DisponibilidadRepository
             return response()->json(['error' => 'Hubo un error al eliminar la disponibilidad'], 500);
         }
     }
+        */
 }
 
 

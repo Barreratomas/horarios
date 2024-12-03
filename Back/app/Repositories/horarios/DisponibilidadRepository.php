@@ -20,9 +20,12 @@ interface DisponibilidadRepository
 
     //------------------------------------------------------------------------------------------------------------------
     // swagger
+
+    /*
     public function obtenerTodasDisponibilidades();
     public function obtenerDisponibilidadPorId($id);
     public function guardarDisponibilidadSwagger($disponibilidad);
     public function actualizarDisponibilidadSwagger($disponibilidad, $id);
     public function  eliminarDisponibilidadPorIdSwagger($id);
+    */
 }

@@ -79,12 +79,6 @@ Route::post('/horarios/carreras/guardar', [CarreraController::class, 'store']);
 Route::put('/horarios/carreras/actualizar/{id}', [CarreraController::class, 'update']);
 Route::delete('/horarios/carreras/eliminar/{id}', [CarreraController::class, 'destroy']);
 
-// Disponibilidades
-Route::get('/horarios/disponibilidad', [DisponibilidadController::class, 'index']);
-Route::get('/horarios/disponibilidad/{id}', [DisponibilidadController::class, 'show']);
-Route::post('/horarios/disponibilidad/guardar', [DisponibilidadController::class, 'store']);
-Route::put('/horarios/disponibilidad/actualizar/{id}', [DisponibilidadController::class, 'update']);
-Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'destroy']);
 
 // DocenteUC
 Route::get('/horarios/docenteUC', [DocenteUCController::class, 'index']);
@@ -115,11 +109,13 @@ Route::delete('/horarios/gradoUC/eliminar/idUC/{id}', [GradoUcController::class,
 
 
 // Disponibilidad
-Route::get('/horarios/disponibilidad', [DisponibilidadController::class, 'index']);
-Route::get('/horarios/disponibilidad/{id}', [DisponibilidadController::class, 'show']);
-Route::post('/horarios/disponibilidad/store', [DisponibilidadController::class, 'store']);
-Route::put('/horarios/disponibilidad/update/{id}', [DisponibilidadController::class, 'update']);
-Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'destroy']);
+//Route::get('/horarios/disponibilidad', [DisponibilidadController::class, 'index']);
+//Route::get('/horarios/disponibilidad/{id}', [DisponibilidadController::class, 'show']);
+//Route::post('/horarios/disponibilidad/store', [DisponibilidadController::class, 'store']);
+//Route::put('/horarios/disponibilidad/update/{id}', [DisponibilidadController::class, 'update']);
+//Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'destroy']);
+Route::get('/horarios/disponibilidad/guardarDisponibilidades', [DisponibilidadController::class, 'guardarDisponibilidades']);
+
 
 
 Route::get('/disponibilidad/guardar', [DisponibilidadController::class, 'guardar'])->name('storeDisponibilidad');
