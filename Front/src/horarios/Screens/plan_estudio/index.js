@@ -129,7 +129,7 @@ const Planes = () => {
                   className="form-control"
                   placeholder="Filtrar por detalle"
                   value={filterText}
-                  onChange={(e) => setFilterText(e.target.value)} // Actualiza el estado del filtro
+                  onChange={(e) => setFilterText(e.target.value)}
                 />
               </div>
               <button

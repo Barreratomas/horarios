@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\horarios;
 
+use App\Http\Requests\LogsRequest;
 use Illuminate\Foundation\Http\FormRequest;
+
+use Illuminate\Support\Facades\Log;
 
 class HorarioPrevioDocenteRequest extends FormRequest
 {
@@ -11,6 +14,7 @@ class HorarioPrevioDocenteRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        Log::info('Se ha realizado una solicitud de autorización para el horario previo del docente');
         return true;
     }
 
@@ -21,28 +25,52 @@ class HorarioPrevioDocenteRequest extends FormRequest
      */
     public function rules(): array
     {
-
+        // Determinar si la solicitud es para creación (POST) o actualización (otros métodos)
         $esCreacion = $this->isMethod('post');
-        $trabajaInstitucion = $this->input('trabajaInstitucion') == 'si';
+        
+        Log::info('Se ha detectado el método de solicitud: ' . ($esCreacion ? 'POST (Creación)' : 'Otro método'));
 
-        // Definir las reglas de validación basadas en la condición
-        $rules = [];
+        // Cargar las reglas de LogsRequest
+        $logsRequest = new LogsRequest();
+        $logsRules = $logsRequest->rules($esCreacion);
 
-        if ($trabajaInstitucion) {
-            $diaRules = $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'array'];
-            $horaRules = $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'array'];
+        // Reglas para 'id_docente' dependiendo de si es creación o actualización
+        $idDocenteRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
 
-            // Regla para cada elemento de los arrays de días y horas
-            $rules = [
-                'dia' => array_merge($diaRules, ['in:lunes,martes,miercoles,jueves,viernes']),
-                'hora' => array_merge($horaRules, ['date_format:H:i', 'before:22:30']),
-            ];
+        // Reglas para 'dia' y 'hora'
+        $rules = [
+            'id_docente' => $idDocenteRules,
+            'dia' => $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'string'],
+            'hora' => $esCreacion ? ['required', 'array', 'min:1'] : ['nullable', 'string'],
+            'dia.*' => ['required', 'in:lunes,martes,miercoles,jueves,viernes'],
+            'hora.*' => ['required', 'before:22:30'],
+        ];
 
-            // Reglas de validación para cada día y hora en el array
-            $rules['dia.*'] = ['in:lunes,martes,miercoles,jueves,viernes'];
-            $rules['hora.*'] = ['date_format:H:i', 'before:22:30'];
-        }
+        // Registrar las reglas de validación
+        Log::info('Reglas de validación para el horario previo del docente: ', $rules);
 
-        return $rules;
+        // Combinamos las reglas de LogsRequest con las reglas específicas para los horarios
+        return array_merge($rules, $logsRules);
+    }
+
+    /**
+     * Se ejecuta después de la validación.
+     *
+     * @return void
+     */
+    public function passedValidation()
+    {
+        Log::info('La validación de la solicitud ha sido exitosa para el horario previo del docente');
+    }
+
+    /**
+     * Se ejecuta si la validación falla.
+     *
+     * @return void
+     */
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        Log::error('La validación de la solicitud ha fallado para el horario previo del docente');
+        Log::error('Errores de validación: ' . json_encode($validator->errors()->toArray()));
     }
 }
