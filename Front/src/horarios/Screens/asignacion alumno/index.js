@@ -171,7 +171,7 @@ const AsignacionAlumno = () => {
                 />
               </div>
               <button className="btn btn-primary me-2" onClick={handleAssignNoIngresantes}>
-                Asignar alumnos no ingresantes
+                Asignacion masiva no ingresantes
               </button>
               <button className="btn btn-primary me-2" onClick={handleAssignIngresantes}>
                 Asignacion masiva ingresantes

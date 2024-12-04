@@ -139,10 +139,24 @@ class DisponibilidadController extends Controller
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-
+            Log::info("Total asignados: $asignados");
+            Log::info("Total no asignados: $noAsignados");
             DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Horarios creados con éxito',
+                'data' => [
+                    'asignados' => $asignados,
+                    'noAsignados' => $noAsignados,
+                ],
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Se produjo un error al crear los horarios',
+ 
+            ], 200);
         }
     }
 

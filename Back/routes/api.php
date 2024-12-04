@@ -132,6 +132,7 @@ Route::post('/horarios/horarios/guardar', [HorarioController::class, 'store']);
 Route::put('/horarios/horarios/actualizar/{id}', [HorarioController::class, 'update']); 
 Route::delete('/horarios/horarios/eliminar/{id}', [HorarioController::class, 'destroy']);
 
+
 // HorarioPrevioDocente
 Route::get('/horarios/horariosPreviosDocentes', [HorarioPrevioDocenteController::class, 'index']);
 Route::get('/horarios/horariosPreviosDocentes/{id}', [HorarioPrevioDocenteController::class, 'show']);
