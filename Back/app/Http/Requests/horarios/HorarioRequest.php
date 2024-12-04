@@ -2,45 +2,88 @@
 
 namespace App\Http\Requests\horarios;
 
-use App\Models\Carrera;
-use App\Models\Comision;
-use App\Models\horarios\Grado;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class HorarioRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determina si el usuario está autorizado a realizar esta solicitud.
      */
     public function authorize(): bool
     {
-        return true;
+        Log::info('Se ha solicitado autorización para gestionar un horario.');
+        return true; // Cambiar según las necesidades de autorización
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Obtiene las reglas de validación que se aplican a la solicitud.
      */
     public function rules(): array
     {
-        $id_primer_grado = Grado::orderBy('id_grado')->first()->id_grado;
-        $id_ultimo_grado = Grado::orderBy('id_grado', 'desc')->first()->id_grado;
+        // Determinar si la solicitud es para creación (POST) o actualización
+        $esCreacion = $this->isMethod('post');
         
-       
-
-        return [
-            'grado' => [
-                'required',
-                'integer',
-                Rule::exists('grado', 'id_grado'), // Utiliza la regla exists para validar que el valor proporcionado para 'grado' existe en la columna 'id_grado' de la tabla 'grado'
-                'min:' . $id_primer_grado,
-                'max:' . $id_ultimo_grado
-                
-                
-            ],
-          
+        Log::info('Método detectado: ' . ($esCreacion ? 'POST (Creación)' : 'Otro método'));
+    
+        // Reglas generales
+        $rules = [
+            'id_grado' => $esCreacion ? ['required', 'exists:grado,id_grado'] : ['nullable', 'exists:grado,id_grado'],
+            'id_aula' => $esCreacion ? ['required', 'exists:aula,id_aula'] : ['nullable', 'exists:aula,id_aula'],
+            'id_uc' => $esCreacion ? ['required', 'exists:unidad_curricular,id_uc'] : ['nullable', 'exists:unidad_curricular,id_uc'],
+            'id_disp' => $esCreacion ? ['required', 'exists:disponibilidad,id_disp'] : ['nullable', 'exists:disponibilidad,id_disp'],
+            'dia' => $esCreacion ? ['required', 'string', 'max:50'] : ['nullable', 'string', 'max:50'],
+            'modulo_inicio' => $esCreacion ? ['required', 'date_format:H:i:s'] : ['nullable', 'date_format:H:i:s'],
+            'modulo_fin' => $esCreacion ? ['required', 'date_format:H:i:s', 'after:modulo_inicio'] : ['nullable', 'date_format:H:i:s', 'after:modulo_inicio'],
+            'modalidad' => ['nullable', 'string', 'max:50'],
         ];
+    
+        // Registrar las reglas para depuración
+        Log::info('Reglas de validación para horario: ', $rules);
+    
+        return $rules;
+    }
+    
+
+    /**
+     * Personalización de mensajes de error.
+     */
+    public function messages(): array
+    {
+        return [
+            'id_grado.required' => 'El grado es obligatorio.',
+            'id_grado.exists' => 'El grado no existe.',
+            'id_aula.required' => 'El aula es obligatoria.',
+            'id_aula.exists' => 'El aula no existe.',
+            'id_uc.required' => 'La unidad curricular es obligatoria.',
+            'id_uc.exists' => 'La unidad curricular no existe.',
+            'id_disp.required' => 'La disponibilidad es obligatoria.',
+            'id_disp.exists' => 'La disponibilidad no existe.',
+            'dia.required' => 'El día es obligatorio.',
+            'dia.max' => 'El día no puede exceder los 50 caracteres.',
+            'modulo_inicio.required' => 'El módulo de inicio es obligatorio.',
+            'modulo_inicio.date_format' => 'El formato del módulo de inicio debe ser HH:mm.',
+            'modulo_fin.required' => 'El módulo de fin es obligatorio.',
+            'modulo_fin.date_format' => 'El formato del módulo de fin debe ser HH:mm.',
+            'modulo_fin.after' => 'El módulo de fin debe ser posterior al módulo de inicio.',
+        ];
+    }
+
+    /**
+     * Acción a ejecutar después de una validación exitosa.
+     */
+    public function passedValidation()
+    {
+        Log::info('La validación de la solicitud ha sido exitosa.');
+    }
+
+    /**
+     * Acción a ejecutar si la validación falla.
+     */
+    public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        Log::error('La validación de la solicitud ha fallado.');
+        Log::error('Errores de validación: ' . json_encode($validator->errors()->toArray()));
+        parent::failedValidation($validator); // Llamada a la implementación por defecto para manejar errores
     }
 }

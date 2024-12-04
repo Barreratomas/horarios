@@ -126,12 +126,11 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 
 
 // horario
-// Route::get('/horario', [HorarioController::class, 'mostrarFormularioPartial'])->name('mostrarFormularioHorario');
-// Route::post('/horario', [HorarioController::class, 'mostrarHorario'])->name('mostrarHorario');
-// Route::get('/horario/docente', [HorarioController::class, 'mostrarFormularioDocentePartial'])->name('formularioHorarioDocente');
-// Route::post('/horario/docente', [HorarioController::class, 'mostrarHorarioDocente'])->name('mostrarHorarioDocente');
-// Route::get('/horario/bedelia', [HorarioController::class, 'mostrarHorarioBedelia'])->name('mostrarHorarioBedelia');
-
+Route::get('/horarios', [HorarioController::class, 'index']); 
+Route::get('/horarios/{id}', [HorarioController::class, 'show']); 
+Route::post('/horarios/guardar', [HorarioController::class, 'store']); 
+Route::put('/horarios/actualizar/{id}', [HorarioController::class, 'update']); 
+Route::delete('/horarios/eliminar/{id}', [HorarioController::class, 'destroy']);
 // Route::get('horario/crear-horario',[HorarioController::class,'crear'])->name('crearHorario');
 Route::get('/horarios/crear-horario', [HorarioController::class, 'store'])->name('storeHorario');
 
