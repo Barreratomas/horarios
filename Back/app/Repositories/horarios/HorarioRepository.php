@@ -5,9 +5,11 @@ namespace App\Repositories\horarios;
 interface HorarioRepository
 {
    
-    public function guardarHorario($params);
-    public function actualizarHorario($id,$params);
-    public function eliminarHorarioPorId($id);
+    public function obtenerTodosHorarios();
+    public function obtenerHorarioPorId($id);
+    public function guardarHorarios($horario);
+    public function actualizarHorarios($horario, $id);
+    public function eliminarHorarios($id);
 
      //------------------------------------------------------------------------------------------------------------------
      public function obtenerTodosHorariosSwagger();
