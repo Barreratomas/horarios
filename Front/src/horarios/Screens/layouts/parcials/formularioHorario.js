@@ -3,10 +3,7 @@ import React, { useState } from 'react';
 const FormularioHoraio = ({ comisiones = [] }) => {
   const [comisionSeleccionada, setComisionSeleccionada] = useState('');
   const [error, setError] = useState('');
-
-  const handleChange = (event) => {
-    setComisionSeleccionada(event.target.value);
-  };
+  const [horario, setHorario] = useState(null);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -15,9 +12,18 @@ const FormularioHoraio = ({ comisiones = [] }) => {
       setError('Por favor selecciona una comisión');
     } else {
       setError('');
-      // Aquí manejarías la lógica de envío, como hacer un fetch o enviar los datos a la API
-      console.log(`Comisión seleccionada: ${comisionSeleccionada}`);
-      // Aquí harías la llamada a la API en lugar de solo un console.log
+      // Simula la obtención del horario basado en la comisión seleccionada
+      const horarioSimulado = {
+        lunes: [
+          { aula: 'Aula 101', docente: 'Juan Pérez' },
+          { aula: 'Aula 102', docente: 'María Gómez' }
+        ],
+        martes: [
+          { aula: 'Aula 103', docente: 'Luis Fernández' },
+          { aula: 'Aula 104', docente: 'Ana Rodríguez' }
+        ]
+      };
+      setHorario(horarioSimulado);
     }
   };
 
@@ -35,23 +41,19 @@ const FormularioHoraio = ({ comisiones = [] }) => {
                 className="form-select"
                 name="comision"
                 value={comisionSeleccionada}
-                onChange={handleChange}
+                onChange={(e) => setComisionSeleccionada(e.target.value)}
                 aria-label="Comisión"
               >
                 <option value="">Selecciona una comisión</option>
                 {comisiones.length > 0 ? (
-                  comisiones
-                    .sort((a, b) => {
-                      if (a.anio === b.anio) {
-                        return a.division.localeCompare(b.division);
-                      }
-                      return a.anio - b.anio;
-                    })
-                    .map((comision) => (
-                      <option key={comision.id_comision} value={comision.id_comision}>
-                        {comision.anio}°{comision.division} | {comision.carrera.nombre}
-                      </option>
-                    ))
+                  comisiones.map((comision, index) => (
+                    <option
+                      key={`${comision.grado.id_grado}-${index}`}
+                      value={comision.grado.id_grado}
+                    >
+                      {comision.grado.grado}°{comision.grado.division} | {comision.carrera.carrera}
+                    </option>
+                  ))
                 ) : (
                   <option value="" disabled>
                     No hay comisiones disponibles
@@ -66,6 +68,42 @@ const FormularioHoraio = ({ comisiones = [] }) => {
               Mostrar Horario
             </button>
           </form>
+
+          {/* Mostrar el horario si está disponible */}
+          {horario && (
+            <div className="mt-3">
+              <h4>Horario de la comisión seleccionada:</h4>
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Modulos</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>9:00 AM - 11:00 AM</td>
+                    <td>
+                      {horario.lunes[0]?.aula} - {horario.lunes[0]?.docente}
+                    </td>
+                    <td>
+                      {horario.martes[0]?.aula} - {horario.martes[0]?.docente}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2:00 PM - 4:00 PM</td>
+                    <td>
+                      {horario.lunes[1]?.aula} - {horario.lunes[1]?.docente}
+                    </td>
+                    <td>
+                      {horario.martes[1]?.aula} - {horario.martes[1]?.docente}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

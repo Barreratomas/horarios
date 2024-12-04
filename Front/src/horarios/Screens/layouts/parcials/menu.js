@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Sesiones from './sesiones';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../../css/menu.css';
@@ -59,7 +60,7 @@ const Menu = () => {
                   Home
                 </button>
               </li>
-              {sessionStorage.getItem('userType') === 'estudiante' && (
+              {sessionStorage.getItem('userType') === 'alumno' && (
                 <li className="nav-item">
                   <button
                     className="nav-link"
@@ -200,11 +201,7 @@ const Menu = () => {
               </a>
             </div>
             <div className="userType">
-              {sessionStorage.getItem('userType') && (
-                <p style={{ color: 'red' }}>
-                  Tipo de usuario: {sessionStorage.getItem('userType')}
-                </p>
-              )}
+              <Sesiones />
             </div>
           </div>
         </nav>

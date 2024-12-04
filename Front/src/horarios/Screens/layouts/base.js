@@ -8,16 +8,18 @@ import '../../css/notificacion.css';
 import '../../css/formularios.css';
 import '../../css/indexSecciones.css';
 
-import { useEffect } from 'react';
+//import { useEffect } from 'react';
 import { getRoutes } from '../../Routes';
 // Componente principal
 const Base = ({ hideMenu }) => {
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
   // const navigate = useNavigate();
 
+  /*
   useEffect(() => {
     sessionStorage.setItem('userType', 'admin');
   });
+  */
 
   // useEffect(() => {
   //   // Redirige si no hay userType
