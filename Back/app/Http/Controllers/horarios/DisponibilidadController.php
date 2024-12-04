@@ -106,40 +106,31 @@ class DisponibilidadController extends Controller
                                 Log::info("- hora previa: {$horaPrevia} ");
 
                                 // llamar a modulosRepartidos
-                                $distribucion = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $horaPrevia, $previo->dia);
+                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
                             }
                         } else {
-                            Log::info("- entro ");
+
 
                             // llamar a modulosRepartidos   
-                            $distribucion = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado);
-                            $previo=null;
+                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc);
                         }
-                        // Loguear la distribución de módulos
-                        Log::info('Distribución de módulos para el docente ' . $docente->id_docente . ' sin horario previo:', [
-                            'distribucion' => json_encode($distribucion)
-                        ]);
-                        if (empty($distribucion)) {
-                            continue;
-                        }
-                        foreach ($distribucion as $dia => $data) {
 
-                            $params = [
-                                'id_uc' => $materia->id_uc,
-                                'id_docente' => $docente->id_docente,
-                                'id_h_p_d' => $previo,
-                                'id_aula' => $data['aula'],
-                                'id_grado' => $grado->id_grado,
-                                'dia' => $dia,
-                                'modulo_inicio' => $data['modulo_inicio'],
-                                'modulo_fin' => $data['modulo_fin'],
-                            ];
-                            $response = $this->disponibilidadService->guardarDisponibilidad($params);
-                            if ($response) {
-                                $asignados++; // Incrementar el contador de asignados
-                            } else {
-                                $noAsignados++; // Incrementar el contador de no asignados
+                        if ($response) {
+                            $exitoEnAsignacion = false;
+
+                            foreach ($response as $respuesta) {
+                                // Evaluar si la respuesta tiene 'status' y es 'success'
+                                if (isset($respuesta->original['status']) && $respuesta->original['status'] === 'success') {
+                                    $exitoEnAsignacion = true;
+                                }
+                                if ($exitoEnAsignacion) {
+                                    $asignados++;
+                                } else {
+                                    $noAsignados++;
+                                }
                             }
+                        } else {
+                            $noAsignados++;
                         }
                     }
                 }
@@ -148,7 +139,7 @@ class DisponibilidadController extends Controller
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-          
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -168,57 +159,57 @@ class DisponibilidadController extends Controller
 
 
 
-    public function actualizar(HorarioPrevioDocente $h_p_d, DocenteUC $dm)
+    public function actualizar(Request $request, $id_disponibilidad)
     {
-        $id_dm = $dm->id_dm;
-        // Buscar registros en la tabla disponibilidades que tengan el mismo id_dm
-        $disponibilidad_vieja = Disponibilidad::where('id_dm', $id_dm)->get();
-        // Verificar si se encontraron registros
-        if ($disponibilidad_vieja->isNotEmpty()) {
-            foreach ($disponibilidad_vieja as $registro) {
-                $registro->delete();
-            }
-        }
+        // $id_dm = $dm->id_dm;
+        // // Buscar registros en la tabla disponibilidades que tengan el mismo id_dm
+        // $disponibilidad_vieja = Disponibilidad::where('id_dm', $id_dm)->get();
+        // // Verificar si se encontraron registros
+        // if ($disponibilidad_vieja->isNotEmpty()) {
+        //     foreach ($disponibilidad_vieja as $registro) {
+        //         $registro->delete();
+        //     }
+        // }
 
-        $modulos_semanales = UnidadCurricular::where('id_materia', $dm->id_materia)->value('modulos_semanales');
-        $id_aula = Aula::where("id_aula", $dm->id_aula)->value('id_aula');
-        $id_grado = Grado::where("id_grado", $dm->id_grado)->value('id_grado');
-        $id_h_p_d = $h_p_d->id_h_p_d;
-        $diaInstituto = $h_p_d->dia;
-        $moduloPrevio = $this->disponibilidadService->horaPrevia($id_h_p_d);
+        // $modulos_semanales = UnidadCurricular::where('id_materia', $dm->id_materia)->value('modulos_semanales');
+        // $id_aula = Aula::where("id_aula", $dm->id_aula)->value('id_aula');
+        // $id_grado = Grado::where("id_grado", $dm->id_grado)->value('id_grado');
+        // $id_h_p_d = $h_p_d->id_h_p_d;
+        // $diaInstituto = $h_p_d->dia;
+        // $moduloPrevio = $this->disponibilidadService->horaPrevia($id_h_p_d);
 
 
-        $distribucion = $this->disponibilidadService->modulosRepartidos($modulos_semanales, $moduloPrevio, $id_dm, $id_grado, $id_aula, $diaInstituto);
-        if (empty($distribucion)) {
-            $dm->delete();
-            $h_p_d->delete();
-            return redirect()->route('indexAsignacion');
-        }
+        // $distribucion = $this->disponibilidadService->modulosRepartidos($modulos_semanales, $moduloPrevio, $id_dm, $id_grado, $id_aula, $diaInstituto);
+        // if (empty($distribucion)) {
+        //     $dm->delete();
+        //     $h_p_d->delete();
+        //     return redirect()->route('indexAsignacion');
+        // }
 
-        foreach ($distribucion as $data) {
-            $dia = $data['dia'];
-            $modulo_inicio = $data['modulo_inicio'];
-            $modulo_fin = $data['modulo_fin'];
+        // foreach ($distribucion as $data) {
+        //     $dia = $data['dia'];
+        //     $modulo_inicio = $data['modulo_inicio'];
+        //     $modulo_fin = $data['modulo_fin'];
 
-            $params = [
-                'id_dm' => $id_dm,
-                'id_h_p_d' => $id_h_p_d,
-                'dia' => $dia,
-                'modulo_inicio' => $modulo_inicio,
-                'modulo_fin' => $modulo_fin,
+        //     $params = [
+        //         'id_dm' => $id_dm,
+        //         'id_h_p_d' => $id_h_p_d,
+        //         'dia' => $dia,
+        //         'modulo_inicio' => $modulo_inicio,
+        //         'modulo_fin' => $modulo_fin,
 
-            ];
+        //     ];
 
-            $response = $this->disponibilidadService->actualizarDisponibilidad($params, "");
-        }
-        if ($response && isset($response['success'])) {
+        //     $response = $this->disponibilidadService->actualizarDisponibilidad($params, "");
+        // }
+        // if ($response && isset($response['success'])) {
 
-            return redirect()->route('storeHorario')->with('success', $response['success']);
-        } else {
-            $dm->delete();
-            $h_p_d->delete();
-            return redirect()->route('indexAsignacion')->withErrors(['error' => $response['error']]);
-        }
+        //     return redirect()->route('storeHorario')->with('success', $response['success']);
+        // } else {
+        //     $dm->delete();
+        //     $h_p_d->delete();
+        //     return redirect()->route('indexAsignacion')->withErrors(['error' => $response['error']]);
+        // }
     }
 
 

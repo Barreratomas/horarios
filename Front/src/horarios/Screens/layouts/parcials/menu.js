@@ -162,7 +162,7 @@ const Menu = () => {
                         navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`)
                       }
                     >
-                      horario previo del docente(en desarrollo)
+                      horario previo del docente
                     </button>
                   </li>
                   <li className="nav-item">
