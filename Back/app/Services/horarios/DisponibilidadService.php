@@ -396,12 +396,10 @@ class DisponibilidadService implements DisponibilidadRepository
         }
 
 
-        $aulas = Aula::all();
-
-        foreach ($aulas as $aula) {
+ 
             // Verificar si el aula tiene asignaciones en el mismo día con los módulos solicitados
             $disponibilidadAula = DB::table('disponibilidad')
-                ->where('id_aula', $aula->id_aula)
+                ->where('id_aula', $id_aula)
                 ->where('dia', $dia)
                 ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
                     // Verificar si hay coincidencia de los módulos
@@ -416,13 +414,12 @@ class DisponibilidadService implements DisponibilidadRepository
 
             // retornar si no existe una disponibilidad (es decir, el aula está disponible)
             if ($disponibilidadAula) {
-                Log::info("Aula {$aula->id_aula} ya está asignada en este rango de tiempo.");
+                Log::info("Aula {$id_aula} ya está asignada en este rango de tiempo.");
             } else {
-                Log::info("Aula {$aula->id_aula} está disponible para este rango de tiempo.");
-                return $aula->id_aula;
+                Log::info("Aula {$id_aula} está disponible para este rango de tiempo.");
+                return $id_aula;
             }
-        }
-        return false;
+   
 
         // return 1;
 

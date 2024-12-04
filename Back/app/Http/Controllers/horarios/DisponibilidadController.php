@@ -54,7 +54,7 @@ class DisponibilidadController extends Controller
     {
         DB::beginTransaction();
 
-       
+        try {
 
             $grados = Grado::all();
 
@@ -148,7 +148,7 @@ class DisponibilidadController extends Controller
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-            try {
+          
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
