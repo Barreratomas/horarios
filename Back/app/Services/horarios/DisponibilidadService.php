@@ -149,7 +149,7 @@ class DisponibilidadService implements DisponibilidadRepository
 
             // Intentar asignar módulos para el día actual
             for ($inicio = 1; $inicio <= 6; $inicio++) {
-                $fin = min($inicio + $modulosHoy - 1, 8); // Asignar hasta $modulosHoy módulos por día
+                $fin = min($inicio + $modulosHoy - 1, 6); // Asignar hasta $modulosHoy módulos por día
 
                 // Si es el día del instituto, respetar moduloPrevio (si está definido)
                 if ($diaInstituto && $dia === $diaInstituto && $moduloPrevio !== null && $inicio <= $moduloPrevio - 1) {

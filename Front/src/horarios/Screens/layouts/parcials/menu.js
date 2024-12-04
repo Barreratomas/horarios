@@ -30,6 +30,35 @@ const Menu = () => {
       botonMenu.style.transition = '0.3s';
     }
   };
+  const crearDisponibilidades = async () => {
+    try {
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/horarios/disponibilidad/guardarDisponibilidades',
+        {
+          method: 'GET', // Método GET
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Error al obtener los datos');
+      }
+
+      const data = await response.json(); // Convertimos la respuesta en JSON
+
+      // Verificamos el estado recibido en el JSON
+      if (data.status === 'success') {
+        console.log(data.message); // "Horarios creados con éxito"
+        console.log(`Asignados: ${data.data.asignados}, No asignados: ${data.data.noAsignados}`);
+      } else {
+        console.error('Ocurrió un error en el servidor:', data.message);
+      }
+    } catch (error) {
+      console.error('Error al crear disponibilidades:', error);
+    }
+  };
 
   return (
     <div>
@@ -187,6 +216,11 @@ const Menu = () => {
                       onClick={() => navigate(`${routes.base}/${routes.logs.main}`)}
                     >
                       Logs
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={crearDisponibilidades}>
+                      crear horarios
                     </button>
                   </li>
                 </>
