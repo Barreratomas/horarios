@@ -284,7 +284,7 @@ class DisponibilidadService implements DisponibilidadRepository
             ->exists();
 
         // retornar si existe una disponibilidad (es decir, el grado no está  disponible)
-        if ($disponibilidadDocente) {
+        if ($disponibilidadGrado) {
             Log::info("grado {$id_grado} ya está asignada en este rango de tiempo.");
             return false;
         } else {
@@ -388,7 +388,7 @@ class DisponibilidadService implements DisponibilidadRepository
             ->exists();
 
         // retornar si existe una disponibilidad (es decir, el grado no está  disponible)
-        if ($disponibilidadDocente) {
+        if ($disponibilidadGrado) {
             Log::info("grado {$id_grado} ya está asignada en este rango de tiempo.");
             return false;
         } else {
