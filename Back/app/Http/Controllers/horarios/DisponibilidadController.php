@@ -32,7 +32,7 @@ class DisponibilidadController extends Controller
         $this->disponibilidadService = $disponibilidadService;
     }
 
-    
+
     public function index()
     {
         $disponibilidades = $this->disponibilidadService->obtenerTodasDisponibilidades();
@@ -43,18 +43,18 @@ class DisponibilidadController extends Controller
     {
         $id = $request->input('id');
         $disponibilidad = $this->disponibilidadService->obtenerDisponibilidadPorId($id);
-        
+
         return view('disponibilidad.show', compact('disponibilidad'));
     }
 
-   
+
 
 
     public function guardarDisponibilidades()
     {
         DB::beginTransaction();
 
-        try {
+       
 
             $grados = Grado::all();
 
@@ -89,14 +89,16 @@ class DisponibilidadController extends Controller
                         )
                         ->where('unidad_curricular.id_uc', '=', $materia->id_uc)  // Filtrar por la materia actual
                         ->get();
+                    Log::info("- docentes: {$docentes} ");
 
                     foreach ($docentes as $docente) {
                         // verificar si el docente tiene horarios previos
                         $horariosPrevios = DB::table('horario_previo_docente')
                             ->where('id_docente', $docente->id_docente)
                             ->get();  // Devuelve una colección con todos los campos
+                        Log::info("- entro horarios  $horariosPrevios");
 
-                        if ($horariosPrevios) {
+                        if (is_array($horariosPrevios) && !empty($horariosPrevios)) {
                             //se asigna el modulo de inicio dependiendo la hora previa del docente 
                             foreach ($horariosPrevios as $previo) {
 
@@ -107,8 +109,11 @@ class DisponibilidadController extends Controller
                                 $distribucion = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $horaPrevia, $previo->dia);
                             }
                         } else {
+                            Log::info("- entro ");
+
                             // llamar a modulosRepartidos   
                             $distribucion = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado);
+                            $previo=null;
                         }
                         // Loguear la distribución de módulos
                         Log::info('Distribución de módulos para el docente ' . $docente->id_docente . ' sin horario previo:', [
@@ -118,10 +123,11 @@ class DisponibilidadController extends Controller
                             continue;
                         }
                         foreach ($distribucion as $dia => $data) {
+
                             $params = [
                                 'id_uc' => $materia->id_uc,
                                 'id_docente' => $docente->id_docente,
-                                'id_h_p_d' => $previo ? $previo->id_h_p_d : null, // Si $previo no existe, asigna null
+                                'id_h_p_d' => $previo,
                                 'id_aula' => $data['aula'],
                                 'id_grado' => $grado->id_grado,
                                 'dia' => $dia,
@@ -142,7 +148,7 @@ class DisponibilidadController extends Controller
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-
+            try {
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -154,7 +160,7 @@ class DisponibilidadController extends Controller
 
 
 
-   
+
 
 
 
@@ -203,7 +209,7 @@ class DisponibilidadController extends Controller
 
             ];
 
-            $response = $this->disponibilidadService->actualizarDisponibilidad($params,"");
+            $response = $this->disponibilidadService->actualizarDisponibilidad($params, "");
         }
         if ($response && isset($response['success'])) {
 
@@ -213,12 +219,9 @@ class DisponibilidadController extends Controller
             $h_p_d->delete();
             return redirect()->route('indexAsignacion')->withErrors(['error' => $response['error']]);
         }
-
-
- 
     }
 
-    
+
 
     public function eliminar(Request $request)
     {
@@ -226,14 +229,8 @@ class DisponibilidadController extends Controller
         $response = $this->disponibilidadService->eliminarDisponibilidadPorId($id);
         if (isset($response['success'])) {
             return redirect()->route('disponibilidades.index')->with('success', $response['success']);
-        }else{
+        } else {
             return redirect()->route('disponibilidades.index')->withErrors(['error' => $response['error']]);
-
         }
     }
-        
-
- 
-
-
 }
