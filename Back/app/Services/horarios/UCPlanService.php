@@ -88,7 +88,7 @@ class UCPlanService implements UCPlanRepository
     $currentUCPlans = UCPlan::where('id_plan', $id_plan)->get();
 
     // Verificar si se enviaron materias en la request
-    $materiasFromRequest = $materias;  // Aquí las materias son un array de IDs que recibes desde el controlador
+    $materiasFromRequest = $materias;  //  materias es un array de IDs que recibes desde el controlador
 
     // Eliminar las relaciones que ya no están en la solicitud
     foreach ($currentUCPlans as $ucPlan) {
