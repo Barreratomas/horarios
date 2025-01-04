@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import DataTable from 'react-data-table-component';
 
 const AsignacionAlumno = () => {
   const [detalles, setDetalles] = useState('');
@@ -151,6 +152,55 @@ const AsignacionAlumno = () => {
       }, 3500);
     }
   };
+  const columns = [
+    {
+      name: 'DNI',
+      selector: (row) => row.alumno.DNI,
+      sortable: true
+    },
+    {
+      name: 'Nombre',
+      selector: (row) => `${row.alumno.nombre} ${row.alumno.apellido}`,
+      sortable: true
+    },
+    {
+      name: 'Grado',
+      selector: (row) => `${row.grado.grado}° ${row.grado.division} (${row.grado.detalle})`
+    },
+    {
+      name: 'Carrera',
+      selector: (row) => row.alumno.carrera
+    },
+    {
+      name: 'Acciones',
+      cell: (row) => (
+        <>
+          <button
+            className="btn btn-primary me-2"
+            onClick={() => {
+              const url = `${routes.base}/${routes.asignacionesAlumno.actualizar(
+                row.id_alumno,
+                row.grado.id_grado
+              )}`;
+              navigate(url);
+            }}
+          >
+            Actualizar
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              setAlumnoToDelete(row.id_alumno);
+              setGradoToDelete(row.grado.id_grado);
+              setShowModal(true);
+            }}
+          >
+            Eliminar
+          </button>
+        </>
+      )
+    }
+  ];
 
   return (
     <>
@@ -170,6 +220,7 @@ const AsignacionAlumno = () => {
                   onChange={handleSearch}
                 />
               </div>
+
               <button className="btn btn-primary me-2" onClick={handleAssignNoIngresantes}>
                 Asignacion masiva no ingresantes
               </button>
@@ -186,52 +237,15 @@ const AsignacionAlumno = () => {
               </button>
             </div>
           </div>
+
           <div className="container">
-            {filteredAlumnos.map((alumno) => (
-              <div
-                key={alumno.id_alumno}
-                style={{
-                  border: '1px solid #ccc',
-                  borderRadius: '5px',
-                  padding: '10px',
-                  marginBottom: '10px',
-                  width: '30vw'
-                }}
-              >
-                <p>DNI: {alumno.alumno.DNI}</p>
-                <p>
-                  Nombre: {alumno.alumno.nombre} {alumno.alumno.apellido}
-                </p>
-                <p>
-                  Grado: {alumno.grado.grado}° {alumno.grado.division} ({alumno.grado.detalle})
-                </p>
-                <p>Carrera: {alumno.alumno.carrera}</p>
-                <div className="botones">
-                  <button
-                    className="btn btn-primary me-2"
-                    onClick={() => {
-                      const url = `${routes.base}/${routes.asignacionesAlumno.actualizar(
-                        alumno.id_alumno,
-                        alumno.grado.id_grado
-                      )}`;
-                      navigate(url);
-                    }}
-                  >
-                    Actualizar
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => {
-                      setAlumnoToDelete(alumno.id_alumno);
-                      setGradoToDelete(alumno.grado.id_grado);
-                      setShowModal(true); // Mostrar el modal
-                    }}
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            ))}
+            <DataTable
+              columns={columns}
+              data={filteredAlumnos}
+              pagination
+              highlightOnHover
+              responsive
+            />
           </div>
         </div>
       ) : (

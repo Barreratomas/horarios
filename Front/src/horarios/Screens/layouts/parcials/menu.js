@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sesiones from './sesiones';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,6 +11,7 @@ const Menu = () => {
 
   const [isCollapsed, setIsCollapsed] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation(); // Obtiene la ruta actual
 
   // Maneja el toggle del menú
   const handleToggle = () => {
@@ -31,6 +32,7 @@ const Menu = () => {
       botonMenu.style.transition = '0.3s';
     }
   };
+  const isActive = (path) => location.pathname === path; // Verifica si la ruta coincide con la actual
   const crearDisponibilidades = async () => {
     try {
       const response = await fetch(
@@ -83,7 +85,9 @@ const Menu = () => {
             <ul className="nav flex-column">
               <li className="nav-item">
                 <button
-                  className="nav-link"
+                  className={`nav-link ${
+                    isActive(`${routes.base}/${routes.home}`) ? 'active' : ''
+                  }`}
                   onClick={() => navigate(`${routes.base}/${routes.home}`)}
                 >
                   Home
@@ -116,7 +120,9 @@ const Menu = () => {
                     <>
                       <li className="nav-item">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            isActive(`${routes.base}/${routes.planilla.alumnos}`) ? 'active' : ''
+                          }`}
                           onClick={() => navigate(`${routes.base}/${routes.planilla.alumnos}`)}
                         >
                           Horarios alumno
@@ -124,7 +130,9 @@ const Menu = () => {
                       </li>
                       <li className="nav-item">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            isActive(`${routes.base}/${routes.planilla.docente}`) ? 'active' : ''
+                          }`}
                           onClick={() => navigate(`${routes.base}/${routes.planilla.docente}`)}
                         >
                           Horarios docente
@@ -134,7 +142,9 @@ const Menu = () => {
                   )}
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.planilla.bedelia}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.planilla.bedelia}`)}
                     >
                       Horarios bedelia
@@ -142,7 +152,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.aulas.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.aulas.main}`)}
                     >
                       Aulas
@@ -150,7 +162,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.materias.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.materias.main}`)}
                     >
                       Materias
@@ -158,7 +172,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.carreras.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.carreras.main}`)}
                     >
                       Carreras
@@ -166,7 +182,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.comisiones.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
                     >
                       Grados
@@ -174,7 +192,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.planes.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
                     >
                       Planes de estudio
@@ -187,7 +207,11 @@ const Menu = () => {
                   </li> */}
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.horariosPreviosDocente.main}`)
+                          ? 'active'
+                          : ''
+                      }`}
                       onClick={() =>
                         navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`)
                       }
@@ -197,7 +221,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.disponibilidad.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.disponibilidad.main}`)}
                     >
                       asignaciones del docente(en desarrollo)
@@ -205,7 +231,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.asignacionesAlumno.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.main}`)}
                     >
                       Asignacion alumnos a grados
@@ -213,7 +241,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.logs.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.logs.main}`)}
                     >
                       Logs
