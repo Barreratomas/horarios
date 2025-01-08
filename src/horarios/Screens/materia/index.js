@@ -242,16 +242,14 @@ const Materias = () => {
             </div>
           </div>
 
-          <div className="container">
-            <DataTable
-              title="Materias"
-              columns={columns}
-              data={filteredMaterias} /* Usar datos filtrados */
-              pagination
-              highlightOnHover
-              responsive
-            />
-          </div>
+          <DataTable
+            title="Materias"
+            columns={columns}
+            data={filteredMaterias} /* Usar datos filtrados */
+            pagination
+            highlightOnHover
+            responsive
+          />
 
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
