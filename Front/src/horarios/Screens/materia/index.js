@@ -153,16 +153,14 @@ const Materias = () => {
     {
       name: 'Acciones',
       cell: (row) => (
-        <div>
+        <>
           <button
-            type="button"
             className="btn btn-primary me-2"
             onClick={() => navigate(`${routes.base}/${routes.materias.actualizar(row.id_uc)}`)}
           >
             Actualizar
           </button>
           <button
-            type="button"
             className="btn btn-danger"
             onClick={() => {
               setMateriaToDelete(row.id_uc);
@@ -171,7 +169,7 @@ const Materias = () => {
           >
             Eliminar
           </button>
-        </div>
+        </>
       )
     }
   ];
@@ -244,16 +242,14 @@ const Materias = () => {
             </div>
           </div>
 
-          <div className="container">
-            <DataTable
-              title="Materias"
-              columns={columns}
-              data={filteredMaterias} /* Usar datos filtrados */
-              pagination
-              highlightOnHover
-              responsive
-            />
-          </div>
+          <DataTable
+            title="Materias"
+            columns={columns}
+            data={filteredMaterias} /* Usar datos filtrados */
+            pagination
+            highlightOnHover
+            responsive
+          />
 
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
