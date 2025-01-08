@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 
 const ActualizarMateria = () => {
   const usuario = sessionStorage.getItem('userType');
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
-  const [detalles, setDetalles] = useState(''); // Detalle de actualización
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [detalles, setDetalles] = useState('');
+  const [loading, setLoading] = useState(true); // Estado para controlar si se están cargando los datos
 
-  const { materiaId } = useParams(); // Obtener ID de la materia desde la URL
+  const { materiaId } = useParams();
   const [unidadCurricular, setUnidadCurricular] = useState('');
   const [tipo, setTipo] = useState('');
   const [horasSem, setHorasSem] = useState('');
@@ -16,14 +17,14 @@ const ActualizarMateria = () => {
   const [formato, setFormato] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { routes } = useOutletContext(); // Obtener rutas desde el contexto
+  const { routes } = useOutletContext();
 
   // Obtener los datos de la materia por ID
   useEffect(() => {
     const obtenerMateria = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/horaios/unidadCurricular/${materiaId}`
+          `http://127.0.0.1:8000/api/horarios/unidadCurricular/${materiaId}`
         );
         const data = await response.json();
 
@@ -38,6 +39,8 @@ const ActualizarMateria = () => {
         }
       } catch (error) {
         console.error('Error:', error);
+      } finally {
+        setLoading(false); // Desactivar el estado de carga
       }
     };
 
@@ -46,9 +49,9 @@ const ActualizarMateria = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setShowModal(true); // Mostrar el modal de confirmación
+    setShowModal(true);
   };
-  // Manejar el envío del formulario
+
   const handleConfirmUpdate = async () => {
     setIsSubmitting(true);
 
@@ -85,14 +88,22 @@ const ActualizarMateria = () => {
     } catch (error) {
       console.error('Error al actualizar la materia:', error);
     } finally {
-      setIsSubmitting(false); // Finalizar el proceso de envío
-      setShowModal(false); // Cerrar el modal de confirmación
+      setIsSubmitting(false);
+      setShowModal(false);
     }
   };
-  // Cancelar la actualización
+
   const handleCancelUpdate = () => {
-    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
+    setShowModal(false);
   };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="container py-3">
@@ -181,7 +192,7 @@ const ActualizarMateria = () => {
           </div>
         </div>
       )}
-      {/* Modal de confirmación */}
+
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar actualización</Modal.Title>

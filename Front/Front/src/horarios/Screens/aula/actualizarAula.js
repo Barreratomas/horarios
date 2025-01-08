@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
@@ -15,6 +15,27 @@ const ActualizarAula = () => {
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const { aulaId } = useParams();
+
+  // Cargar los datos del aula para su visualización
+  useEffect(() => {
+    const fetchAula = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/horarios/aulas/${aulaId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setNombre(data.nombre);
+          setTipoAula(data.tipo_aula);
+          setCapacidad(data.capacidad);
+        } else {
+          console.error('Error al obtener los datos del aula');
+        }
+      } catch (error) {
+        console.error('Error de red al obtener el aula:', error);
+      }
+    };
+
+    fetchAula();
+  }, [aulaId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,6 +78,7 @@ const ActualizarAula = () => {
   const handleCancelUpdate = () => {
     setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
   };
+
   return (
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
