@@ -1,0 +1,63 @@
+
+.button-container {
+    position: fixed;
+    margin-top: 10px;
+    z-index: 1000;
+}
+
+.navElemento{
+width: 100%;
+}
+#sidebar {
+    width: 0;
+    position: fixed;
+    height: 100%;
+    overflow-y: hidden;
+    transition: width 0.3s ease; 
+    z-index: 2;
+}
+
+
+#sidebar.show {
+    width: 250px;
+}
+
+#sidebar ul {
+    padding: 0;
+    list-style: none;
+}
+
+#sidebar a {
+    text-decoration: none;
+    color: #000;
+}
+
+
+.button-container.show {
+    margin-left: 250px;
+}
+
+.cont-nav{
+    padding-top: 40px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logout {
+    margin-top: auto;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+.userType {
+   margin-left: 10px;
+    color: red;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    color: #007bff;
+    background-color: #e9ecef;
+  }
+  

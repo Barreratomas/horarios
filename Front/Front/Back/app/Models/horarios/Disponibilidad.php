@@ -2,6 +2,7 @@
 
 namespace App\Models\horarios;
 
+use App\Models\CarreraGrado;
 use App\Models\Docente;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -68,7 +69,7 @@ class Disponibilidad extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id_uc', 'id_docente', 'id_h_p_d', 'id_aula', 'id_grado', 'dia', 'modulo_inicio', 'modulo_fin'];
+    protected $fillable = ['id_uc', 'id_docente', 'id_h_p_d', 'id_aula', 'id_carrera_grado', 'dia', 'modulo_inicio', 'modulo_fin'];
     protected $table = 'disponibilidad';
     protected $primaryKey = 'id_disp';
 
@@ -83,9 +84,9 @@ class Disponibilidad extends Model
     }
 
     // Una disponibilidad pertenece a una grado
-    public function grado(): BelongsTo
+    public function carreraGrado(): BelongsTo
     {
-        return $this->belongsTo(Grado::class, 'id_grado', 'id_grado');
+        return $this->belongsTo(CarreraGrado::class, 'id_carrera_grado', 'id_carrera_grado');
     }
 
     // Una disponibilidad pertenece a un aula
