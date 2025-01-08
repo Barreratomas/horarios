@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
+use App\Models\CarreraGrado;
 use Illuminate\Support\Facades\Log;
 
 
@@ -57,29 +58,30 @@ class DisponibilidadController extends Controller
         try {
 
             $grados = Grado::all();
-
+            $carrerasGrados = CarreraGrado::all(); 
 
             // recorrer solo los grado en bucle
             $asignados = 0; // Contador para asignaciones exitosas
-            $noAsignados = 0; // Contador para asignaciones no realizadas        
-            foreach ($grados as $grado) {
+            $noAsignados = 0; // Contador para asignaciones no realizadas   
+                 
+            foreach ($carrerasGrados as $carreraGrado) {
                 // obtener todas las materias de $gradp
-                $materias = DB::table('grado')
-                    ->join('grado_uc', 'grado.id_grado', '=', 'grado_uc.id_grado')
+                $materias = DB::table('carrera_grado')
+                    ->join('grado_uc', 'carrera_grado.id_carrera_grado', '=', 'grado_uc.id_carrera_grado')
                     ->join('unidad_curricular', 'grado_uc.id_uc', '=', 'unidad_curricular.id_uc')
                     ->select(
                         'unidad_curricular.id_uc',
                         'unidad_curricular.formato',
                         'unidad_curricular.horas_sem'
                     )
-                    ->where('grado.id_grado', '=', $grado->id_grado) // Filtrar solo por el grado actual
+                    ->where('carrera_grado.id_carrera_grado', '=', $carreraGrado->id_carrera_grado) 
                     ->get();
 
 
 
 
                 foreach ($materias as $materia) {
-                    // Log::info("- id de materia: {$materia->id_uc} (Formato: {$materia->formato}, Horas: {$materia->horas_sem})");
+                    Log::info("- id de materia: {$materia->id_uc} (Formato: {$materia->formato}, Horas: {$materia->horas_sem})");
                     // obtener los docentes que tengan materia
                     $docentes = DB::table('unidad_curricular')
                         ->join('docente_uc', 'unidad_curricular.id_uc', '=', 'docente_uc.id_uc')
@@ -89,6 +91,7 @@ class DisponibilidadController extends Controller
                         )
                         ->where('unidad_curricular.id_uc', '=', $materia->id_uc)  // Filtrar por la materia actual
                         ->get();
+                        
                     Log::info("- docentes: {$docentes} ");
 
                     foreach ($docentes as $docente) {
@@ -106,13 +109,13 @@ class DisponibilidadController extends Controller
                                 Log::info("- hora previa: {$horaPrevia} ");
 
                                 // llamar a modulosRepartidos
-                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
+                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
                             }
                         } else {
 
 
                             // llamar a modulosRepartidos   
-                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc);
+                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc);
                         }
 
                         if ($response) {

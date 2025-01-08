@@ -30,7 +30,7 @@ class AlumnoGrado extends Model
 {
     use HasFactory;
 
-    protected $fillable= ['id_alumno', 'id_grado'];
+    protected $fillable= ['id_alumno', 'id_carrera_grado'];
     protected $table = 'alumno_grado';
     
     public $autoincrement = false;
@@ -42,8 +42,10 @@ class AlumnoGrado extends Model
     }
 
     # Uno o muchos Alumno_grado pertenece a un Grado.
-    public function grado():BelongsTo{
-        return $this->belongsTo(Grado::class, 'id_grado');
+    public function carreraGrado():BelongsTo{
+        return $this->belongsTo(CarreraGrado::class, 'id_carrera_grado');
     }
+
+    
 
 }

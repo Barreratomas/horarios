@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 {
   "explorer.confirmDragAndDrop": false,
@@ -36,4 +37,23 @@
   },
   "editor.minimap.enabled": false,
   "editor.fontLigatures": false
+=======
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "urquiza_server",
+            "username": "root",
+            "database": "urquiza_server",
+            "password": ""
+        }
+    ]
+>>>>>>> f7262be82827e26fa5124b39eda3e42cbd3102d7
 }

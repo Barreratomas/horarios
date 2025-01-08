@@ -1,0 +1,1709 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Planificacion Horaria",
+        "description": "Gestion de horarios de clases",
+        "contact": {
+            "email": "contacto@tudominio.com"
+        },
+        "license": {
+            "name": "Licencia",
+            "url": "https://www.terciarioUrquiza.com.ar/planificacionHoraria"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/aulas": {
+            "get": {
+                "tags": [
+                    "Aula"
+                ],
+                "summary": "Obtener todas las aulas",
+                "description": "Devuelve todas las aulas",
+                "operationId": "getAulas",
+                "responses": {
+                    "200": {
+                        "description": "Aulas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Aula"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las aulas"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Aula"
+                ],
+                "summary": "Guardar un aula",
+                "description": "Guardar un aula",
+                "operationId": "guardarAula",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AulaData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Aula guardada correctamente"
+                    },
+                    "400": {
+                        "description": "Error al guardar el aula"
+                    }
+                }
+            }
+        },
+        "/api/aulas/{id}": {
+            "get": {
+                "tags": [
+                    "Aula"
+                ],
+                "summary": "Obtener un aula por id",
+                "description": "Obtener un aula por id",
+                "operationId": "obtenerAulaPorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del aula",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Aula obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Aula"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontró el aula"
+                    },
+                    "500": {
+                        "description": "Error al obtener el aula"
+                    }
+                }
+            }
+        },
+        "/api/aulas/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Aula"
+                ],
+                "summary": "Actualizar un aula",
+                "description": "Actualizar un aula",
+                "operationId": "actualizarAula",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del aula",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AulaData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Aula actualizada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el aula"
+                    }
+                }
+            }
+        },
+        "/api/aulas/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Aula"
+                ],
+                "summary": "Eliminar un aula",
+                "description": "Eliminar un aula",
+                "operationId": "eliminarAula",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del aula",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Aula eliminada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el aula"
+                    }
+                }
+            }
+        },
+        "/api/cambioDocente": {
+            "get": {
+                "tags": [
+                    "CambioDocente"
+                ],
+                "summary": "Obtener todos los cambios de docente",
+                "description": "Retorna un array de cambios de docente",
+                "operationId": "066b4570a99a55d525cc385c44872518",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontraron cambios de docente"
+                    }
+                }
+            }
+        },
+        "/api/cambioDocente/{id}": {
+            "get": {
+                "tags": [
+                    "CambioDocente"
+                ],
+                "summary": "Obtener cambio de docente por id",
+                "description": "Retorna un cambio de docente",
+                "operationId": "002b01e4cf7c9b5216eb976ba68d8f2b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del cambio de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el cambio de docente"
+                    }
+                }
+            }
+        },
+        "/api/cambioDocente/guardar": {
+            "post": {
+                "tags": [
+                    "CambioDocente"
+                ],
+                "summary": "Guardar cambio de docente",
+                "description": "Guardar un cambio de docente",
+                "operationId": "56f6616c5eafe09a4f648ee4cba1abcf",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CambioDocente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cambio de docente guardado"
+                    },
+                    "500": {
+                        "description": "Error al guardar el cambio de docente"
+                    }
+                }
+            }
+        },
+        "/api/cambioDocente/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "CambioDocente"
+                ],
+                "summary": "Actualizar cambio de docente",
+                "description": "Actualizar un cambio de docente",
+                "operationId": "a0da9970d40cc08f8cfb4b320030c9f8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del cambio de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CambioDocente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cambio de docente actualizado"
+                    },
+                    "404": {
+                        "description": "No se encontró el cambio de docente"
+                    }
+                }
+            }
+        },
+        "/api/cambioDocente/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "CambioDocente"
+                ],
+                "summary": "Eliminar cambio de docente por id",
+                "description": "Eliminar un cambio de docente",
+                "operationId": "fdddcf7147f755fc8ecf8ceebba4d835",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del cambio de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cambio de docente eliminado"
+                    },
+                    "404": {
+                        "description": "No se encontró el cambio de docente"
+                    }
+                }
+            }
+        },
+        "/api/carreras": {
+            "get": {
+                "tags": [
+                    "Carrera"
+                ],
+                "summary": "Obtener todas las carreras",
+                "description": "Devuelve todas las carreras",
+                "operationId": "getCambiosDocente",
+                "responses": {
+                    "200": {
+                        "description": "Carreras",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Carrera"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener las carreras"
+                    }
+                }
+            }
+        },
+        "/api/carreras/{id}": {
+            "get": {
+                "tags": [
+                    "Carrera"
+                ],
+                "summary": "Obtener una carrera por id",
+                "description": "Devuelve una carrera",
+                "operationId": "getCambioDocentePorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carrera",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrera"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No existe la carrera"
+                    },
+                    "500": {
+                        "description": "Error al obtener la carrera"
+                    }
+                }
+            }
+        },
+        "/api/carreras/guardar": {
+            "post": {
+                "tags": [
+                    "Carrera"
+                ],
+                "summary": "Guardar una carrera",
+                "description": "Guardar una carrera",
+                "operationId": "guardarCambioDocente",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Carrera"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Carrera guardada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrera"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al guardar la carrera"
+                    }
+                }
+            }
+        },
+        "/api/carreras/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Carrera"
+                ],
+                "summary": "Actualizar una carrera",
+                "description": "Actualizar una carrera",
+                "operationId": "actualizarCambioDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Carrera"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Carrera actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Carrera"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No existe la carrera"
+                    },
+                    "500": {
+                        "description": "Error al actualizar la carrera"
+                    }
+                }
+            }
+        },
+        "/api/carreras/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Carrera"
+                ],
+                "summary": "Eliminar una carrera",
+                "description": "Eliminar una carrera",
+                "operationId": "eliminarCambioDocentePorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carrera eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "No existe la carrera"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la carrera"
+                    }
+                }
+            }
+        },
+        "/api/comisiones": {
+            "get": {
+                "tags": [
+                    "Comision"
+                ],
+                "summary": "Obtener todas las comisiones",
+                "description": "Devuelve un array de comisiones",
+                "operationId": "0de656abeb0fe5e895e7f9a24ab4b1f2",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener las comisiones"
+                    }
+                }
+            }
+        },
+        "/api/comisiones/{id}": {
+            "get": {
+                "tags": [
+                    "Comision"
+                ],
+                "summary": "Obtener comision por id",
+                "description": "Devuelve una comision",
+                "operationId": "fde4d8f3e11ccef4d9b155bc62bf9c68",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la comision",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la comision"
+                    },
+                    "500": {
+                        "description": "Error al obtener la comision"
+                    }
+                }
+            }
+        },
+        "/api/comisiones/guardar": {
+            "post": {
+                "tags": [
+                    "Comision"
+                ],
+                "summary": "Guardar comision",
+                "description": "Guardar una comision",
+                "operationId": "7acfa8d38b1b6d26ff51c33e5b88a3a2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Comision"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar la comision"
+                    }
+                }
+            }
+        },
+        "/api/comisiones/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Comision"
+                ],
+                "summary": "Actualizar comision",
+                "description": "Actualizar una comision",
+                "operationId": "6c7991ef8978561d28a6b607a7f46510",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la comision",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Comision"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al actualizar la comision"
+                    }
+                }
+            }
+        },
+        "/api/comisiones/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Comision"
+                ],
+                "summary": "Eliminar comision por id",
+                "description": "Eliminar una comision",
+                "operationId": "a0920b42a624034e34821bc094f1a926",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la comision",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la comision"
+                    }
+                }
+            }
+        },
+        "/api/disponibilidad": {
+            "get": {
+                "tags": [
+                    "Disponibilidad"
+                ],
+                "summary": "Obtener todas las disponibilidades",
+                "operationId": "d290acb65163f50a92dbec50373aff63",
+                "responses": {
+                    "200": {
+                        "description": "Devuelve todas las disponibilidades"
+                    },
+                    "404": {
+                        "description": "No se encontraron disponibilidades"
+                    }
+                }
+            }
+        },
+        "/api/disponibilidad/{id}": {
+            "get": {
+                "tags": [
+                    "Disponibilidad"
+                ],
+                "summary": "Obtener disponibilidad por id",
+                "operationId": "10bd6bf7124376d0a3cb39033d369d80",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Devuelve la disponibilidad"
+                    },
+                    "404": {
+                        "description": "No se encontró la disponibilidad"
+                    }
+                }
+            }
+        },
+        "/api/disponibilidad/guardar": {
+            "post": {
+                "tags": [
+                    "Disponibilidad"
+                ],
+                "summary": "Guardar disponibilidad",
+                "operationId": "90fa4f1940e33dc71ed5bc2af959624a",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Disponibilidad"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad guardada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar la disponibilidad"
+                    }
+                }
+            }
+        },
+        "/api/disponibilidad/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Disponibilidad"
+                ],
+                "summary": "Actualizar disponibilidad",
+                "operationId": "a443fecc67a34e74a012a9d42e960daf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Disponibilidad"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad actualizada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al actualizar la disponibilidad"
+                    }
+                }
+            }
+        },
+        "/api/disponibilidad/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Disponibilidad"
+                ],
+                "summary": "Eliminar disponibilidad por id",
+                "operationId": "75ad56ba1f1fc2ce3c7e80d45880e5d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la disponibilidad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Disponibilidad eliminada correctamente"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la disponibilidad"
+                    }
+                }
+            }
+        },
+        "/api/docentes": {
+            "get": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Obtener todos los docentes",
+                "description": "Devuelve todos los docentes",
+                "operationId": "obtenerDocente",
+                "responses": {
+                    "200": {
+                        "description": "Docentes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Docente"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener los docentes"
+                    }
+                }
+            }
+        },
+        "/api/docentes/{id}": {
+            "get": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Obtener docente por dni",
+                "description": "Devuelve un docente",
+                "operationId": "obtenerDocentePorDni",
+                "parameters": [
+                    {
+                        "name": "dni",
+                        "in": "path",
+                        "description": "DNI del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Docente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Docente"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al obtener el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/guardar": {
+            "post": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Guardar docente",
+                "description": "Guarda un docente",
+                "operationId": "guardarDocente",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Docente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Docente guardado correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Actualizar docente",
+                "description": "Actualiza un docente",
+                "operationId": "actualizarDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Docente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Docente actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el docente"
+                    }
+                }
+            }
+        },
+        "/api/docentes/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Docente"
+                ],
+                "summary": "Eliminar docente",
+                "description": "Elimina un docente",
+                "operationId": "eliminarDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del docente",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Docente eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "Docente no encontrado"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el docente"
+                    }
+                }
+            }
+        },
+        "/api/horarios": {
+            "get": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Obtener todos los horarios",
+                "description": "Retorna un array de horarios",
+                "operationId": "d6e7d1b6cad06a6b841a864d9ffeaa2c",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontraron horarios"
+                    },
+                    "500": {
+                        "description": "Error al obtener los horarios"
+                    }
+                }
+            }
+        },
+        "/api/horarios/{id}": {
+            "get": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Obtener horario por id",
+                "description": "Retorna un horario",
+                "operationId": "f3d0940996bf0313a64f7e9ea3021ea4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró el horario"
+                    },
+                    "500": {
+                        "description": "Error al obtener el horario"
+                    }
+                }
+            }
+        },
+        "/api/horarios/guardar": {
+            "post": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Guardar horario",
+                "description": "Guardar un nuevo horario",
+                "operationId": "f8714b29f02aebc34b464b3edc09fdfc",
+                "requestBody": {
+                    "description": "Datos del horario",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Horario"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Horario guardado correctamente"
+                    },
+                    "500": {
+                        "description": "Error al guardar el horario"
+                    }
+                }
+            }
+        },
+        "/api/horarios/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Actualizar horario",
+                "description": "Actualizar un horario existente",
+                "operationId": "714fa83f5ddd9e3ff9acecefd3c34100",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos del horario",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Horario"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Horario actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "No se encontró el horario"
+                    },
+                    "500": {
+                        "description": "Error al actualizar el horario"
+                    }
+                }
+            }
+        },
+        "/api/horarios/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Eliminar horario",
+                "description": "Eliminar un horario existente",
+                "operationId": "a465abe784ef0fc74755bfddbff1d392",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horario eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "No se encontró el horario"
+                    },
+                    "500": {
+                        "description": "Error al eliminar el horario"
+                    }
+                }
+            }
+        },
+        "/api/materias": {
+            "get": {
+                "tags": [
+                    "Materias"
+                ],
+                "summary": "Obtener todas las materias",
+                "description": "Devuelve un array de materias",
+                "operationId": "ce64d4a8c3503884806e1c48739e20fc",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al obtener las materias"
+                    }
+                }
+            }
+        },
+        "/api/materias/{id}": {
+            "get": {
+                "tags": [
+                    "Materias"
+                ],
+                "summary": "Obtener materia por id",
+                "description": "Devuelve una materia",
+                "operationId": "8624bdc19c63b1ac3eb44f7d29e24eb0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la materia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la materia"
+                    },
+                    "500": {
+                        "description": "Error al obtener la materia"
+                    }
+                }
+            }
+        },
+        "/api/materias/guardar": {
+            "post": {
+                "tags": [
+                    "Materias"
+                ],
+                "summary": "Guardar materia",
+                "description": "Guarda una materia",
+                "operationId": "b59f92a268f6c4a79a80cc61499965fa",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string"
+                                    },
+                                    "modulos_semanales": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Operación exitosa"
+                    },
+                    "500": {
+                        "description": "Error al guardar la materia"
+                    }
+                }
+            }
+        },
+        "/api/materias/actualizar/{id}": {
+            "put": {
+                "tags": [
+                    "Materias"
+                ],
+                "summary": "Actualizar materia",
+                "description": "Actualiza una materia",
+                "operationId": "cdf37fed87835a0a03d131e9019d8b30",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la materia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string"
+                                    },
+                                    "modulos_semanales": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la materia"
+                    },
+                    "500": {
+                        "description": "Error al actualizar la materia"
+                    }
+                }
+            }
+        },
+        "/api/materias/eliminar/{id}": {
+            "delete": {
+                "tags": [
+                    "Materias"
+                ],
+                "summary": "Eliminar materia",
+                "description": "Elimina una materia",
+                "operationId": "a26f40f950dd4798fd21783450374f78",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la materia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "404": {
+                        "description": "No se encontró la materia"
+                    },
+                    "500": {
+                        "description": "Error al eliminar la materia"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AulaData": {
+                "title": "AulaData",
+                "description": "Esquema del objeto AulaData",
+                "properties": {
+                    "nombre": {
+                        "description": "Nombre del aula",
+                        "type": "string"
+                    },
+                    "capacidad": {
+                        "description": "Capacidad del aula",
+                        "type": "integer"
+                    },
+                    "tipo_aula": {
+                        "description": "Tipo de aula",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CambiosDocenteData": {
+                "title": "CambiosDocenteData",
+                "description": "Esquema del objeto CambiosDocenteData",
+                "properties": {
+                    "docente_anterior": {
+                        "description": "DNI del docente anterior",
+                        "type": "string"
+                    },
+                    "docente_nuevo": {
+                        "description": "DNI del docente nuevo",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CarreraData": {
+                "title": "CarreraData",
+                "description": "Esquema del objeto CarreraData",
+                "properties": {
+                    "nombre": {
+                        "description": "Nombre de la carrera",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ComisionData": {
+                "title": "ComisionData",
+                "description": "Esquema del objeto ComisionData",
+                "properties": {
+                    "anio": {
+                        "description": "Año de la comision",
+                        "type": "integer"
+                    },
+                    "division": {
+                        "description": "Division de la comision",
+                        "type": "string"
+                    },
+                    "id_carrera": {
+                        "description": "Id de la carrera",
+                        "type": "integer"
+                    },
+                    "capacidad": {
+                        "description": "Capacidad de la comision",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "DisponibilidadData": {
+                "title": "DisponibilidadData",
+                "description": "Esquema del objeto DisponibilidadData",
+                "properties": {
+                    "id_disponibilidad": {
+                        "description": "ID de la disponibilidad",
+                        "type": "integer"
+                    },
+                    "id_dm": {
+                        "description": "ID del docente materia",
+                        "type": "integer"
+                    },
+                    "id_h_p_d": {
+                        "description": "ID de la hora por dia",
+                        "type": "integer"
+                    },
+                    "id_aula": {
+                        "description": "ID del aula",
+                        "type": "integer"
+                    },
+                    "dia": {
+                        "description": "Dia de la disponibilidad",
+                        "type": "string"
+                    },
+                    "modulo_inicio": {
+                        "description": "Modulo de inicio de la disponibilidad",
+                        "type": "integer"
+                    },
+                    "modulo_fin": {
+                        "description": "Modulo de fin de la disponibilidad",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "DocenteData": {
+                "title": "DocenteData",
+                "description": "Esquema del objeto DocenteData",
+                "properties": {
+                    "dni": {
+                        "description": "DNI del docente",
+                        "type": "string"
+                    },
+                    "nombre": {
+                        "description": "Nombre del docente",
+                        "type": "string"
+                    },
+                    "apellido": {
+                        "description": "Apellido del docente",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email del docente",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "HorarioData": {
+                "title": "HorarioData",
+                "description": "Esquema del objeto HorarioData",
+                "properties": {
+                    "id": {
+                        "description": "Id del horario",
+                        "type": "integer"
+                    },
+                    "hora_inicio": {
+                        "description": "Hora de inicio del horario",
+                        "type": "string"
+                    },
+                    "hora_fin": {
+                        "description": "Hora de fin del horario",
+                        "type": "string"
+                    },
+                    "dia": {
+                        "description": "Dia del horario",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "MateriaData": {
+                "title": "MateriaData",
+                "description": "Esquema del objeto MateriaData",
+                "properties": {
+                    "nombre": {
+                        "description": "Nombre del Materia",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Aula": {
+                "title": "Aula",
+                "description": "Esquema del objeto Aula",
+                "properties": {
+                    "id_aula": {
+                        "description": "Id del aula",
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "description": "Nombre del aula",
+                        "type": "string"
+                    },
+                    "capacidad": {
+                        "description": "Capacidad del aula",
+                        "type": "integer"
+                    },
+                    "tipo_aula": {
+                        "description": "Tipo de aula",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CambioDocente": {
+                "title": "CambioDocente",
+                "description": "Esquema del objeto CambioDocente",
+                "properties": {
+                    "id_cambio": {
+                        "description": "Id del cambio de docente",
+                        "type": "integer"
+                    },
+                    "docente_anterior": {
+                        "description": "DNI del docente anterior",
+                        "type": "string"
+                    },
+                    "docente_nuevo": {
+                        "description": "DNI del docente nuevo",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Carrera": {
+                "title": "Carrera",
+                "description": "Esquema del objeto Carrera",
+                "properties": {
+                    "id_carrera": {
+                        "description": "Id de la carrera",
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "description": "Nombre de la carrera",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Comision": {
+                "title": "Comision",
+                "description": "Esquema del objeto Comision",
+                "properties": {
+                    "id_comision": {
+                        "description": "Id de la comision",
+                        "type": "integer"
+                    },
+                    "anio": {
+                        "description": "Año de la comision",
+                        "type": "integer"
+                    },
+                    "division": {
+                        "description": "Division de la comision",
+                        "type": "string"
+                    },
+                    "id_carrera": {
+                        "description": "Id de la carrera",
+                        "type": "integer"
+                    },
+                    "capacidad": {
+                        "description": "Capacidad de la comision",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Disponibilidad": {
+                "title": "Disponibilidad",
+                "description": "Esquema del objeto Disponibilidad",
+                "properties": {
+                    "id_disponibilidad": {
+                        "description": "Id de la disponibilidad",
+                        "type": "integer"
+                    },
+                    "id_dm": {
+                        "description": "Id de la docente materia",
+                        "type": "integer"
+                    },
+                    "id_h_p_d": {
+                        "description": "Id del horario previo docente",
+                        "type": "integer"
+                    },
+                    "id_aula": {
+                        "description": "Id del aula",
+                        "type": "integer"
+                    },
+                    "dia": {
+                        "description": "Dia de la disponibilidad",
+                        "type": "string"
+                    },
+                    "modulo_inicio": {
+                        "description": "Modulo de inicio de la disponibilidad",
+                        "type": "integer"
+                    },
+                    "modulo_fin": {
+                        "description": "Modulo de fin de la disponibilidad",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Docente": {
+                "title": "Docente",
+                "description": "Esquema del objeto Docente",
+                "properties": {
+                    "dni": {
+                        "description": "DNI del docente",
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "description": "Nombre del docente",
+                        "type": "string"
+                    },
+                    "apellido": {
+                        "description": "Apellido del docente",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email del docente",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "DocenteMateria": {
+                "title": "DocenteMateria",
+                "description": "Esquema del objeto DocenteMateria",
+                "properties": {
+                    "id_dm": {
+                        "description": "ID de la relacion docente materia",
+                        "type": "integer"
+                    },
+                    "dni_docente": {
+                        "description": "DNI del docente",
+                        "type": "integer"
+                    },
+                    "id_materia": {
+                        "description": "ID de la materia",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Horario": {
+                "title": "Horario",
+                "description": "Esquema del objeto Horario",
+                "properties": {
+                    "id_horario": {
+                        "description": "ID del horario",
+                        "type": "integer"
+                    },
+                    "dia": {
+                        "description": "Dia de la semana",
+                        "type": "string"
+                    },
+                    "hora_inicio": {
+                        "description": "Hora de inicio",
+                        "type": "time"
+                    },
+                    "hora_fin": {
+                        "description": "Hora de fin",
+                        "type": "time"
+                    },
+                    "v_p": {
+                        "description": "Vigente o Pasado",
+                        "type": "boolean"
+                    },
+                    "id_dm": {
+                        "description": "ID de la relacion docente materia",
+                        "type": "integer"
+                    },
+                    "id_aula": {
+                        "description": "ID del aula",
+                        "type": "integer"
+                    },
+                    "id_comision": {
+                        "description": "ID de la comision",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "HorarioPrevioDocente": {
+                "title": "HorarioPrevioDocente",
+                "description": "Esquema del objeto HorarioPrevioDocente",
+                "properties": {
+                    "id_h_p_d": {
+                        "description": "ID del horario previo del docente",
+                        "type": "integer"
+                    },
+                    "dni_docente": {
+                        "description": "DNI del docente",
+                        "type": "string"
+                    },
+                    "dia": {
+                        "description": "Dia de la semana",
+                        "type": "string"
+                    },
+                    "hora": {
+                        "description": "Hora del horario",
+                        "type": "time"
+                    }
+                },
+                "type": "object"
+            },
+            "Materia": {
+                "title": "Materia",
+                "description": "Esquema del objeto Materia",
+                "properties": {
+                    "id_materia": {
+                        "description": "ID de la materia",
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "description": "Nombre de la materia",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Usuario": {
+                "title": "Usuario",
+                "description": "Esquema del objeto Usuario",
+                "properties": {
+                    "dni": {
+                        "description": "DNI del usuario",
+                        "type": "integer"
+                    },
+                    "nombre": {
+                        "description": "Nombre del usuario",
+                        "type": "string"
+                    },
+                    "apellido": {
+                        "description": "Apellido del usuario",
+                        "type": "string"
+                    },
+                    "tipo": {
+                        "description": "Tipo de usuario",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email del usuario",
+                        "type": "string"
+                    },
+                    "id_comision": {
+                        "description": "ID de la comision a la que pertenece el usuario",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}

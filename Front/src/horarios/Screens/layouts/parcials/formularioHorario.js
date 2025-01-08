@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-const FormularioHoraio = ({ comisiones = [] }) => {
+const FormularioHoraio = ({ comisiones = [], onComisionSeleccionada }) => {
   const [comisionSeleccionada, setComisionSeleccionada] = useState('');
   const [error, setError] = useState('');
-  const [horario, setHorario] = useState(null);
+  // const [horario, setHorario] = useState(null);
+  console.log(comisiones);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -11,19 +12,8 @@ const FormularioHoraio = ({ comisiones = [] }) => {
     if (!comisionSeleccionada) {
       setError('Por favor selecciona una comisión');
     } else {
-      setError('');
-      // Simula la obtención del horario basado en la comisión seleccionada
-      const horarioSimulado = {
-        lunes: [
-          { aula: 'Aula 101', docente: 'Juan Pérez' },
-          { aula: 'Aula 102', docente: 'María Gómez' }
-        ],
-        martes: [
-          { aula: 'Aula 103', docente: 'Luis Fernández' },
-          { aula: 'Aula 104', docente: 'Ana Rodríguez' }
-        ]
-      };
-      setHorario(horarioSimulado);
+      console.log(comisionSeleccionada);
+      onComisionSeleccionada(comisionSeleccionada);
     }
   };
 
@@ -68,42 +58,6 @@ const FormularioHoraio = ({ comisiones = [] }) => {
               Mostrar Horario
             </button>
           </form>
-
-          {/* Mostrar el horario si está disponible */}
-          {horario && (
-            <div className="mt-3">
-              <h4>Horario de la comisión seleccionada:</h4>
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Modulos</th>
-                    <th>Lunes</th>
-                    <th>Martes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>9:00 AM - 11:00 AM</td>
-                    <td>
-                      {horario.lunes[0]?.aula} - {horario.lunes[0]?.docente}
-                    </td>
-                    <td>
-                      {horario.martes[0]?.aula} - {horario.martes[0]?.docente}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2:00 PM - 4:00 PM</td>
-                    <td>
-                      {horario.lunes[1]?.aula} - {horario.lunes[1]?.docente}
-                    </td>
-                    <td>
-                      {horario.martes[1]?.aula} - {horario.martes[1]?.docente}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </div>
     </div>
