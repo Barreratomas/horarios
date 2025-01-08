@@ -25,6 +25,7 @@ const Aulas = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [hideMessage, setHideMessage] = useState(false);
 
+  // Opciones para los selects
   const tipos = ['Normal', 'Laboratorio', 'Sum'];
 
   useEffect(() => {

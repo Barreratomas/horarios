@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Urquiza´s school Sign-up/Login System
 
 This application is designed for Urquiza´s N°49 school of Rosario, Santa Fé, Argentina; and aims to organize and manage the different users (students) and a Super-admin that manage and give their role according to the respectives position in the school. The plan with this app is to add implementations as they are required by the client.
@@ -45,3 +46,32 @@ You will also see any lint errors in the console.
 ### License & Copyright
 
 © PrograPs
+=======
+
+# Pagina Terciario Urquiza
+
+Creación de pagina web para el terciario Urquiza.
+
+
+## Deploy
+
+Para deployar el proyecto necesitamos tener instalado [Composer](https://getcomposer.org/) , [NodeJS](https://nodejs.org/en/) y [GIT](https://git-scm.com/).
+
+- Usamos Git Bash para descargar el proyecto con git clone en alguna carpeta.
+```bash
+  git clone https://github.com/LucianoStradiot/Proyecto-Escuela-Urquiza.git
+```
+- Abrimos el proyecto con Visual Studio Code.
+- En la carpeta Back abrimos la terminal y ejecutamos el siguiente codigo para descargar las dependencias:
+```bash
+  composer i
+```
+- En la carpeta Front abrimos la terminal y ejecutamos el siguiente codigo para descargar las dependencias:
+```bash
+  npm install
+```
+## Environment Variables
+
+Necesitamos tener en la carpeta Front y Back el archivo de las variables de entorno ".env", el cual tiene la variables donde indicamos la conexion a la DB y demas.
+
+>>>>>>> f7262be82827e26fa5124b39eda3e42cbd3102d7
