@@ -2,6 +2,7 @@
 
 namespace App\Models\horarios;
 
+use App\Models\CarreraGrado;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,18 +30,18 @@ class GradoUC extends Model
     use HasFactory;
 
     protected $table = 'grado_uc';
-    protected $primaryKey = ['id_grado', 'id_uc'];
+    protected $primaryKey = ['id_carrera_grado', 'id_uc'];
     public $incrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
-        'id_grado',
+        'id_carrera_grado',
         'id_uc'
     ];
 
     // GradoUC pertenece a un Grado
-    public function grado():BelongsTo{
-        return $this->BelongsTo(Grado::class, 'id_grado');
+    public function carreraGrado():BelongsTo{
+        return $this->BelongsTo(CarreraGrado::class, 'id_carrera_grado');
     }
 
     

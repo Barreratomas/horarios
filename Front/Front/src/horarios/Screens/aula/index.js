@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import DataTable from 'react-data-table-component'; // Import DataTable component
 
 const Aulas = () => {
   const [detalles, setDetalles] = useState('');
@@ -31,17 +32,12 @@ const Aulas = () => {
     if (location.state && location.state.successMessage) {
       setSuccessMessage(location.state.successMessage);
 
-      // Mostrar el mensaje durante 3 segundos
-      setTimeout(() => {
-        setHideMessage(true);
-      }, 3000);
-
-      // Limpiar después de la transición
+      setTimeout(() => setHideMessage(true), 3000);
       setTimeout(() => {
         setSuccessMessage('');
         setHideMessage(false);
 
-        navigate(location.pathname, { replace: true }); // Reemplaza la entrada en el historial para no tener el state
+        navigate(location.pathname, { replace: true });
       }, 3500);
     }
 
@@ -92,7 +88,7 @@ const Aulas = () => {
         setHideMessage(false);
         navigate(location.pathname, { replace: true });
       }, 3500);
-      setShowModal(false); // Cerrar el modal
+      setShowModal(false);
     } catch (error) {
       setErrors([error.message || 'Error al eliminar aula']);
     }
@@ -126,6 +122,49 @@ const Aulas = () => {
     setFilteredAulas(aulas);
   };
 
+  // Define columns for DataTable
+  const columns = [
+    {
+      name: 'Nombre',
+      selector: (row) => row.nombre,
+      sortable: true
+    },
+    {
+      name: 'Tipo',
+      selector: (row) => row.tipo_aula,
+      sortable: true
+    },
+    {
+      name: 'Capacidad',
+      selector: (row) => row.capacidad,
+      sortable: true
+    },
+    {
+      name: 'Acciones',
+      cell: (row) => (
+        <div className="botones">
+          <button
+            type="button"
+            className="btn btn-primary me-2"
+            onClick={() => navigate(`${routes.base}/${routes.aulas.actualizar(row.id_aula)}`)}
+          >
+            Actualizar
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => {
+              setAulaToDelete(row.id_aula);
+              setShowModal(true);
+            }}
+          >
+            Eliminar
+          </button>
+        </div>
+      )
+    }
+  ];
+
   return (
     <>
       {loading ? (
@@ -142,7 +181,7 @@ const Aulas = () => {
                   name="nombre"
                   value={searchCriteria.nombre}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 50%' }} // El input ocupa el 50%
+                  style={{ flex: '0 0 50%' }}
                 />
 
                 <select
@@ -150,7 +189,7 @@ const Aulas = () => {
                   name="tipo"
                   value={searchCriteria.tipo}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 25%' }} // El select tipo ocupa el 15%
+                  style={{ flex: '0 0 25%' }}
                 >
                   <option value="">Filtrar por tipo...</option>
                   {tipos.map((tipo) => (
@@ -164,7 +203,7 @@ const Aulas = () => {
                   type="button"
                   className="btn btn-secondary me-2 px-0 py-1 mx-2"
                   onClick={handleClearFilters}
-                  style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
+                  style={{ flex: '0 0 15%' }}
                 >
                   Limpiar Filtros
                 </button>
@@ -179,52 +218,18 @@ const Aulas = () => {
             </div>
           </div>
 
-          <div className="container">
-            {filteredAulas.length > 0 ? (
-              filteredAulas.map((aula) => (
-                <div
-                  key={aula.id_aula}
-                  style={{
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    marginBottom: '10px',
-                    width: '30vw'
-                  }}
-                >
-                  <p>Nombre: {aula.nombre}</p>
-                  <p>Tipo: {aula.tipo_aula}</p>
-                  <p>Capacidad: {aula.capacidad}</p>
+          {/* DataTable to display aulas */}
 
-                  <div className="botones">
-                    <button
-                      type="button"
-                      className="btn btn-primary me-2"
-                      onClick={() =>
-                        navigate(`${routes.base}/${routes.aulas.actualizar(aula.id_aula)}`)
-                      }
-                    >
-                      Actualizar
-                    </button>
+          <DataTable
+            title="Aulas"
+            columns={columns}
+            data={filteredAulas}
+            pagination
+            highlightOnHover
+            responsive
+          />
 
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={() => {
-                        setAulaToDelete(aula.id_aula); // Establecer el grado a eliminar
-                        setShowModal(true); // Mostrar el modal
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No se encontraron aulas que coincidan con la búsqueda.</p>
-            )}
-          </div>
-          {/* Modal de confirmación */}
+          {/* Modal for confirmation */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Confirmar eliminación</Modal.Title>

@@ -1,0 +1,125 @@
+.container_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+.col-6{
+    width: 100%;
+}
+.form-select {
+    width: 100%; /* Asegura que el select ocupe el 100% del ancho del contenedor */
+    overflow: hidden; /* Oculta cualquier desbordamiento */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos si hay desbordamiento de texto */
+    white-space: nowrap; /* Evita que el texto se envuelva en varias líneas */
+  }
+  
+  .option-text {
+    display: block; /* Hace que el texto ocupe el bloque completo */
+    width: 100%; /* Establece el ancho completo */
+    overflow: hidden; /* Evita el desbordamiento */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos para el texto que no cabe */
+    white-space: nowrap; /* Evita el salto de línea */
+  }
+form {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+    text-overflow: ellipsis;
+}
+.h_p_d_select{
+    color: black;
+  
+}
+.form-control {
+    color: black; 
+}
+.form-control option {
+    color: black; 
+}
+
+label {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+  
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Errores */
+.text-danger {
+    color: #dc3545;
+    font-size: 0.9rem;
+    margin-top: -15px;
+    margin-bottom: 15px;
+}
+
+.alert {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    form {
+        padding: 20px;
+    }
+
+    button[type="submit"] {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+}
