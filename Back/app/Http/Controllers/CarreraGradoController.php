@@ -42,8 +42,13 @@ class CarreraGradoController extends Controller
     {
         return $this->carreraGradoService->obtenerTodosCarreraGrado();
     }
-    
-    
+
+
+    public function showByCarreraGrado($id_carreraGrado)
+    {
+        return $this->carreraGradoService->obtenerCarreraGrado($id_carreraGrado);
+    }
+
     /*
     * @OA\Get(
     *      path="/api/horarios/carreraGrados/carrera/{id_carrera}",
@@ -78,7 +83,7 @@ class CarreraGradoController extends Controller
     {
         return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
     }
-    
+
 
     /*
     * @OA\Get(
@@ -138,7 +143,7 @@ class CarreraGradoController extends Controller
         return $this->carreraGradoService->guardarCarreraGrado($id_carrera, $id_grado);
     }
 
-   
+
     /*
     * @OA\Delete(
     *      path="/api/horarios/carreraGrados/eliminar/{id_carrera}/{id_grado}",
@@ -170,8 +175,8 @@ class CarreraGradoController extends Controller
     *      )
     * )
     */
-    public function destroy($id_carrera, $id_grado)
+    public function destroy($id_carrera_grado)
     {
-       return $this->carreraGradoService->eliminarCarreraGradoPorIdGradoYCarrera( $id_carrera, $id_grado);
+        return $this->carreraGradoService->eliminarCarreraGradoPorIdGradoYCarrera($id_carrera_grado);
     }
 }

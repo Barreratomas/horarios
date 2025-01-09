@@ -22,9 +22,11 @@ const ActualizarComision = () => {
   useEffect(() => {
     const fetchComision = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/horarios/grados/${comisionId}`);
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/horarios/carreraGrados/${comisionId}`
+        );
         const data = await response.json();
-
+        console.log(data);
         if (response.ok) {
           setCapacidad(data.capacidad);
           setMateriasSeleccionadas(data.materias || []);

@@ -12,9 +12,7 @@ class GradoMapper
             'grado' => $gradoData['grado'],
             'division' => $gradoData['division'],
             'detalle' => $gradoData['detalle'],
-            'capacidad' => $gradoData['capacidad'],
             'carrera_id' => $gradoData['carrera_id']
         ]);
     }
-
 }

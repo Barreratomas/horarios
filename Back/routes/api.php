@@ -126,10 +126,10 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 
 
 // horario
-Route::get('/horarios/horarios', [HorarioController::class, 'index']); 
-Route::get('/horarios/horarios/{id}', [HorarioController::class, 'show']); 
-Route::post('/horarios/horarios/guardar', [HorarioController::class, 'store']); 
-Route::put('/horarios/horarios/actualizar/{id}', [HorarioController::class, 'update']); 
+Route::get('/horarios/horarios', [HorarioController::class, 'index']);
+Route::get('/horarios/horarios/{id}', [HorarioController::class, 'show']);
+Route::post('/horarios/horarios/guardar', [HorarioController::class, 'store']);
+Route::put('/horarios/horarios/actualizar/{id}', [HorarioController::class, 'update']);
 Route::delete('/horarios/horarios/eliminar/{id}', [HorarioController::class, 'destroy']);
 
 
@@ -212,13 +212,15 @@ Route::delete('/horarios/docentes/eliminar/{id}', [DocenteController::class, 'de
 
 // CarreraGrado
 Route::get('/horarios/carreraGrados', [CarreraGradoController::class, 'index']);
+Route::get('/horarios/carreraGrados/{id_carreraGrado}', [CarreraGradoController::class, 'showByCarreraGrado']);
+
 Route::get('/horarios/carreraGrados/carrera/{id_carrera}', [CarreraGradoController::class, 'showByCarrera']);
 Route::get('/horarios/carreraGrados/carrera/SinUC/{id_carrera}', [CarreraGradoController::class, 'showByCarreraSinUC']);
 Route::get('/horarios/carreraGrados/grado/{id_grado}', [CarreraGradoController::class, 'showByGrado']);
 Route::post('/horarios/carreraGrados/guardar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'store']);
-Route::delete('/horarios/carreraGrados/eliminar/{id_carrera}/{id_grado}', [CarreraGradoController::class, 'destroy']);
+Route::delete('/horarios/carreraGrados/eliminar/{id_carrera_grado}', [CarreraGradoController::class, 'destroy']);
 
 
 // Logs
-Route::get('/horarios/logs',[LogModificacionEliminacionController::class,'index']);
-Route::post('/horarios/logs',[LogModificacionEliminacionController::class,'store']);
+Route::get('/horarios/logs', [LogModificacionEliminacionController::class, 'index']);
+Route::post('/horarios/logs', [LogModificacionEliminacionController::class, 'store']);

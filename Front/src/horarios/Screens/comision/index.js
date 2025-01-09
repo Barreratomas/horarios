@@ -80,7 +80,8 @@ const Comisiones = () => {
             grado_uc: item.grado.grado_uc
           },
           id_carrera: item.id_carrera,
-          id_grado: item.id_grado
+          id_grado: item.id_grado,
+          id_carrera_grado: item.id_carrera_grado
         }));
 
         setGrados(normalizedData);
@@ -106,7 +107,7 @@ const Comisiones = () => {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/grados/eliminar/${gradoToDelete}`,
+        `http://127.0.0.1:8000/api/horarios/carreraGrados/eliminar/${gradoToDelete}`,
         {
           method: 'DELETE',
           body: JSON.stringify({ detalles: detalles, usuario }), // Enviar detalles con la eliminación
@@ -116,9 +117,9 @@ const Comisiones = () => {
 
       if (!response.ok) throw new Error('Error al eliminar el grado');
 
-      setGrados(grados.filter((grado) => grado.grado.id_grado !== gradoToDelete));
+      setGrados(grados.filter((grado) => grado.id_carrera_grado !== gradoToDelete));
       setFilteredComisiones(
-        filteredComisiones.filter((comision) => comision.grado.id_grado !== gradoToDelete)
+        filteredComisiones.filter((comision) => comision.id_carrera_grado !== gradoToDelete)
       );
       setSuccessMessage('Grado eliminado correctamente');
 
@@ -213,9 +214,9 @@ const Comisiones = () => {
 
           <div className="container">
             {filteredComisiones.length > 0 ? (
-              filteredComisiones.map(({ id_grado, id_carrera, carrera, grado }) => (
+              filteredComisiones.map(({ id_carrera_grado, carrera, grado }) => (
                 <div
-                  key={`${id_grado}-${id_carrera}`}
+                  key={id_carrera_grado} // Usar id_carrera_grado como clave única
                   style={{
                     border: '1px solid #ccc',
                     borderRadius: '5px',
@@ -249,8 +250,11 @@ const Comisiones = () => {
                     <button
                       type="button"
                       className="btn btn-primary me-2"
-                      onClick={() =>
-                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
+                      onClick={
+                        () =>
+                          navigate(
+                            `${routes.base}/${routes.comisiones.actualizar(id_carrera_grado)}`
+                          ) // Cambiado a id_carrera_grado
                       }
                     >
                       Actualizar
@@ -258,7 +262,7 @@ const Comisiones = () => {
                     <button
                       className="btn btn-danger"
                       onClick={() => {
-                        setGradoToDelete(grado.id_grado);
+                        setGradoToDelete(id_carrera_grado); // Cambiado a id_carrera_grado
                         setShowModal(true);
                       }}
                     >
