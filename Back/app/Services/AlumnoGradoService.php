@@ -308,7 +308,16 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
                         foreach ($uc_plan as $uc) {
                             $id_uc = $uc->id_uc;
+                            // Validación de grados asociados a UC para la carrera correspondiente
+                            $gradosAsociados = GradoUC::where('id_uc', $id_uc)
+                                ->join('carrera_grado', 'grado_uc.id_carrera_grado', '=', 'carrera_grado.id_carrera_grado')
+                                ->where('carrera_grado.id_carrera', $id_carrera) // Verificar que la carrera coincida
+                                ->pluck('carrera_grado.id_carrera_grado');
 
+                            if ($gradosAsociados->isEmpty()) {
+                                Log::warning("No hay grados asociados a la UC $id_uc para la carrera $id_carrera.");
+                                continue; // Si no hay grados asociados, saltar al siguiente
+                            }
                             $gradosPrimerAnio = $gradoUC->filter(function ($grado) use ($id_uc) {
                                 return $grado->id_uc === $id_uc;
                             });
@@ -322,7 +331,11 @@ class AlumnoGradoService implements AlumnoGradoRepository
                                     Log::info("No se encontró el grado con id_carrera_grado $id_carrera_grado.");
                                     continue; // Si no existe, saltar al siguiente
                                 }
-
+                                // Validar si el grado es igual a 1
+                                if ($carreraGrado->grado->grado !== 1) {
+                                    Log::info("El grado para la carrera $id_carrera_grado no es igual a 1.");
+                                    continue; // Si no es igual a 1, saltar este grado
+                                }
                                 // Verificar la capacidad del grado
                                 $alumnosEnGrado = AlumnoGrado::where('id_carrera_grado', $id_carrera_grado)->count();
                                 $capacidadGrado = $carreraGrado->capacidad;
