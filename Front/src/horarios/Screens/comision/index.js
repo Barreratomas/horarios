@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
+import { Modal, Button } from 'react-bootstrap';
 import '../../css/acordeon.css';
 
 const Accordion = ({ title, children }) => {
@@ -23,8 +23,8 @@ const Accordion = ({ title, children }) => {
 const Comisiones = () => {
   const usuario = sessionStorage.getItem('userType');
   const navigate = useNavigate();
-  const { routes } = useOutletContext(); // Acceder a las rutas definidas
-  const location = useLocation(); // Manejar el estado de navegación
+  const { routes } = useOutletContext();
+  const location = useLocation();
 
   const [filteredComisiones, setFilteredComisiones] = useState([]);
   const [searchCriteria, setSearchCriteria] = useState({
@@ -110,7 +110,7 @@ const Comisiones = () => {
         `http://127.0.0.1:8000/api/horarios/carreraGrados/eliminar/${gradoToDelete}`,
         {
           method: 'DELETE',
-          body: JSON.stringify({ detalles: detalles, usuario }), // Enviar detalles con la eliminación
+          body: JSON.stringify({ detalles: detalles, usuario }),
           headers: { 'Content-Type': 'application/json' }
         }
       );

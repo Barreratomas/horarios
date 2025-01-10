@@ -4,15 +4,15 @@ import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarAsignarAlumno = () => {
   const usuario = sessionStorage.getItem('userType');
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');
 
-  const { alumnoId, idGradoActual } = useParams(); // idGrado será el grado actual
-  const [carrera, setCarrera] = useState(''); // Estado para la carrera seleccionada
-  const [grado, setGrado] = useState(''); // Estado para el grado seleccionado
-  const [carreras, setCarreras] = useState([]); // Estado para las carreras disponibles
-  const [grados, setGrados] = useState([]); // Estado para los grados disponibles
+  const { alumnoId, idGradoActual } = useParams();
+  const [carrera, setCarrera] = useState('');
+  const [grado, setGrado] = useState('');
+  const [carreras, setCarreras] = useState([]);
+  const [grados, setGrados] = useState([]);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { routes } = useOutletContext();
@@ -26,7 +26,7 @@ const ActualizarAsignarAlumno = () => {
           throw new Error('Error al obtener carreras');
         }
         const carrerasData = await response.json();
-        setCarreras(carrerasData); // Asignar carreras desde la API
+        setCarreras(carrerasData);
       } catch (error) {
         console.error('Error al obtener carreras:', error);
       }
@@ -47,7 +47,8 @@ const ActualizarAsignarAlumno = () => {
             throw new Error('Error al obtener grados');
           }
           const gradosData = await response.json();
-          setGrados(gradosData); // Asignar grados desde la API
+          console.log(gradosData);
+          setGrados(gradosData);
         } catch (error) {
           console.error('Error al obtener grados:', error);
         }
@@ -136,8 +137,8 @@ const ActualizarAsignarAlumno = () => {
                 >
                   <option value="">Seleccione un grado</option>
                   {grados.map((g) => (
-                    <option key={g.id_grado} value={g.id_grado}>
-                      {`${g.grado.detalle} (Capacidad: ${g.grado.capacidad})- ${g.carrera.carrera}`}
+                    <option key={g.id_carrera_grado} value={g.id_carrera_grado}>
+                      {`${g.grado.detalle} (Capacidad: ${g.grado.capacidad})`}
                     </option>
                   ))}
                 </select>

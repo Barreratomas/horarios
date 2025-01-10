@@ -43,7 +43,7 @@ const CrearAsignacionAlumno = () => {
     e.preventDefault();
     setErrors({});
     const [id_grado, id_carrera] = grado.split('-');
-    console.log(`dni: ${dni}, grado: ${id_grado}, carrera: ${id_carrera}`);
+    console.log(`id_alumno: ${dni}, grado: ${id_grado}, carrera: ${id_carrera}`);
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${dni}/${id_grado}`,
@@ -111,8 +111,8 @@ const CrearAsignacionAlumno = () => {
                 <option value="">Seleccione un grado y carrera</option>
                 {grados.map((item) => (
                   <option
-                    key={`${item.grado.id_grado}-${item.carrera.id_carrera}`}
-                    value={`${item.grado.id_grado}-${item.carrera.id_carrera}`}
+                    key={`${item.id_grado}-${item.carrera.id_carrera}`}
+                    value={`${item.id_grado}-${item.carrera.id_carrera}`}
                   >
                     {`Grado: ${item.grado.grado}, División: ${item.grado.division} - Carrera: ${item.carrera.carrera}`}
                   </option>

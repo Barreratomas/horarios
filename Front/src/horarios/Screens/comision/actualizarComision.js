@@ -3,17 +3,17 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
 const ActualizarComision = () => {
-  const usuario = sessionStorage.getItem('userType'); // Obtener el usuario del sessionStorage
-  const { comisionId } = useParams(); // Obtener ID de la comisión desde la URL
+  const usuario = sessionStorage.getItem('userType');
+  const { comisionId } = useParams();
   const [capacidad, setCapacidad] = useState('');
   const [materias, setMaterias] = useState([]);
   const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
-  const [detalles, setDetalles] = useState(''); // Detalle de actualización
+  const [detalles, setDetalles] = useState('');
   const [errors, setErrors] = useState({});
   const [fetchError, setFetchError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();

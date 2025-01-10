@@ -43,27 +43,29 @@ class AlumnoGradoService implements AlumnoGradoRepository
     public function obtenerTodosAlumnoGradoConRelaciones()
     {
         try {
-            // Cargar los registros de AlumnoGrado con sus relaciones, incluida la carrera
-            $alumnosGrado = AlumnoGrado::with(['alumno', 'grado', 'alumno.alumno_carrera'])->get();
+            // Cargar los registros de AlumnoGrado con sus relaciones actualizadas
+            $alumnosGrado = AlumnoGrado::with(['alumno', 'carreraGrado.grado', 'carreraGrado.carrera'])->get();
 
             // Transformar los datos para estructurarlos correctamente
             $result = $alumnosGrado->map(function ($alumnoGrado) {
                 return [
                     'id_alumno' => $alumnoGrado->id_alumno,
-                    'id_grado' => $alumnoGrado->id_grado,
+                    'id_carrera_grado' => $alumnoGrado->id_carrera_grado,
                     'alumno' => $alumnoGrado->alumno ? [
                         'id_alumno' => $alumnoGrado->alumno->id_alumno,
                         'DNI' => $alumnoGrado->alumno->DNI,
                         'nombre' => $alumnoGrado->alumno->nombre,
                         'apellido' => $alumnoGrado->alumno->apellido,
-                        'carrera' => $alumnoGrado->alumno->alumno_carrera->first()->carrera->carrera ?? 'No asignada',
+                        'carrera' => $alumnoGrado->carreraGrado && $alumnoGrado->carreraGrado->carrera
+                            ? $alumnoGrado->carreraGrado->carrera->carrera
+                            : 'No asignada',
                     ] : null,
-                    'grado' => $alumnoGrado->grado ? [
-                        'id_grado' => $alumnoGrado->grado->id_grado,
-                        'grado' => $alumnoGrado->grado->grado,
-                        'division' => $alumnoGrado->grado->division,
-                        'detalle' => $alumnoGrado->grado->detalle,
-                        'capacidad' => $alumnoGrado->grado->capacidad,
+                    'grado' => $alumnoGrado->carreraGrado && $alumnoGrado->carreraGrado->grado ? [
+                        'id_grado' => $alumnoGrado->carreraGrado->grado->id_grado,
+                        'grado' => $alumnoGrado->carreraGrado->grado->grado,
+                        'division' => $alumnoGrado->carreraGrado->grado->division,
+                        'detalle' => $alumnoGrado->carreraGrado->grado->detalle,
+                        'capacidad' => $alumnoGrado->carreraGrado->capacidad,
                     ] : null,
                 ];
             });
@@ -103,9 +105,13 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'Hubo un error al obtener el alumnoGrado'], 500);
         }
     }
-    public function obtenerAlumnoGradoPorIdGrado($id_grado)
+
+
+
+
+    public function obtenerAlumnoGradoPorIdGrado($id_carrea_grado)
     {
-        $alumnoGrado = AlumnoGrado::where('id_grado', $id_grado)->get();
+        $alumnoGrado = AlumnoGrado::where('id_carrea_grado', $id_carrea_grado)->get();
         if (!$alumnoGrado) {
             return response()->json(['error' => 'AlumnoGrado no encontrado'], 404);
         }
@@ -116,16 +122,31 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'Hubo un error al obtener el alumnoGrado'], 500);
         }
     }
+    public function obtenerAlumnoGradoPorIdGradoCantidad($id_carrera_grado)
+    {
+        try {
+            // Contar directamente los registros de AlumnoGrado
+            $cantidadAlumnos = AlumnoGrado::where('id_carrera_grado', $id_carrera_grado)->count();
+
+            return response()->json(['cantidad' => $cantidadAlumnos], 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener la cantidad de alumnoGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener la cantidad de alumnoGrado'], 500);
+        }
+    }
 
 
-    public function guardarAlumnoGrado($id_alumno, $id_grado)
+    public function guardarAlumnoGrado($id_alumno, $id_carrera_grado)
     {
 
-        $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado);
-        $grado = $gradoResponse->getData();
-        $capacidad = $grado->capacidad;
+        $carreraGradoResponse = CarreraGrado::find($id_carrera_grado);
+        Log::info('carrera grado: ' . json_encode($carreraGradoResponse));
 
-        $alumnosGrados = $this->obtenerAlumnoGradoPorIdGrado($id_grado)->original;
+
+
+        $capacidad = $carreraGradoResponse->capacidad;
+
+        $alumnosGrados = $this->obtenerAlumnoGradoPorIdGradoCantidad($id_carrera_grado)->original;
         //Log::info('Alumnos en el grado: ' . $capacidad . ' ' . json_encode($alumnosGrados));
         //Log::info('Count:' . count($alumnosGrados->original));
 
@@ -133,7 +154,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
             return response()->json(['error' => 'El grado ya alcanzó su capacidad máxima'], 400);
         }
         try {
-            $alumnoGradoModel = $this->alumnoGradoMapper->toAlumnoGrado($id_alumno, $id_grado);
+            $alumnoGradoModel = $this->alumnoGradoMapper->toAlumnoGrado($id_alumno, $id_carrera_grado);
             $alumnoGradoModel->save();
             return response()->json($alumnoGradoModel, 201);
         } catch (Exception $e) {
@@ -147,7 +168,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
         try {
             // Verificar si el alumno está asignado al grado actual
             $alumnoGradoActual = AlumnoGrado::where('id_alumno', $id_alumno)
-                ->where('id_grado', $id_grado_actual)
+                ->where('id_carrera_grado', $id_grado_actual)
                 ->first();
 
             if (!$alumnoGradoActual) {
@@ -158,19 +179,23 @@ class AlumnoGradoService implements AlumnoGradoRepository
             $dniAlumno = $alumnoGradoActual->alumno->DNI;
 
             // obtener detalle grado actual
-            $gradoActual = $alumnoGradoActual->grado;
-            $detalleGradoActual = $gradoActual->detalle;
+            $gradoActual = $alumnoGradoActual->carreraGrado;
+            $detalleGradoActual = $gradoActual->grado->detalle;
 
             // Verificar la capacidad del nuevo grado
-            $gradoResponse = $this->gradoService->obtenerGradoPorId($id_grado_nuevo);
-            $gradoNuevo = $gradoResponse->getData();
-            $capacidad = $gradoNuevo->capacidad;
+            $carreraGradoResponse = CarreraGrado::where('id_carrera_grado', $id_grado_nuevo)->first();
+
+            if (!$carreraGradoResponse) {
+                return response()->json(['error' => 'Nuevo grado no encontrado'], 404);
+            }
+
+            $capacidad = $carreraGradoResponse->capacidad;
 
             // obtener detalle grado nuevo
-            $detalleGradoNuevo = $gradoNuevo->detalle;
+            $detalleGradoNuevo = $carreraGradoResponse->grado->detalle;
 
             // Verificar si el nuevo grado ya alcanzó su capacidad
-            $alumnosEnNuevoGrado = AlumnoGrado::where('id_grado', $id_grado_nuevo)->count();
+            $alumnosEnNuevoGrado = AlumnoGrado::where('id_carrera_grado', $id_grado_nuevo)->count();
 
             if ($alumnosEnNuevoGrado >= $capacidad) {
                 return response()->json(['error' => 'El nuevo grado ya alcanzó su capacidad máxima'], 400);
@@ -178,8 +203,8 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
             // Actualizar el grado del alumno usando update con where
             $updated = AlumnoGrado::where('id_alumno', $id_alumno)
-                ->where('id_grado', $id_grado_actual)
-                ->update(['id_grado' => $id_grado_nuevo]);
+                ->where('id_carrera_grado', $id_grado_actual)
+                ->update(['id_carrera_grado' => $id_grado_nuevo]);
 
             if ($updated) {
                 return response()->json([
@@ -199,20 +224,20 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
 
 
-    public function eliminarAlumnoGrado($id_alumno, $id_grado)
+    public function eliminarAlumnoGrado($id_alumno, $id_carrera_grado)
     {
         try {
-            $alumnoGrado = AlumnoGrado::with(['alumno', 'grado'])
+            $alumnoGrado = AlumnoGrado::with(['alumno', 'carreraGrado'])
                 ->where('id_alumno', $id_alumno)
-                ->where('id_grado', $id_grado)
+                ->where('id_carrera_grado', $id_carrera_grado)
                 ->first();
 
             $dniAlumno = $alumnoGrado->alumno->DNI ?? 'N/A';
-            $detalleGrado = $alumnoGrado->grado->detalle ?? 'N/A';
+            $detalleGrado = $alumnoGrado->carreraGrado->grado->detalle ?? 'N/A';
 
             // Intentar eliminar el registro con la clave compuesta
             $deletedCount = AlumnoGrado::where('id_alumno', $id_alumno)
-                ->where('id_grado', $id_grado)
+                ->where('id_carrera_grado', $id_carrera_grado)
                 ->delete();
 
             // Verificar si se eliminó algún registro

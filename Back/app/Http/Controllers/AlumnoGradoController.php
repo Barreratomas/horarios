@@ -203,6 +203,7 @@ class AlumnoGradoController extends Controller
             $alumnoGradoResponse = $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno, $id_grado);
 
             $alumnoGrado = $alumnoGradoResponse->getData();
+            Log::info(json_encode($alumnoGrado));
             $dniAlumno = $alumnoGrado->dni_alumno;
             $nombreGrado = $alumnoGrado->detalle_grado;
 
@@ -245,53 +246,53 @@ class AlumnoGradoController extends Controller
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
-        
+
         // Iniciar transacción
         DB::beginTransaction();
-    
+
         try {
-           
-    
+
+
             $alumnoGradoResponse = $this->alumnoGradoService->actualizarAlumnoGrado($id_alumno, $id_grado_actual, $id_grado);
-            
+
             // Verificación de respuesta
             if (!$alumnoGradoResponse || !$alumnoGradoResponse->getData()) {
                 Log::error("Error: La respuesta de la actualización del grado es nula o vacía para el alumno con ID $id_alumno.");
                 throw new \Exception('Error al obtener los datos del alumno y los grados.');
             }
-    
+
             $alumnoGrado = $alumnoGradoResponse->getData();
             $dniAlumno = $alumnoGrado->dni_alumno;
             $gradoActual = $alumnoGrado->detalle_grado_actual;
             $gradoNuevo = $alumnoGrado->detalle_grado_nuevo;
-    
+
             // Verificar si los valores obtenidos son válidos
             if (!isset($dniAlumno) || !isset($gradoActual) || !isset($gradoNuevo)) {
                 Log::error("Error: No se pudieron obtener los detalles necesarios. DNI: $dniAlumno, Grado Actual: $gradoActual, Grado Nuevo: $gradoNuevo.");
                 throw new \Exception('No se pudo obtener el nombre del alumno del grado.');
             }
-    
-           
-    
+
+
+
             $accion = "Actualización del alumno de dni " . $dniAlumno . " de " . $gradoActual . "(id: " . $id_grado_actual . ")" . " hacia " . $gradoNuevo . "(id:" . $id_grado . ")";
-    
+
             // Guardar log de modificación
             $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
-    
+
             // Commit de la transacción
             DB::commit();
-            
-          
+
+
             return response()->json([
                 'message' => 'Grado del alumno actualizado correctamente.'
             ], 200);
         } catch (\Exception $e) {
             // Rollback de la transacción
             DB::rollBack();
-            
+
             // Log del error
             Log::error("Error al actualizar el grado del alumno. Excepción: " . $e->getMessage());
-            
+
             return response()->json([
                 'error' => 'Hubo un problema al eliminar al alumno del grado: ' . $e->getMessage()
             ], 500);

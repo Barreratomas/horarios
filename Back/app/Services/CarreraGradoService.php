@@ -127,7 +127,7 @@ class CarreraGradoService implements CarreraGradoRepository
     {
         try {
 
-            $carreraGrado = CarreraGrado::with(['carrera', 'grado'])
+            $carreraGrado = CarreraGrado::with(['grado'])
                 ->where('id_carrera', $id_carrera)
                 ->get();
 
@@ -239,6 +239,12 @@ class CarreraGradoService implements CarreraGradoRepository
             return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
         }
         try {
+            // Eliminar relaciones dependientes
+            $carreraGrado->alumno_grado()->delete();
+            $carreraGrado->grado_uc()->delete();
+            $carreraGrado->disponibilidad()->delete();
+
+            // Eliminar CarreraGrado
             $carreraGrado->delete();
             return response()->json($carreraGrado, 200);
         } catch (Exception $e) {

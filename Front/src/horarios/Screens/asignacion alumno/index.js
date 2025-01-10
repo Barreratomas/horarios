@@ -46,6 +46,7 @@ const AsignacionAlumno = () => {
         if (!response.ok) throw new Error('Error al obtener los alumnos');
 
         const data = await response.json();
+        console.log(data);
         setAlumnos(data);
         setFilteredAlumnos(data);
         setServerUp(true);
@@ -165,11 +166,14 @@ const AsignacionAlumno = () => {
     },
     {
       name: 'Grado',
-      selector: (row) => `${row.grado.grado}° ${row.grado.division} (${row.grado.detalle})`
+      selector: (row) =>
+        row.grado
+          ? `${row.grado.grado}° ${row.grado.division} (${row.grado.detalle})`
+          : 'No asignado'
     },
     {
       name: 'Carrera',
-      selector: (row) => row.alumno.carrera
+      selector: (row) => row.alumno?.carrera || 'No asignada'
     },
     {
       name: 'Acciones',
@@ -180,7 +184,7 @@ const AsignacionAlumno = () => {
             onClick={() => {
               const url = `${routes.base}/${routes.asignacionesAlumno.actualizar(
                 row.id_alumno,
-                row.grado.id_grado
+                row.id_carrera_grado
               )}`;
               navigate(url);
             }}
@@ -191,7 +195,7 @@ const AsignacionAlumno = () => {
             className="btn btn-danger"
             onClick={() => {
               setAlumnoToDelete(row.id_alumno);
-              setGradoToDelete(row.grado.id_grado);
+              setGradoToDelete(row.id_carrera_grado);
               setShowModal(true);
             }}
           >
