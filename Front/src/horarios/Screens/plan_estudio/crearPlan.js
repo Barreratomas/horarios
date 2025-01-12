@@ -177,6 +177,15 @@ const CrearPlan = () => {
             <button type="submit" className="btn btn-primary me-2">
               Crear
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>

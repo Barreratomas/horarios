@@ -152,6 +152,15 @@ const ActualizarAsignarAlumno = () => {
             <button type="submit" className="btn btn-primary mt-3">
               {isSubmitting ? 'Actualizando...' : 'Actualizar asignación'}
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>
