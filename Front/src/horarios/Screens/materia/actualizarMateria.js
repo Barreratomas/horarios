@@ -4,6 +4,7 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 
 const ActualizarMateria = () => {
   const usuario = sessionStorage.getItem('userType');
+  console.log(usuario);
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');

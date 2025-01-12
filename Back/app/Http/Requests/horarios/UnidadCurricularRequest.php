@@ -24,6 +24,9 @@ class UnidadCurricularRequest extends FormRequest
      */
     public function rules(): array
     {
+
+
+
         $esCreacion = $this->isMethod('post');
         $logsRequest = new LogsRequest();
 
@@ -31,17 +34,15 @@ class UnidadCurricularRequest extends FormRequest
         $logsRules = $logsRequest->rules($esCreacion);
 
         // Definir reglas de validación para UnidadCurricular
-        $unidadCurricularRules = $esCreacion ? ['required', 'string', 'max:60', Rule::unique('unidad_curricular')] : ['nullable', 'string', 'max:60', Rule::unique('unidad_curricular')];
+        $unidadCurricularRules = $esCreacion ? ['required', 'string', 'max:60', Rule::unique('unidad_curricular')]  : ['nullable', 'string', 'max:60', Rule::unique('unidad_curricular')->ignore($this->route('id'), 'id_uc')];
         $tipoRules = $esCreacion ? ['required', 'string', 'max:20'] : ['nullable', 'string', 'max:20'];
         $horasSemRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $horasAnualRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
         $formatoRules = $esCreacion ? ['required', 'string', 'max:20'] : ['nullable', 'string', 'max:20'];
 
-        // Logueamos el valor de esCreacion
         Log::info('Método de solicitud: ' . $this->getMethod());
         Log::info('Es una creación (POST): ' . ($esCreacion ? 'Sí' : 'No'));
 
-        // Logueamos los valores de las variables
         Log::info('Valor de unidad_curricular: ' . $this->unidad_curricular);
         Log::info('Valor de tipo: ' . $this->tipo);
         Log::info('Valor de horas_sem: ' . $this->horas_sem);
