@@ -14,9 +14,7 @@ class HorarioMapper
             'modulo_fin' => $horarioData['modulo_fin'],
             'modalidad' => $horarioData['modalidad'],
             'id_disp' => $horarioData['id_disp'],
-            'id_uc' => $horarioData['id_uc'],
-            'id_aula' => $horarioData['id_aula'],
-            'id_grado' => $horarioData['id_grado']
+
         ]);
     }
 }

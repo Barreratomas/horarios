@@ -28,6 +28,7 @@ class DisponibilidadController extends Controller
 {
     protected $disponibilidadService;
 
+
     public function __construct(DisponibilidadService $disponibilidadService)
     {
         $this->disponibilidadService = $disponibilidadService;
@@ -58,12 +59,12 @@ class DisponibilidadController extends Controller
         try {
 
             $grados = Grado::all();
-            $carrerasGrados = CarreraGrado::all(); 
+            $carrerasGrados = CarreraGrado::all();
 
             // recorrer solo los grado en bucle
             $asignados = 0; // Contador para asignaciones exitosas
             $noAsignados = 0; // Contador para asignaciones no realizadas   
-                 
+
             foreach ($carrerasGrados as $carreraGrado) {
                 // obtener todas las materias de $gradp
                 $materias = DB::table('carrera_grado')
@@ -74,7 +75,7 @@ class DisponibilidadController extends Controller
                         'unidad_curricular.formato',
                         'unidad_curricular.horas_sem'
                     )
-                    ->where('carrera_grado.id_carrera_grado', '=', $carreraGrado->id_carrera_grado) 
+                    ->where('carrera_grado.id_carrera_grado', '=', $carreraGrado->id_carrera_grado)
                     ->get();
 
 
@@ -91,7 +92,7 @@ class DisponibilidadController extends Controller
                         )
                         ->where('unidad_curricular.id_uc', '=', $materia->id_uc)  // Filtrar por la materia actual
                         ->get();
-                        
+
                     Log::info("- docentes: {$docentes} ");
 
                     foreach ($docentes as $docente) {
@@ -138,12 +139,12 @@ class DisponibilidadController extends Controller
                     }
                 }
             }
-            // Loguear los resultados
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-            Log::info("Total asignados: $asignados");
-            Log::info("Total no asignados: $noAsignados");
+
+
+
             DB::commit();
             return response()->json([
                 'status' => 'success',
@@ -158,7 +159,7 @@ class DisponibilidadController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Se produjo un error al crear los horarios',
- 
+
             ], 200);
         }
     }

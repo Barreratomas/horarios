@@ -48,67 +48,35 @@ class HorarioService implements HorarioRepository
         }
     }
 
-    public function guardarHorarios($request)
+    public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp)
     {
-
-        Log::info('Iniciando la creación de un nuevo horario.');
-
-        // Obtener relaciones de las tablas relacionadas
-        $grado = Grado::find($request->id_grado);
-        $aula = Aula::find($request->id_aula);
-        $uc = UnidadCurricular::find($request->id_uc);
-        $disponibilidad = Disponibilidad::find($request->id_disp);
-
-        // Verificar si las relaciones existen
-        if (!$grado || !$aula || !$uc || !$disponibilidad) {
-            Log::warning('Una o más relaciones no existen: grado, aula, unidad curricular o disponibilidad no encontrados.');
-            return response()->json(['error' => 'Una o más relaciones no existen'], 400);
-        }
-
-
-        Log::info('Relaciones encontradas: Grado: ' . $grado->id_grado . ', Aula: ' . $aula->id_aula . ', Unidad Curricular: ' . $uc->id_uc . ', Disponibilidad: ' . $disponibilidad->id_disp);
-
-        // Verificar que no haya restricciones
         try {
+            // los datos para el mapper
+            $horarioData = [
+                'dia' => $dia,
+                'modulo_inicio' => $modulo_inicio,
+                'modulo_fin' => $modulo_fin,
+                'modalidad' => "p", // hay que hacer la modalidad dinamica
+                'id_disp' => $id_disp,
+            ];
 
-            Log::info('Validando conflictos de horarios en el aula: ' . $aula->id_aula . ', día: ' . $request->dia);
+            $horario = HorarioMapper::toHorario($horarioData);
 
-            // Validar para evitar conflictos de horarios en un aula
-            $aulaConflictos = Horario::where('id_aula', $aula->id_aula)
-                ->where('dia', $request->dia)
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('modulo_inicio', [$request->modulo_inicio, $request->modulo_fin])
-                        ->orWhereBetween('modulo_fin', [$request->modulo_inicio, $request->modulo_fin]);
-                })
-                ->exists();
-
-            if ($aulaConflictos) {
-                Log::warning('Conflicto de horario detectado en el aula ' . $aula->id_aula . ' para el día ' . $request->dia);
-                return response()->json(['error' => 'El aula ya tiene un horario en conflicto'], 400);
+            if ($horario->save()) {
+                return response()->json([
+                    'status' => 'success',
+                ], 201);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error al guardar el horario'
+                ], 500);
             }
-
-            // Validar disponibilidad del docente
-            Log::info('Validando disponibilidad del docente con id_disp: ' . $disponibilidad->id_disp);
-
-            if (
-                $disponibilidad->dia !== $request->dia ||
-                $disponibilidad->modulo_inicio > $request->modulo_inicio ||
-                $disponibilidad->modulo_fin < $request->modulo_fin
-            ) {
-                Log::warning('El docente no está disponible en el horario indicado. Disponibilidad: ' . json_encode($disponibilidad));
-                return response()->json(['error' => 'El docente no está disponible en el horario indicado'], 400);
-            }
-
-            // Crear el nuevo horario
-            $horarioModel = $this->horarioMapper->toHorario($request->validated());
-            $horarioModel->save();
-
-            Log::info('Horario creado exitosamente: ' . json_encode($horarioModel));
-
-            return response()->json($horarioModel, 201);
-        } catch (Exception $e) {
-            Log::error('Error al guardar el horario: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al guardar el horario'], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

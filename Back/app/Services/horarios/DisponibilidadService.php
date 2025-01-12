@@ -17,14 +17,18 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\horarios\HorarioService;
 
 class DisponibilidadService implements DisponibilidadRepository
 {
     protected $disponibilidadMapper;
+    protected $horarioService;
 
-    public function __construct(DisponibilidadMapper $disponibilidadMapper)
+
+    public function __construct(DisponibilidadMapper $disponibilidadMapper,  HorarioService $horarioService)
     {
         $this->disponibilidadMapper = $disponibilidadMapper;
+        $this->horarioService = $horarioService;
     }
 
 
@@ -114,13 +118,13 @@ class DisponibilidadService implements DisponibilidadRepository
             'moduloPrevio' => $moduloPrevio,
             'diaInstituto' => $diaInstituto,
         ]);
-        $modulos_semanales_o=$modulos_semanales;
+        $modulos_semanales_o = $modulos_semanales;
 
         $diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
         $responses = []; // Inicializar arreglo para almacenar respuestas
         $seAsignoModulo = false; // Bandera para verificar si hubo algún módulo asignado
-    
+
 
         // Determinar el índice de inicio según diaInstituto
         $indiceDiaInstituto = $diaInstituto ? array_search($diaInstituto, $diasSemana) : 0;
@@ -141,7 +145,7 @@ class DisponibilidadService implements DisponibilidadRepository
         $maxModulosPorDia = 3;
 
         while ($modulos_semanales > 0) {
-            
+
             $dia = $diasSemana[$contadorDia];
             Log::info("Procesando día {$dia}");
 
@@ -162,7 +166,7 @@ class DisponibilidadService implements DisponibilidadRepository
                 }
 
                 // Verificar disponibilidad en la base de datos
-                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales,$modulos_semanales_o);
+                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o);
                 Log::info("Procesando dis");
 
                 // Si están disponibles, asignar los módulos y descontar los módulos semanales
@@ -188,7 +192,12 @@ class DisponibilidadService implements DisponibilidadRepository
                         'modulo_fin' => $fin,
                     ];
                     $response = $this->guardarDisponibilidad($params);
-                    $responses[] = $response; // Agregar respuesta al arreglo
+                    if ($response->getStatusCode() == 201) {
+                        $id_disp = $response->getData()->id;
+
+                        $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp);
+                    }
+                    $responses[] = $response;
 
                     // Descontar los módulos asignados
                     $modulos_semanales -= count($modulosAsignados);
@@ -202,7 +211,7 @@ class DisponibilidadService implements DisponibilidadRepository
                     }
 
                     $asignado = true; // Se logró asignar módulo
-                    $seAsignoModulo = true; 
+                    $seAsignoModulo = true;
 
                     break; // Salir del bucle si se asignó correctamente
                 } else {
@@ -245,7 +254,7 @@ class DisponibilidadService implements DisponibilidadRepository
 
 
 
-    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales,$modulos_semanales_o)
+    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o)
     {
         // Calcular el rango de módulos que se intentan asignar
 
@@ -378,51 +387,53 @@ class DisponibilidadService implements DisponibilidadRepository
 
                 return response()->json([
                     'status' => 'success',
+                    'id' => $disponibilidad->id_disp,
+
                 ], 201);
             } else {
                 return response()->json([
                     'status' => 'error',
-                ], 500); 
+                ], 500);
             }
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error'   
+                'status' => 'error'
             ], 500);
         }
     }
 
 
 
-    public function verificarModulosDiaIndividual($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_grado, $id_uc, $modulos_semanales,$modulos_semanales_o,$id_aula)
+    public function verificarModulosDiaIndividual($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $id_aula)
     {
-                // Calcular el rango de módulos que se intentan asignar
-                $modulosPorAsignar = range($modulo_inicio, $modulo_fin);
-                // Consultar la base de datos para obtener todos los módulos ya asignados de lunes a viernes
-                $modulosAsignados = DB::table('disponibilidad')
-                    ->where('id_uc', $id_uc)
-                    ->where('id_grado', $id_grado)
-                    ->whereIn('dia', ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'])
-                    ->get(['modulo_inicio', 'modulo_fin']);
-        
-                $totalModulosAsignados = 0;
-        
-                // Calcular el número total de módulos asignados en la semana
-                foreach ($modulosAsignados as $modulo) {
-                    $inicio = (int)$modulo->modulo_inicio;
-                    $fin = (int)$modulo->modulo_fin;
-                    $totalModulosAsignados += $fin - $inicio + 1;
-                }
-        
-                // Calcular los nuevos módulos que se sumarían
-                $modulosNuevos = count($modulosPorAsignar);
-        
-                // Verificar si el total excede los módulos semanales permitidos
-                if ($totalModulosAsignados + $modulosNuevos > $modulos_semanales_o) {
-                    Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} sin espcio en modulos semanales");
-                    return false; // No es posible asignar más módulos
-                } else {
-                    Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} tiene modulos disponibles semanales.");
-                }
+        // Calcular el rango de módulos que se intentan asignar
+        $modulosPorAsignar = range($modulo_inicio, $modulo_fin);
+        // Consultar la base de datos para obtener todos los módulos ya asignados de lunes a viernes
+        $modulosAsignados = DB::table('disponibilidad')
+            ->where('id_uc', $id_uc)
+            ->where('id_grado', $id_grado)
+            ->whereIn('dia', ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'])
+            ->get(['modulo_inicio', 'modulo_fin']);
+
+        $totalModulosAsignados = 0;
+
+        // Calcular el número total de módulos asignados en la semana
+        foreach ($modulosAsignados as $modulo) {
+            $inicio = (int)$modulo->modulo_inicio;
+            $fin = (int)$modulo->modulo_fin;
+            $totalModulosAsignados += $fin - $inicio + 1;
+        }
+
+        // Calcular los nuevos módulos que se sumarían
+        $modulosNuevos = count($modulosPorAsignar);
+
+        // Verificar si el total excede los módulos semanales permitidos
+        if ($totalModulosAsignados + $modulosNuevos > $modulos_semanales_o) {
+            Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} sin espcio en modulos semanales");
+            return false; // No es posible asignar más módulos
+        } else {
+            Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} tiene modulos disponibles semanales.");
+        }
 
         // Verificar si el docente está asignado en el rango de módulos
         $disponibilidadDocente = DB::table('disponibilidad')
