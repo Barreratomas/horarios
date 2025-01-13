@@ -71,6 +71,20 @@ class HorarioController extends Controller
         return $this->horarioService->obtenerHorarioPorId($id);
     }
 
+
+
+
+
+
+    public function mostrarPorCarreraGrado($id)
+    {
+        return $this->horarioService->obtenerHorarioPorCarreraGrado($id);
+    }
+
+    public function mostrarPorDocente($id)
+    {
+        return $this->horarioService->obtenerHorarioPorDocente($id);
+    }
     /**
      * @OA\Post(
      *     path="/horarios",
@@ -171,7 +185,7 @@ class HorarioController extends Controller
 
 
 
- //-----------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------
     // Swagger
 
 
@@ -197,7 +211,7 @@ class HorarioController extends Controller
      */
     public function obtenerTodosHorariosSwagger()
     {
-       return $this->horarioService->obtenerTodosHorariosSwagger();
+        return $this->horarioService->obtenerTodosHorariosSwagger();
     }
 
 
@@ -333,5 +347,4 @@ class HorarioController extends Controller
     {
         return $this->horarioService->eliminarHorariosSwagger($id);
     }
-
 }

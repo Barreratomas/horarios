@@ -128,6 +128,8 @@ Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadControll
 // horario
 Route::get('/horarios/horarios', [HorarioController::class, 'index']);
 Route::get('/horarios/horarios/{id}', [HorarioController::class, 'show']);
+Route::get('/horarios/horariosPorCarreraGrado/{id}', [HorarioController::class, 'mostrarPorCarreraGrado']);
+Route::get('/horarios/horariosPorDocente/{id}', [HorarioController::class, 'mostrarPorDocente']);
 Route::post('/horarios/horarios/guardar', [HorarioController::class, 'store']);
 Route::put('/horarios/horarios/actualizar/{id}', [HorarioController::class, 'update']);
 Route::delete('/horarios/horarios/eliminar/{id}', [HorarioController::class, 'destroy']);

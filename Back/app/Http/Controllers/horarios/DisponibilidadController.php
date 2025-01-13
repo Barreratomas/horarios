@@ -80,9 +80,8 @@ class DisponibilidadController extends Controller
 
 
 
-
                 foreach ($materias as $materia) {
-                    Log::info("- id de materia: {$materia->id_uc} (Formato: {$materia->formato}, Horas: {$materia->horas_sem})");
+                    // Log::info("- id de materia: {$materia->id_uc} (Formato: {$materia->formato}, Horas: {$materia->horas_sem})");
                     // obtener los docentes que tengan materia
                     $docentes = DB::table('unidad_curricular')
                         ->join('docente_uc', 'unidad_curricular.id_uc', '=', 'docente_uc.id_uc')
@@ -93,21 +92,21 @@ class DisponibilidadController extends Controller
                         ->where('unidad_curricular.id_uc', '=', $materia->id_uc)  // Filtrar por la materia actual
                         ->get();
 
-                    Log::info("- docentes: {$docentes} ");
+                    // Log::info("- docentes: {$docentes} ");
 
                     foreach ($docentes as $docente) {
                         // verificar si el docente tiene horarios previos
                         $horariosPrevios = DB::table('horario_previo_docente')
                             ->where('id_docente', $docente->id_docente)
                             ->get();  // Devuelve una colección con todos los campos
-                        Log::info("- entro horarios  $horariosPrevios");
+                        // Log::info("- entro horarios  $horariosPrevios");
 
                         if (is_array($horariosPrevios) && !empty($horariosPrevios)) {
                             //se asigna el modulo de inicio dependiendo la hora previa del docente 
                             foreach ($horariosPrevios as $previo) {
 
                                 $horaPrevia = $this->disponibilidadService->horaPrevia($previo->hora);
-                                Log::info("- hora previa: {$horaPrevia} ");
+                                // Log::info("- hora previa: {$horaPrevia} ");
 
                                 // llamar a modulosRepartidos
                                 $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);

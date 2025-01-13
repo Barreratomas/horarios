@@ -39,7 +39,7 @@ const ActualizarAula = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setShowModal(true); // Mostrar el modal de confirmación
+    setShowModal(true);
   };
 
   const handleConfirmUpdate = async () => {

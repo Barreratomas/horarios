@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import Tabla from '../layouts/parcials/table';
-import FormularioHoraio from '../layouts/parcials/formularioHorario';
+import TablaHorario from '../layouts/parcials/table';
+import FormularioHorario from '../layouts/parcials/formularioHorario';
 
 const Horario = () => {
   const [comisiones, setComisiones] = useState([]);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [comision, setComision] = useState('');
 
-  const fetchHorarios = async () => {
-    console.log(comision);
+  const fetchHorarios = async (comisionSeleccionada) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://127.0.0.1:8000/api/horarios/horarios/${comision}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/horariosPorCarreraGrado/${comisionSeleccionada}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
       const data = await response.json();
 
       if (!response.ok) {
@@ -26,7 +27,6 @@ const Horario = () => {
       } else {
         setHorarios(data);
         setError('');
-        console.log(data);
       }
     } catch (error) {
       setError('No se pudo cargar los horarios');
@@ -39,12 +39,12 @@ const Horario = () => {
   useEffect(() => {
     const fetchComisiones = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados'); // Reemplaza con la URL correcta
+        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados');
         if (!response.ok) {
           throw new Error('Error al cargar las comisiones');
         }
         const data = await response.json();
-        setComisiones(data); // Establece las comisiones en el estado
+        setComisiones(data);
         setError('');
       } catch (error) {
         setError('No se pudo cargar las comisiones');
@@ -57,8 +57,7 @@ const Horario = () => {
   }, []);
 
   const handleComisionSeleccionada = (comisionSeleccionada) => {
-    setComision(comisionSeleccionada);
-    fetchHorarios();
+    fetchHorarios(comisionSeleccionada);
   };
 
   if (loading) {
@@ -71,12 +70,12 @@ const Horario = () => {
 
   return (
     <div className="container">
-      <FormularioHoraio
+      <FormularioHorario
         comisiones={comisiones}
         onComisionSeleccionada={handleComisionSeleccionada}
       />
       <div className="row">
-        <Tabla horarios={horarios} />
+        <TablaHorario horarios={horarios} modo="alumno" />
       </div>
     </div>
   );

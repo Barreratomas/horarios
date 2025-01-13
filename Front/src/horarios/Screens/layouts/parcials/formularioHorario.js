@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
-const FormularioHoraio = ({ comisiones = [], onComisionSeleccionada }) => {
+const FormularioHorario = ({ comisiones = [], onComisionSeleccionada }) => {
   const [comisionSeleccionada, setComisionSeleccionada] = useState('');
   const [error, setError] = useState('');
-  // const [horario, setHorario] = useState(null);
-  console.log(comisiones);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -12,7 +10,6 @@ const FormularioHoraio = ({ comisiones = [], onComisionSeleccionada }) => {
     if (!comisionSeleccionada) {
       setError('Por favor selecciona una comisión');
     } else {
-      console.log(comisionSeleccionada);
       onComisionSeleccionada(comisionSeleccionada);
     }
   };
@@ -31,16 +28,16 @@ const FormularioHoraio = ({ comisiones = [], onComisionSeleccionada }) => {
                 className="form-select"
                 name="comision"
                 value={comisionSeleccionada}
-                onChange={(e) => setComisionSeleccionada(e.target.value)}
+                onChange={(e) => {
+                  setComisionSeleccionada(e.target.value);
+                  setError('');
+                }}
                 aria-label="Comisión"
               >
                 <option value="">Selecciona una comisión</option>
                 {comisiones.length > 0 ? (
-                  comisiones.map((comision, index) => (
-                    <option
-                      key={`${comision.grado.id_grado}-${index}`}
-                      value={comision.grado.id_grado}
-                    >
+                  comisiones.map((comision) => (
+                    <option key={comision.id_carrera_grado} value={comision.id_carrera_grado}>
                       {comision.grado.grado}°{comision.grado.division} | {comision.carrera.carrera}
                     </option>
                   ))
@@ -64,4 +61,4 @@ const FormularioHoraio = ({ comisiones = [], onComisionSeleccionada }) => {
   );
 };
 
-export default FormularioHoraio;
+export default FormularioHorario;

@@ -1,35 +1,11 @@
 import React, { useState } from 'react';
 
-const FormularioHorarioDocente = () => {
-  const [dni, setDni] = useState('');
-  const [error, setError] = useState('');
+const FormularioHorarioDocente = ({ docentes, onDocenteSeleccionado }) => {
+  const [docenteSeleccionado, setDocenteSeleccionado] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Validación simple del DNI (puedes ajustarla según tus necesidades)
-    if (!dni) {
-      setError('Por favor, ingrese el DNI del docente.');
-      return;
-    }
-
-    //  hacer una solicitud POST a la ruta correspondiente
-    // Ejemplo:
-    // fetch('/mostrarHorarioDocente', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // Asegúrate de incluir CSRF Token
-    //   },
-    //   body: JSON.stringify({ dni }),
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //   // Maneja la respuesta
-    // })
-    // .catch(error => {
-    //   console.error('Error:', error);
-    // });
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onDocenteSeleccionado(docenteSeleccionado);
   };
 
   return (
@@ -38,22 +14,36 @@ const FormularioHorarioDocente = () => {
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="dni" style={{ fontFamily: 'sans-serif' }}>
-                Ingrese el DNI del docente:
+              <label htmlFor="docente" style={{ fontFamily: 'sans-serif' }}>
+                Selecciona un docente:
               </label>
-              <input
-                type="number"
-                className="form-control"
-                name="dni"
-                id="dni"
-                value={dni}
-                onChange={(e) => setDni(e.target.value)}
-              />
-              {error && <div className="text-danger">{error}</div>}
+
+              <select
+                className="form-select"
+                name="docente"
+                value={docenteSeleccionado}
+                onChange={(e) => {
+                  setDocenteSeleccionado(e.target.value);
+                }}
+                aria-label="Docente"
+              >
+                <option value="">Selecciona un docente</option>
+                {docentes.length > 0 ? (
+                  docentes.map((docente) => (
+                    <option key={docente.id_docente} value={docente.id_docente}>
+                      {docente.nombre} {docente.apellido}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    No hay docentes disponibles
+                  </option>
+                )}
+              </select>
             </div>
 
             <button type="submit" className="btn btn-primary me-2">
-              Mostrar horarios
+              Mostrar Horarios
             </button>
           </form>
         </div>

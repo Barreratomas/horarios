@@ -26,13 +26,21 @@ class HorarioService implements HorarioRepository
     public function obtenerTodosHorarios()
     {
         try {
-            $horarios = Horario::all();
+            $horarios = Horario::with([
+                'disponibilidad.unidadCurricular',
+                'disponibilidad.docente',
+                'disponibilidad.aula',
+                'disponibilidad.carreraGrado.grado'
+            ])->get();
+
             return response()->json($horarios, 200);
         } catch (Exception $e) {
+
             Log::error('Error al obtener los horarios: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener los horarios'], 500);
         }
     }
+
 
     public function obtenerHorarioPorId($id)
     {
@@ -47,6 +55,60 @@ class HorarioService implements HorarioRepository
             return response()->json(['error' => 'Hubo un error al obtener el horario'], 500);
         }
     }
+
+
+    public function obtenerHorarioPorCarreraGrado($id)
+    {
+        try {
+            // Obtener los horarios con relaciones completas
+            $horarios = Horario::whereHas('disponibilidad', function ($query) use ($id) {
+                $query->where('id_carrera_grado', $id);
+            })
+                ->with([
+                    'disponibilidad.unidadCurricular',
+                    'disponibilidad.docente',
+                    'disponibilidad.aula',
+                    'disponibilidad.carreraGrado.grado'
+                ])
+                ->get();
+
+            if ($horarios->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron horarios para este grado'], 404);
+            }
+
+            return response()->json($horarios, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener los horarios: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener los horarios'], 500);
+        }
+    }
+
+    public function obtenerHorarioPorDocente($id)
+    {
+        try {
+            // Obtener los horarios con relaciones completas
+            $horarios = Horario::whereHas('disponibilidad', function ($query) use ($id) {
+                $query->where('id_docente', $id);
+            })
+                ->with([
+                    'disponibilidad.unidadCurricular',
+                    'disponibilidad.docente',
+                    'disponibilidad.aula',
+                    'disponibilidad.carreraGrado.grado'
+                ])
+                ->get();
+
+            if ($horarios->isEmpty()) {
+                return response()->json(['error' => 'No se encontraron horarios para este grado'], 404);
+            }
+
+            return response()->json($horarios, 200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener los horarios: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener los horarios'], 500);
+        }
+    }
+
 
     public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp)
     {
