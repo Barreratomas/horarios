@@ -226,7 +226,6 @@ const Comisiones = () => {
                   }}
                 >
                   <h5>Carrera: {carrera.carrera}</h5>
-                  <p>Cupo: {carrera.cupo}</p>
                   <p>Grado: {grado.grado}</p>
                   <p>División: {grado.division}</p>
                   <p>Detalle: {grado.detalle}</p>

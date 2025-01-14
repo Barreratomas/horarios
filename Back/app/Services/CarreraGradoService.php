@@ -168,10 +168,25 @@ class CarreraGradoService implements CarreraGradoRepository
     public function update($idCarreraGrado, $nuevaCapacidad)
     {
         try {
-            // Buscar el registro correspondiente con la relación grado
-            $carreraGrado = CarreraGrado::with('grado')->findOrFail($idCarreraGrado);
+            // Busca el registro correspondiente con la relación grado y carrera
+            $carreraGrado = CarreraGrado::with(['grado', 'carrera'])->findOrFail($idCarreraGrado);
 
-            // Actualizar la capacidad
+            // Obtiene el cupo total de la carrera
+            $cupoCarrera = $carreraGrado->carrera->cupo;
+
+            // Suma la capacidad existente en carrera_grado (excluyendo el registro actual)
+            $capacidadExistente = CarreraGrado::where('id_carrera', $carreraGrado->id_carrera)
+                ->where('id_carrera_grado', '!=', $idCarreraGrado)
+                ->sum('capacidad') ?? 0;
+
+            // Valida que la nueva capacidad no supere el cupo total
+            if (($capacidadExistente + $nuevaCapacidad) > $cupoCarrera) {
+                return response()->json([
+                    'error' => 'La capacidad actualizada supera el cupo total de la carrera.'
+                ], 400);
+            }
+
+            // Actualiza la capacidad
             $carreraGrado->capacidad = $nuevaCapacidad;
             $carreraGrado->save();
 
@@ -180,7 +195,7 @@ class CarreraGradoService implements CarreraGradoRepository
                 'nueva_capacidad' => $nuevaCapacidad
             ]);
 
-            // Preparar los datos para la respuesta
+            // Prepara los datos para la respuesta
             $gradoDetalles = $carreraGrado->grado;
 
             return response()->json([
@@ -209,6 +224,7 @@ class CarreraGradoService implements CarreraGradoRepository
     }
 
 
+
     public function guardarCarreraGrado($id_carrera, $id_grado, $capacidad)
     {
         $grado = $this->gradoService->obtenerGradoPorId($id_grado);
@@ -217,7 +233,20 @@ class CarreraGradoService implements CarreraGradoRepository
             return ['error' => 'No se encontró el grado o la carrera'];
         }
 
+
+
         try {
+
+            // Suma la capacidad de todos los grados ya asociados a la carrera
+            $capacidadExistente = CarreraGrado::where('id_carrera', $id_carrera)->sum('capacidad');
+
+            // Valida si la suma de capacidades más la nueva supera el cupo de la carrera
+            if (($capacidadExistente + $capacidad) > $carrera->cupo) {
+                return response()->json([
+                    'error' => 'No se puede asignar la capacidad. Supera el cupo total de la carrera.'
+                ], 400);
+            }
+
             $carreraGrado = $this->carreraGradoMapper->toCarreraGrado($id_carrera, $id_grado, $capacidad);
             $carreraGrado->save();
             return response()->json($carreraGrado, 201);
