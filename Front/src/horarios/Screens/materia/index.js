@@ -256,9 +256,8 @@ const Materias = () => {
               <Modal.Title>Confirmar eliminación</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>¿Estás seguro de que quieres eliminar esta materia?</p>
               <div className="form-group">
-                <label htmlFor="detalles">Detalles:</label>
+                <label htmlFor="detalles">Por favor, ingrese el motivo de eliminación:</label>
                 <textarea
                   id="detalles"
                   className="form-control"

@@ -182,7 +182,7 @@ const ActualizarAsignarAlumno = () => {
           <Modal.Title>Confirmar actualización</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <label htmlFor="detalles">Detalles:</label>
+          <label htmlFor="detalles">Por favor, ingrese el motivo de actualización:</label>
           <textarea
             name="detalles"
             value={detalles}

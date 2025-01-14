@@ -278,11 +278,9 @@ const Comisiones = () => {
 
           {/* Modal de confirmación */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>Confirmar eliminación</Modal.Title>
-            </Modal.Header>
+            <Modal.Header closeButton></Modal.Header>
             <Modal.Body>
-              <p>¿Estás seguro de que quieres eliminar este grado?</p>
+              <label htmlFor="detalles">Por favor, ingrese el motivo de eliminacion:</label>
               <div className="form-group">
                 <label htmlFor="detalles">Detalles:</label>
                 <textarea

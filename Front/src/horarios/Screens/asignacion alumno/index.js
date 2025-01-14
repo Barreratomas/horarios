@@ -261,9 +261,8 @@ const AsignacionAlumno = () => {
           <Modal.Title>Confirmar eliminación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>¿Estás seguro de que quieres eliminar el grado del alumno?</p>
           <div className="form-group">
-            <label htmlFor="detalles">Detalles:</label>
+            <label htmlFor="detalles">Por favor, ingrese el motivo de eliminacion:</label>
             <textarea
               id="detalles"
               className="form-control"
