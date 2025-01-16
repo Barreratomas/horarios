@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import '../../css/acordeon.css';
+import { useNotification } from '../layouts/parcials/notification';
 
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,24 +36,20 @@ const Comisiones = () => {
   const [serverUp, setServerUp] = useState(false);
   const [grados, setGrados] = useState([]);
   const [carreras, setCarreras] = useState([]);
-  const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [gradoToDelete, setGradoToDelete] = useState(null);
   const [detalles, setDetalles] = useState('');
 
-  useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+  const { addNotification } = useNotification();
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
+
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchGrados = async () => {
@@ -95,7 +92,6 @@ const Comisiones = () => {
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener grados:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
       } finally {
         setLoading(false);
       }
@@ -116,23 +112,18 @@ const Comisiones = () => {
       );
 
       if (!response.ok) throw new Error('Error al eliminar el grado');
-
+      const data = await response.json();
+      console.log('el grado ', data);
       setGrados(grados.filter((grado) => grado.id_carrera_grado !== gradoToDelete));
       setFilteredComisiones(
         filteredComisiones.filter((comision) => comision.id_carrera_grado !== gradoToDelete)
       );
-      setSuccessMessage('Grado eliminado correctamente');
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+      addNotification('Se eliminó el grado', 'success');
+
       setShowModal(false); // Cerrar el modal
     } catch (error) {
-      console.error('Error al eliminar grado:', error);
-      setErrors([error.message || 'Error al eliminar el grado']);
+      addNotification(error.message, 'danger');
     }
   };
 
@@ -249,11 +240,8 @@ const Comisiones = () => {
                     <button
                       type="button"
                       className="btn btn-primary me-2"
-                      onClick={
-                        () =>
-                          navigate(
-                            `${routes.base}/${routes.comisiones.actualizar(id_carrera_grado)}`
-                          ) // Cambiado a id_carrera_grado
+                      onClick={() =>
+                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_carrera_grado)}`)
                       }
                     >
                       Actualizar
@@ -261,7 +249,7 @@ const Comisiones = () => {
                     <button
                       className="btn btn-danger"
                       onClick={() => {
-                        setGradoToDelete(id_carrera_grado); // Cambiado a id_carrera_grado
+                        setGradoToDelete(id_carrera_grado);
                         setShowModal(true);
                       }}
                     >
@@ -300,22 +288,6 @@ const Comisiones = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
-          <div
-            id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`}
-          >
-            {errors.length > 0 && (
-              <div className="alert alert-danger">
-                <ul>
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          </div>
         </div>
       ) : (
         <p>No se pudo conectar al servidor.</p>

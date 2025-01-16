@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-import DataTable from 'react-data-table-component'; // Import DataTable component
-
+import DataTable from 'react-data-table-component';
+import { useNotification } from '../layouts/parcials/notification';
 const Aulas = () => {
   const [detalles, setDetalles] = useState('');
   const usuario = sessionStorage.getItem('userType');
@@ -21,24 +21,19 @@ const Aulas = () => {
     nombre: '',
     tipo: ''
   });
-  const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
+
+  const { addNotification } = useNotification();
 
   // Opciones para los selects
   const tipos = ['Normal', 'Laboratorio', 'Sum'];
 
   useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchAulas = async () => {
@@ -51,24 +46,26 @@ const Aulas = () => {
         if (!response.ok) throw new Error('Error al obtener aulas');
 
         const data = await response.json();
+
         console.log(data);
         setAulas(data);
         setFilteredAulas(data);
         setServerUp(true);
       } catch (error) {
-        console.error('Error al obtener aulas:', error);
+        console.log('Error al obtener aulas:', error.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchAulas();
-  }, [location.state, navigate, location.pathname]);
+  }, [location.state, location.pathname]);
 
   const handleDelete = async () => {
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/aulas/eliminar/${aulaToDelete}`,
+
         {
           method: 'DELETE',
           body: JSON.stringify({ detalles: detalles, usuario }),
@@ -77,20 +74,16 @@ const Aulas = () => {
       );
 
       if (!response.ok) throw new Error('Error al eliminar aula');
+      const data = await response.json();
 
       setAulas(aulas.filter((aula) => aula.id_aula !== aulaToDelete));
       setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== aulaToDelete));
-      setSuccessMessage('Aula eliminada correctamente');
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+      addNotification(data.message, 'success');
+
       setShowModal(false);
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar aula']);
+      addNotification(error.message, 'danger');
     }
   };
 
@@ -253,22 +246,6 @@ const Aulas = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
-          <div
-            id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`}
-          >
-            {errors.length > 0 && (
-              <div className="alert alert-danger">
-                <ul>
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          </div>
         </div>
       ) : (
         <h1>Este módulo no está disponible en este momento</h1>

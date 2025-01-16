@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
+import { useNotification } from '../layouts/parcials/notification';
 
 const AsignacionAlumno = () => {
   const [detalles, setDetalles] = useState('');
@@ -20,21 +21,16 @@ const AsignacionAlumno = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
-  const [errors, setErrors] = useState([]);
+
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     if (location.state?.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+      addNotification(location.state.successMessage, 'success');
 
-      setTimeout(() => setHideMessage(true), 3000);
-
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchAlumnos = async () => {
@@ -51,8 +47,7 @@ const AsignacionAlumno = () => {
         setFilteredAlumnos(data);
         setServerUp(true);
       } catch (error) {
-        console.error('Error al obtener los alumnos:', error);
-        setErrors([error.message || 'Error al conectar con el servidor...']);
+        console.log('Error al obtener aulas:', error.message);
       } finally {
         setLoading(false);
       }
@@ -86,27 +81,32 @@ const AsignacionAlumno = () => {
       );
 
       if (!response.ok) throw new Error('Error al eliminar la asignación');
+      const data = await response.json();
 
-      setAlumnos(alumnos.filter((alumno) => alumno.id_alumno !== alumnoToDelete));
-      setFilteredAlumnos(filteredAlumnos.filter((alumno) => alumno.id_alumno !== alumnoToDelete));
+      setAlumnos(
+        alumnos.filter(
+          (alumno) =>
+            !(alumno.id_alumno === alumnoToDelete && alumno.id_carrera_grado === gradoToDelete)
+        )
+      );
+      setFilteredAlumnos(
+        filteredAlumnos.filter(
+          (alumno) =>
+            !(alumno.id_alumno === alumnoToDelete && alumno.id_carrera_grado === gradoToDelete)
+        )
+      );
 
-      setSuccessMessage('Asignación eliminada correctamente');
+      addNotification(data.message, 'success');
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-      }, 3500);
-      setShowModal(false); // Cerrar el modal
+      setShowModal(false);
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar la asignación']);
+      addNotification(error.message, 'danger');
     }
   };
 
   const handleAssignIngresantes = async () => {
-    // Mostrar notificación al iniciar
-    setSuccessMessage('Comenzó el proceso de asignación de ingresantes');
-    setHideMessage(false);
+    addNotification('Comenzó el proceso de asignación de ingresantes', 'info');
+
     try {
       const response = await fetch(
         'http://127.0.0.1:8000/api/horarios/alumnoGrados/asignarIngresantes',
@@ -118,21 +118,19 @@ const AsignacionAlumno = () => {
 
       if (!response.ok) throw new Error('Error al asignar alumno');
 
-      const data = await response.json();
-      setSuccessMessage(data.message || 'Alumno asignado correctamente');
-      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, { replace: true });
+      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
+        state: {
+          successMessage: 'Los alumnos ingresantes fueron asignados a los grados con éxito',
+          updated: true
+        }
+      });
     } catch (error) {
-      setErrors([error.message || 'Error al asignar el alumno']);
-    } finally {
-      setTimeout(() => {
-        setHideMessage(true);
-        setSuccessMessage('');
-      }, 3500);
+      addNotification(error.message, 'danger');
     }
   };
   const handleAssignNoIngresantes = async () => {
-    setSuccessMessage('Comenzó el proceso de asignación de no ingresantes');
-    setHideMessage(false);
+    addNotification('Comenzó el proceso de asignación de no ingresantes', 'info');
+
     try {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnoGrados/asignar', {
         method: 'GET',
@@ -141,16 +139,16 @@ const AsignacionAlumno = () => {
 
       if (!response.ok) throw new Error('Error al asignar alumnos no ingresantes');
 
-      const data = await response.json();
-      setSuccessMessage(data.message || 'Alumnos no ingresantes asignados correctamente');
-      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, { replace: true });
+      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
+        state: {
+          successMessage: 'Los alumnos no ingresantes fueron asignados a los grados con éxito',
+          updated: true
+        }
+      });
     } catch (error) {
-      setErrors([error.message || 'Error al asignar alumnos no ingresantes']);
+      addNotification(error.message, 'danger');
     } finally {
-      setTimeout(() => {
-        setHideMessage(true);
-        setSuccessMessage('');
-      }, 3500);
+      console.log();
     }
   };
   const columns = [
@@ -215,7 +213,6 @@ const AsignacionAlumno = () => {
           <div className="row align-items-center justify-content-center">
             <div className="col-6 text-center">
               <div className="filter mb-2 d-flex flex-wrap align-items-center">
-                {/* Input ocupa el 70% del espacio */}
                 <input
                   type="text"
                   className="form-control mb-2 mb-md-0 me-md-2"
@@ -281,19 +278,6 @@ const AsignacionAlumno = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      <div id="messages-container" className={`container ${hideMessage ? 'hide-messages' : ''}`}>
-        {errors.length > 0 && (
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      </div>
     </>
   );
 };

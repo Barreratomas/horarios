@@ -6,12 +6,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../../css/menu.css';
 import { getRoutes } from '../../../Routes';
 
+import { useNotification } from './notification';
 const Menu = () => {
-  const routes = getRoutes(); // Llamada a la función para obtener las rutas
+  const routes = getRoutes();
 
   const [isCollapsed, setIsCollapsed] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation(); // Obtiene la ruta actual
+  const location = useLocation();
+  const { addNotification } = useNotification();
 
   // Maneja el toggle del menú
   const handleToggle = () => {
@@ -32,13 +34,14 @@ const Menu = () => {
       botonMenu.style.transition = '0.3s';
     }
   };
-  const isActive = (path) => location.pathname === path; // Verifica si la ruta coincide con la actual
+  const isActive = (path) => location.pathname === path;
+
   const crearDisponibilidades = async () => {
     try {
       const response = await fetch(
         'http://127.0.0.1:8000/api/horarios/disponibilidad/guardarDisponibilidades',
         {
-          method: 'GET', // Método GET
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json'
           }
@@ -49,17 +52,21 @@ const Menu = () => {
         throw new Error('Error al obtener los datos');
       }
 
-      const data = await response.json(); // Convertimos la respuesta en JSON
+      const data = await response.json();
 
-      // Verificamos el estado recibido en el JSON
+      console.log(data);
+
       if (data.status === 'success') {
-        console.log(data.message); // "Horarios creados con éxito"
-        console.log(`Asignados: ${data.data.asignados}, No asignados: ${data.data.noAsignados}`);
+        addNotification(data.message, 'success');
+        addNotification(
+          `Asignados: ${data.data.asignados}, No asignados: ${data.data.noAsignados}`,
+          'info'
+        );
       } else {
-        console.error('Ocurrió un error en el servidor:', data.message);
+        addNotification(data.errors, 'danger');
       }
     } catch (error) {
-      console.error('Error al crear disponibilidades:', error);
+      addNotification('Error al crear disponibilidades:', 'error');
     }
   };
 

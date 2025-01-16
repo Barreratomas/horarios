@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNotification } from '../layouts/parcials/notification';
 
 const CrearAsignacionAlumno = () => {
   const [alumnos, setAlumnos] = useState([]);
   const [grados, setGrados] = useState([]);
   const [dni, setDni] = useState('');
   const [grado, setGrado] = useState('');
-  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
+
+  const { addNotification } = useNotification();
 
   // Cargar alumnos desde la API
   const fetchAlumnos = async () => {
@@ -18,7 +20,7 @@ const CrearAsignacionAlumno = () => {
       const data = await response.json();
       setAlumnos(data);
     } catch (error) {
-      console.error('Error cargando alumnos:', error);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -30,7 +32,7 @@ const CrearAsignacionAlumno = () => {
       console.log(data);
       setGrados(data);
     } catch (error) {
-      console.error('Error cargando grados:', error);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -41,7 +43,6 @@ const CrearAsignacionAlumno = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});
     const [id_grado, id_carrera] = grado.split('-');
     console.log(`id_alumno: ${dni}, grado: ${id_grado}, carrera: ${id_carrera}`);
     try {
@@ -56,16 +57,16 @@ const CrearAsignacionAlumno = () => {
       );
       if (response.ok) {
         navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
-          state: { successMessage: 'Asignacion del alumno creada con éxito' }
+          state: { successMessage: 'El alumno fue asignado con éxito', updated: true }
         });
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors); // Manejar errores de validación
+          addNotification(data.errors, 'danger');
         }
       }
     } catch (error) {
-      console.error('Error creando la asignacion del alumno:', error);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -93,7 +94,6 @@ const CrearAsignacionAlumno = () => {
                   </option>
                 ))}
               </select>
-              {errors.dni && <div className="text-danger">{errors.dni}</div>}
             </div>
 
             {/* Selección de Grado y Carrera */}
@@ -118,7 +118,6 @@ const CrearAsignacionAlumno = () => {
                   </option>
                 ))}
               </select>
-              {errors.grado && <div className="text-danger">{errors.grado}</div>}
             </div>
             {/* Botón de Envío */}
             <button type="submit" className="btn btn-primary">
@@ -136,19 +135,6 @@ const CrearAsignacionAlumno = () => {
           </form>
         </div>
       </div>
-
-      {/* Mostrar Errores Globales */}
-      {Object.keys(errors).length > 0 && (
-        <div className="container mt-3" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

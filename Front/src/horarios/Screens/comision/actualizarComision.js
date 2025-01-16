@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { useNotification } from '../layouts/parcials/notification';
 
 const ActualizarComision = () => {
   const usuario = sessionStorage.getItem('userType');
@@ -9,14 +10,15 @@ const ActualizarComision = () => {
   const [materias, setMaterias] = useState([]);
   const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
   const [detalles, setDetalles] = useState('');
-  const [errors, setErrors] = useState({});
-  const [fetchError, setFetchError] = useState('');
+
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
+
+  const { addNotification } = useNotification();
 
   // Obtener los datos de la comisión existente
   useEffect(() => {
@@ -26,15 +28,14 @@ const ActualizarComision = () => {
           `http://127.0.0.1:8000/api/horarios/carreraGrados/${comisionId}`
         );
         const data = await response.json();
-        console.log(data);
         if (response.ok) {
           setCapacidad(data.capacidad);
           setMateriasSeleccionadas(data.materias || []);
         } else {
-          setFetchError('Error al obtener el grado.');
+          addNotification(data.errors, 'danger');
         }
       } catch (error) {
-        setFetchError('Error de red al intentar cargar los datos del grado.');
+        addNotification(`Error de conexión`, 'danger');
       } finally {
         setIsLoading(false);
       }
@@ -54,7 +55,7 @@ const ActualizarComision = () => {
         const gradoUCData = await gradoUCResponse.json();
 
         if (!gradoUCResponse.ok || !Array.isArray(gradoUCData)) {
-          console.log('No hay materias asociadas al grado o error en los datos.');
+          console.log('No hay materias asociadas ');
           setMateriasSeleccionadas([]); // Dejar materias seleccionadas vacías
         } else {
           // Extraer IDs de las materias asociadas al grado
@@ -72,7 +73,7 @@ const ActualizarComision = () => {
 
         setMaterias(materiasData);
       } catch (error) {
-        setFetchError(error.message || 'Error de red.');
+        addNotification(error.message || 'Error de conexión.', 'danger');
       } finally {
         setIsLoading(false);
       }
@@ -114,16 +115,16 @@ const ActualizarComision = () => {
 
       if (response.ok) {
         navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Comisión actualizada con éxito' }
+          state: { successMessage: 'Grado actualizado con éxito', updated: true }
         });
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors);
+          addNotification(data.errors, 'danger');
         }
       }
     } catch (error) {
-      setFetchError('Error al intentar actualizar la comisión.');
+      addNotification(`Error de conexión`, 'danger');
     } finally {
       setIsSubmitting(false); // Finalizar el proceso de envío
       setShowModal(false); // Cerrar el modal de confirmación
@@ -142,8 +143,6 @@ const ActualizarComision = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            {fetchError && <div className="alert alert-danger">{fetchError}</div>}
-
             <label htmlFor="capacidad">Capacidad</label>
             <input
               type="number"
@@ -186,16 +185,6 @@ const ActualizarComision = () => {
               Volver Atrás
             </button>
           </form>
-
-          {Object.keys(errors).length > 0 && (
-            <div className="alert alert-danger mt-3">
-              <ul>
-                {Object.values(errors).map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
 

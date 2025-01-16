@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { useNotification } from '../layouts/parcials/notification';
 
 const ActualizarAula = () => {
   const usuario = sessionStorage.getItem('userType');
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');
 
   const [nombre, setNombre] = useState('');
   const [tipoAula, setTipoAula] = useState('');
   const [capacidad, setCapacidad] = useState('');
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const { aulaId } = useParams();
+
+  const { addNotification } = useNotification();
 
   // Cargar los datos del aula para su visualización
   useEffect(() => {
     const fetchAula = async () => {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/horarios/aulas/${aulaId}`);
+        const data = await response.json();
+        console.log(data);
         if (response.ok) {
-          const data = await response.json();
           setNombre(data.nombre);
           setTipoAula(data.tipo_aula);
           setCapacidad(data.capacidad);
@@ -59,19 +62,19 @@ const ActualizarAula = () => {
 
       if (response.ok) {
         navigate(`${routes.base}/${routes.aulas.main}`, {
-          state: { successMessage: 'Aula actualizada con éxito' }
+          state: { successMessage: 'Aula actualizada con éxito', updated: true }
         });
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors);
+          addNotification(data.errors, 'danger');
         }
       }
     } catch (error) {
-      console.error('Error actualizando aula:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
-      setIsSubmitting(false); // Finalizar el proceso de envío
-      setShowModal(false); // Cerrar el modal de confirmación
+      setIsSubmitting(false);
+      setShowModal(false);
     }
   };
   // Cancelar la actualización
@@ -94,7 +97,6 @@ const ActualizarAula = () => {
             />
             <br />
             <br />
-            {errors.nombre && <div className="text-danger">{errors.nombre}</div>}
             <label htmlFor="tipo_aula">Ingrese el tipo de aula</label>
             <br />
             <input
@@ -105,7 +107,6 @@ const ActualizarAula = () => {
             />
             <br />
             <br />
-            {errors.tipo_aula && <div className="text-danger">{errors.tipo_aula}</div>}
             <label htmlFor="capacidad">Ingrese la capacidad</label>
             <br />
             <input
@@ -116,7 +117,6 @@ const ActualizarAula = () => {
             />
             <br />
             <br />
-            {errors.capacidad && <div className="text-danger">{errors.capacidad}</div>}
             <button type="submit" className="btn btn-primary mt-3">
               {isSubmitting ? 'Actualizando...' : 'Actualizar aula'}
             </button>
@@ -133,17 +133,6 @@ const ActualizarAula = () => {
         </div>
       </div>
 
-      {Object.keys(errors).length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>

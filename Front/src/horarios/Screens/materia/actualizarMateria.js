@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button, Spinner } from 'react-bootstrap';
-
+import { useNotification } from '../layouts/parcials/notification';
 const ActualizarMateria = () => {
   const usuario = sessionStorage.getItem('userType');
   console.log(usuario);
@@ -16,9 +16,9 @@ const ActualizarMateria = () => {
   const [horasSem, setHorasSem] = useState('');
   const [horasAnual, setHorasAnual] = useState('');
   const [formato, setFormato] = useState('');
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { routes } = useOutletContext();
+  const { addNotification } = useNotification();
 
   // Obtener los datos de la materia por ID
   useEffect(() => {
@@ -78,16 +78,16 @@ const ActualizarMateria = () => {
 
       if (response.ok) {
         navigate(`${routes.base}/${routes.materias.main}`, {
-          state: { successMessage: 'Materia actualizada con éxito' }
+          state: { successMessage: 'Materia actualizada con éxito', updated: true }
         });
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors);
+          addNotification(data.errors, 'danger');
         }
       }
     } catch (error) {
-      console.error('Error al actualizar la materia:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
       setIsSubmitting(false);
       setShowModal(false);
@@ -120,9 +120,7 @@ const ActualizarMateria = () => {
               onChange={(e) => setUnidadCurricular(e.target.value)}
               maxLength="60"
             />
-            {errors.unidad_curricular && (
-              <div className="text-danger">{errors.unidad_curricular}</div>
-            )}
+
             <br />
             <br />
 
@@ -135,7 +133,6 @@ const ActualizarMateria = () => {
               onChange={(e) => setTipo(e.target.value)}
               maxLength="20"
             />
-            {errors.tipo && <div className="text-danger">{errors.tipo}</div>}
             <br />
             <br />
 
@@ -147,7 +144,6 @@ const ActualizarMateria = () => {
               value={horasSem}
               onChange={(e) => setHorasSem(e.target.value)}
             />
-            {errors.horas_sem && <div className="text-danger">{errors.horas_sem}</div>}
             <br />
             <br />
 
@@ -159,7 +155,6 @@ const ActualizarMateria = () => {
               value={horasAnual}
               onChange={(e) => setHorasAnual(e.target.value)}
             />
-            {errors.horas_anual && <div className="text-danger">{errors.horas_anual}</div>}
             <br />
             <br />
 
@@ -171,7 +166,6 @@ const ActualizarMateria = () => {
               value={formato}
               onChange={(e) => setFormato(e.target.value)}
             />
-            {errors.formato && <div className="text-danger">{errors.formato}</div>}
             <br />
             <br />
 
@@ -190,18 +184,6 @@ const ActualizarMateria = () => {
           </form>
         </div>
       </div>
-
-      {Object.keys(errors).length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
 
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>

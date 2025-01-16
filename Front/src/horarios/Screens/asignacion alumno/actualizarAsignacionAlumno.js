@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { useNotification } from '../layouts/parcials/notification';
 
 const ActualizarAsignarAlumno = () => {
   const usuario = sessionStorage.getItem('userType');
@@ -13,9 +14,10 @@ const ActualizarAsignarAlumno = () => {
   const [grado, setGrado] = useState('');
   const [carreras, setCarreras] = useState([]);
   const [grados, setGrados] = useState([]);
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { routes } = useOutletContext();
+
+  const { addNotification } = useNotification();
 
   // Obtener las carreras disponibles
   useEffect(() => {
@@ -28,7 +30,7 @@ const ActualizarAsignarAlumno = () => {
         const carrerasData = await response.json();
         setCarreras(carrerasData);
       } catch (error) {
-        console.error('Error al obtener carreras:', error);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
@@ -50,7 +52,7 @@ const ActualizarAsignarAlumno = () => {
           console.log(gradosData);
           setGrados(gradosData);
         } catch (error) {
-          console.error('Error al obtener grados:', error);
+          addNotification(`Error de conexión`, 'danger');
         }
       };
 
@@ -79,16 +81,16 @@ const ActualizarAsignarAlumno = () => {
 
       if (response.ok) {
         navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
-          state: { successMessage: 'Alumno actualizado con éxito' }
+          state: { successMessage: 'El grado del alumno fue actualizado con éxito', updated: true }
         });
       } else {
         const data = await response.json();
         if (data.errors) {
-          setErrors(data.errors); // Mostrar errores de validación si los hay
+          addNotification(data.errors, 'danger');
         }
       }
     } catch (error) {
-      console.error('Error al actualizar el alumno:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
       setIsSubmitting(false); // Finalizar el proceso de envío
       setShowModal(false); // Cerrar el modal de confirmación
@@ -120,7 +122,6 @@ const ActualizarAsignarAlumno = () => {
               ))}
             </select>
             <br />
-            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
             <br />
 
             {/* Selector de Grado, solo se muestra después de seleccionar una carrera */}
@@ -144,7 +145,6 @@ const ActualizarAsignarAlumno = () => {
                 </select>
 
                 <br />
-                {errors.grado && <div className="text-danger">{errors.grado}</div>}
                 <br />
               </>
             )}
@@ -165,17 +165,6 @@ const ActualizarAsignarAlumno = () => {
         </div>
       </div>
 
-      {Object.keys(errors).length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>

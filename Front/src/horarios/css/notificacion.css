@@ -1,13 +1,13 @@
 #messages-container {
-    width: 30%;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.5s ease; /* Transición más rápida para suavizar */
+  width: 30%;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 }
 
 #messages-container.hide-messages {
-    opacity: 0; /* Ocultar el mensaje suavemente */
+  opacity: 0;
 }

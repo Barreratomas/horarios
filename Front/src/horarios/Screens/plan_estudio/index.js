@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import '../../css/acordeon.css';
 import { Modal, Button } from 'react-bootstrap';
-
+import { useNotification } from '../layouts/parcials/notification';
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -34,20 +34,18 @@ const Planes = () => {
   const [serverUp, setServerUp] = useState(false);
   const [planes, setPlanes] = useState([]);
   const [filteredPlanes, setFilteredPlanes] = useState([]);
-  const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
+
   const [filterText, setFilterText] = useState(''); // Nuevo estado para el texto de filtro
 
+  const { addNotification } = useNotification();
+
   useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
+
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchPlanes = async () => {
@@ -61,10 +59,10 @@ const Planes = () => {
 
         const data = await response.json();
         setPlanes(data);
-        setFilteredPlanes(data); // Inicializamos el estado de planes filtrados
+        setFilteredPlanes(data);
         setServerUp(true);
       } catch (error) {
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        console.log([error.message || 'Servidor fuera de servicio']);
       } finally {
         setLoading(false);
       }
@@ -74,7 +72,6 @@ const Planes = () => {
   }, [location.state, navigate, location.pathname]);
 
   useEffect(() => {
-    // Filtrar planes cuando el texto de filtro cambie
     if (filterText === '') {
       setFilteredPlanes(planes); // Si no hay texto de filtro, mostramos todos los planes
     } else {
@@ -99,19 +96,14 @@ const Planes = () => {
       );
 
       if (!response.ok) throw new Error('Error al eliminar el plan');
+      const data = await response.json();
 
       setPlanes(planes.filter((plan) => plan.id_plan !== planToDelete));
-      setSuccessMessage('Plan eliminado correctamente');
+      addNotification(data.message, 'success');
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
       setShowModal(false); // Cerrar el modal
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar el plan']);
+      addNotification(error.message, 'danger');
     }
   };
 
@@ -243,21 +235,6 @@ const Planes = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-          <div
-            id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`}
-          >
-            {errors.length > 0 && (
-              <div className="alert alert-danger">
-                <ul>
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          </div>
         </div>
       ) : (
         <h1>Este módulo no está disponible en este momento</h1>
