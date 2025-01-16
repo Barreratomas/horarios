@@ -272,6 +272,7 @@ class CarreraGradoService implements CarreraGradoRepository
             $carreraGrado->alumno_grado()->delete();
             $carreraGrado->grado_uc()->delete();
             $carreraGrado->disponibilidad()->delete();
+            $carreraGrado->grado()->delete();
 
             // Eliminar CarreraGrado
             $carreraGrado->delete();

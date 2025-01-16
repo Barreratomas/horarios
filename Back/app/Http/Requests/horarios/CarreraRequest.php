@@ -5,6 +5,8 @@ namespace App\Http\Requests\horarios;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\LogsRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CarreraRequest extends FormRequest
 {
@@ -25,20 +27,28 @@ class CarreraRequest extends FormRequest
     {
 
         $esCreacion = $this->isMethod('post');
-        $logsRequest= new LogsRequest();
+        $logsRequest = new LogsRequest();
         $logsRules = $logsRequest->rules($esCreacion);
 
-        $carreraRules = $esCreacion ? ['required', 'string', 'max:70'] : ['nullable', 'string', 'max:70'];
-        $cupoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
+        $carreraRules = $esCreacion ? ['required', 'string', 'max:70'] : ['required', 'string', 'max:70'];
+        $cupoRules = $esCreacion ? ['required', 'integer', 'min:1'] : ['required', 'integer', 'min:1'];
 
 
-      
+
         return array_merge(
             $logsRules,  // Reglas de LogsRequest
             [
-               'carrera' => $carreraRules,
+                'carrera' => $carreraRules,
                 'cupo' => $cupoRules
             ]
         );
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'errors' => $validator->errors()->all(),
+            'message' => 'Error de validación en los datos enviados.',
+        ], 422));
     }
 }
