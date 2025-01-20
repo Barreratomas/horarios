@@ -8,6 +8,8 @@ const ActualizarComision = () => {
   const { comisionId } = useParams();
   const [capacidad, setCapacidad] = useState('');
   const [materias, setMaterias] = useState([]);
+  const [carrera, setCarrera] = useState([]);
+
   const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
   const [detalles, setDetalles] = useState('');
 
@@ -31,13 +33,12 @@ const ActualizarComision = () => {
         if (response.ok) {
           setCapacidad(data.capacidad);
           setMateriasSeleccionadas(data.materias || []);
+          setCarrera(data.id_carrera);
         } else {
           addNotification(data.errors, 'danger');
         }
       } catch (error) {
         addNotification(`Error de conexión`, 'danger');
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -46,7 +47,13 @@ const ActualizarComision = () => {
 
   // Cargar materias disponibles
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMaterias = async () => {
+      console.log('id de la carrera', carrera);
+      if (!carrera) {
+        console.log('Carrera aún no está disponible o no tiene id_carrera. Esperando...');
+        return; // Esperar hasta que `carrera` tenga un valor válido
+      }
+
       try {
         // Obtener las materias asociadas al grado
         const gradoUCResponse = await fetch(
@@ -64,23 +71,40 @@ const ActualizarComision = () => {
         }
 
         // Obtener todas las materias disponibles
-        const materiasResponse = await fetch('http://127.0.0.1:8000/api/horarios/unidadCurricular');
+        console.log('id de la carrera arriba', carrera);
+
+        const materiasResponse = await fetch(
+          `http://127.0.0.1:8000/api/horarios/uCPlan/${carrera}/relaciones`
+        );
+        console.log(materiasResponse);
+
         const materiasData = await materiasResponse.json();
 
         if (!materiasResponse.ok) {
           throw new Error('Error al cargar las materias disponibles.');
         }
+        console.log('sin formato ', materiasData);
 
-        setMaterias(materiasData);
-      } catch (error) {
-        addNotification(error.message || 'Error de conexión.', 'danger');
-      } finally {
+        const materiasFormateadas = materiasData
+          .map((plan) =>
+            plan.plan_estudio.uc_plan.map((uc) => ({
+              id_uc: uc.id_uc,
+              unidad_curricular: uc.unidad_curricular.unidad_curricular
+            }))
+          )
+          .flat(); // Para aplanar el arreglo resultante de arrays dentro de arrays.
+
+        console.log('formaterasd ', materiasFormateadas);
+
+        setMaterias(materiasFormateadas);
         setIsLoading(false);
+      } catch (error) {
+        console.log(error.message || 'Error de conexión.', 'danger');
       }
     };
 
-    fetchData();
-  }, [comisionId]);
+    fetchMaterias();
+  }, [carrera, comisionId]);
 
   // Manejar la selección de materias
   const handleCheckboxChange = (idMateria) => {
@@ -155,21 +179,23 @@ const ActualizarComision = () => {
 
             <div className="materias-list mt-3">
               <h5>Seleccione las materias asociadas:</h5>
-              {materias.map((materia) => (
-                <div key={materia.id_uc} className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    value={materia.id_uc}
-                    checked={materiasSeleccionadas.includes(materia.id_uc)}
-                    id={`materia-${materia.id_uc}`}
-                    onChange={() => handleCheckboxChange(materia.id_uc)}
-                  />
-                  <label className="form-check-label" htmlFor={`materia-${materia.id_uc}`}>
-                    {materia.unidad_curricular}
-                  </label>
-                </div>
-              ))}
+              {materias.map((materia, index) => {
+                return (
+                  <div key={`${materia.id_uc}-${index}`} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={materia.id_uc}
+                      checked={materiasSeleccionadas.includes(materia.id_uc)}
+                      id={`materia-${materia.id_uc}`}
+                      onChange={() => handleCheckboxChange(materia.id_uc)}
+                    />
+                    <label className="form-check-label" htmlFor={`materia-${materia.id_uc}`}>
+                      {materia.unidad_curricular}
+                    </label>
+                  </div>
+                );
+              })}
             </div>
 
             <button type="submit" className="btn btn-primary mt-3">

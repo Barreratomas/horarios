@@ -86,6 +86,7 @@ class CarreraGradoService implements CarreraGradoRepository
             $response = [
                 'id_carrera_grado' => $carreraGrado->id_carrera_grado,
                 'carrera' => $carreraGrado->carrera->carrera ?? 'Sin carrera',
+                'id_carrera' => $carreraGrado->id_carrera,
                 'grado' => [
                     'nombre' => $carreraGrado->grado->grado ?? 'Sin grado',
                     'detalle' => $carreraGrado->grado->detalle ?? 'Sin detalle'
@@ -236,6 +237,14 @@ class CarreraGradoService implements CarreraGradoRepository
 
 
         try {
+            // Verificar si ya existe un registro con el mismo id_carrera y id_grado
+            $existingCarreraGrado = CarreraGrado::where('id_carrera', $id_carrera)
+                ->where('id_grado', $id_grado)
+                ->first();
+
+            if ($existingCarreraGrado) {
+                return response()->json(['message' => 'El registro ya existe', 'data' => $existingCarreraGrado], 409);
+            }
 
             // Suma la capacidad de todos los grados ya asociados a la carrera
             $capacidadExistente = CarreraGrado::where('id_carrera', $id_carrera)->sum('capacidad');
@@ -268,11 +277,22 @@ class CarreraGradoService implements CarreraGradoRepository
             return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
         }
         try {
+
+            // Buscar si existen otros registros con el mismo id_grado y division
+            $existenOtrosGrados = CarreraGrado::where('id_grado', $carreraGrado->id_grado)
+                ->whereHas('grado', function ($query) use ($carreraGrado) {
+                    $query->where('division', $carreraGrado->grado->division);
+                })
+                ->count();
+
+            if ($existenOtrosGrados == 1) {
+                $carreraGrado->grado()->delete();
+            }
             // Eliminar relaciones dependientes
             $carreraGrado->alumno_grado()->delete();
             $carreraGrado->grado_uc()->delete();
             $carreraGrado->disponibilidad()->delete();
-            $carreraGrado->grado()->delete();
+
 
             // Eliminar CarreraGrado
             $carreraGrado->delete();

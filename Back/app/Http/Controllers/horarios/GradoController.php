@@ -147,6 +147,17 @@ class GradoController extends Controller
 
             $carreraGradoResponse = $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado, $request->input('capacidad'));
 
+            if ($carreraGradoResponse->status() === 409) {
+                $carreraGrado = $carreraGradoResponse->getData();
+                Log::info('El registro de Carrera-Grado ya existe', ['carreraGrado' => $carreraGrado]);
+
+                // Si el registro ya existe, puedes devolverlo como respuesta o tomar alguna acción adicional
+                return response()->json([
+                    'error' => 'El registro de Carrera-Grado ya existe',
+                    'data' => $carreraGrado
+                ], 409);
+            }
+
             $carreraGrado = $carreraGradoResponse->getData();
 
             Log::info('Relación Carrera-Grado guardada correctamente', ['carreraGrado' => $carreraGrado]);

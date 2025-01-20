@@ -74,15 +74,29 @@ class GradoService implements GradoRepository
     {
         try {
             $gradoData = $request;
+
+            // Verificar si ya existe un grado con la misma division y grado
+            $existingGrado = Grado::where('grado', $gradoData['grado'])
+                ->where('division', $gradoData['division'])
+                ->first();
+
+            // Si ya existe, retornar un mensaje indicando que no se puede crear
+            if ($existingGrado) {
+                return response()->json($existingGrado, 200);
+            }
+
+            // Si no existe, proceder a guardar el nuevo grado
             $grado = new Grado($gradoData);
             $gradoModel = $this->gradoMapper->toGrado($grado);
             $gradoModel->save();
+
             return response()->json($gradoModel, 201);
         } catch (Exception $e) {
             Log::error('Error al guardar el grado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar el grado'], 500);
         }
     }
+
 
     public function actualizarGrados($request, $id)
     {
@@ -109,7 +123,7 @@ class GradoService implements GradoRepository
                 $grado->delete();
                 return response()->json([
                     'nombre_grado' => $nombreGrado,
-                ], 200);            
+                ], 200);
             } else {
                 return response()->json(['error' => 'No existe el grado'], 404);
             }

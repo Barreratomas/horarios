@@ -444,6 +444,10 @@ class AlumnoGradoService implements AlumnoGradoRepository
                 $materiasAlumno = AlumnoUC::where('id_alumno', $id_alumno)->pluck('id_uc');
 
                 foreach ($materiasAlumno as $id_uc) {
+
+
+
+
                     Log::info("Procesando UC con ID: $id_uc para el alumno $id_alumno");
 
                     // Obtener la carrera del alumno
@@ -477,7 +481,26 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
                     Log::info("UC $id_uc tiene los siguientes grados asociados: " . implode(', ', $gradosAsociados->toArray()));
 
+
+                    // Verificar si el alumno ya está inscrito en esta UC en cualquier grado
+                    // $yaInscritoEnUcEnOtroGrado = DB::table('alumno_grado')
+                    //     ->join('carrera_grado', 'alumno_grado.id_carrera_grado', '=', 'carrera_grado.id_carrera_grado')
+                    //     ->join('grado_uc', 'carrera_grado.id_carrera_grado', '=', 'grado_uc.id_carrera_grado')
+                    //     ->where('alumno_grado.id_alumno', $id_alumno)
+                    //     ->where('grado_uc.id_uc', $id_uc)
+                    //     ->exists();
+
+                    // if ($yaInscritoEnUcEnOtroGrado) {
+                    //     Log::info("El alumno $id_alumno ya está inscrito en la UC $id_uc en otro grado. No se asignará nuevamente.");
+                    //     continue; // Saltar este grado
+                    // }
+
+
                     foreach ($gradosAsociados as $id_carrera_grado) {
+
+
+
+
                         // Obtener el id_grado desde carrera_grado
                         $id_grado = DB::table('carrera_grado')
                             ->where('id_carrera_grado', $id_carrera_grado)

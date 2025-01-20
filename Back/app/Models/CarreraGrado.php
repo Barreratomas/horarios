@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CarreraGrado extends Model
 {
-    protected $fillable = ['id_carrera', 'id_grado','capacidad'];
+    protected $fillable = ['id_carrera', 'id_grado', 'capacidad'];
     protected $table = 'carrera_grado';
     protected $primaryKey = 'id_carrera_grado';
     public $incrementing = true;
@@ -50,19 +50,21 @@ class CarreraGrado extends Model
     {
         return $this->belongsTo(Grado::class, 'id_grado');
     }
-     public function disponibilidad():HasMany{
+    public function disponibilidad(): HasMany
+    {
         return $this->hasMany(Disponibilidad::class, 'id_carrera_grado', 'id_carrera_grado');
     }
 
     // Un grado tiene uno o muchos alumno_grado
-    public function alumno_grado():HasMany{
+    public function alumno_grado(): HasMany
+    {
         return $this->hasMany(AlumnoGrado::class, 'id_carrera_grado', 'id_carrera_grado');
     }
 
 
     // Un grado tiene uno o muchos grado_uc
-    public function grado_uc():HasMany{
+    public function grado_uc(): HasMany
+    {
         return $this->hasMany(GradoUC::class, 'id_carrera_grado', 'id_carrera_grado');
     }
-
 }
