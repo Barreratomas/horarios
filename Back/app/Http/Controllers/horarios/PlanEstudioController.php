@@ -27,7 +27,6 @@ class PlanEstudioController extends Controller
         $this->UCPlanService = $UCPlanService;
         $this->CarreraPlanService = $CarreraPlanService;
         $this->logModificacionEliminacionController = $logModificacionEliminacionController;
-
     }
 
 
@@ -99,7 +98,7 @@ class PlanEstudioController extends Controller
     {
         return $this->planEstudioService->obtenerPlanEstudioPorId($id);
     }
-    
+
     public function showConRelaciones($id)
     {
         return $this->planEstudioService->obtenerPlanEstudioPorIdConRelaciones($id);
@@ -131,32 +130,48 @@ class PlanEstudioController extends Controller
     public function store(PlanEstudioRequest $request)
     {
         DB::beginTransaction();
-    
+
         try {
+            // Datos de entrada
             $data = $request->only(['detalle', 'fecha_inicio', 'fecha_fin']);
             $id_carrera = $request->input('id_carrera');
             $materias = $request->input('materias');
-    
-            // Log de datos iniciales
-          
+
+            // Log de los datos iniciales
+            Log::info('Datos recibidos para guardar el plan de estudio', [
+                'data' => $data,
+                'id_carrera' => $id_carrera,
+                'materias' => $materias,
+            ]);
+
             // Guardar plan de estudio
             $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
-          
-    
+
+            Log::info('Respuesta al guardar plan de estudio', [
+                'PEResponse' => $PEResponse->getData()
+            ]);
+
             $PE = $PEResponse->getData();
-         
-    
+
             if (isset($PE->error)) {
                 Log::error('Error en la respuesta de guardarPlanEstudio', [
                     'error' => $PE->error
                 ]);
                 return response()->json(['error' => $PE->error], 500);
             }
-    
+
+            // Log de éxito al guardar el plan de estudio
+            Log::info('Plan de estudio guardado exitosamente', [
+                'id_plan' => $PE->id_plan
+            ]);
+
             // Guardar UCPlan
             $ucplanResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
-          
-    
+
+            Log::info('Respuesta al guardar UCPlan', [
+                'ucplanResponse' => $ucplanResponse->getData()
+            ]);
+
             if ($ucplanResponse->getStatusCode() !== 201) {
                 DB::rollBack();
                 Log::error('Error al guardar UCPlan', [
@@ -164,11 +179,18 @@ class PlanEstudioController extends Controller
                 ]);
                 return response()->json($ucplanResponse->getData(), 500);
             }
-    
+
+            // Log de éxito al guardar UCPlan
+            Log::info('UCPlan guardado exitosamente', [
+                'id_plan' => $PE->id_plan
+            ]);
+
             // Guardar CarreraPlan
             $carreraPlanResponse = $this->CarreraPlanService->guardarCarreraPlan($PE->id_plan, $id_carrera);
-          
-    
+            Log::info("Respuesta al guardar CarreraPlan", [
+                'carreraPlanResponse' => $carreraPlanResponse->getData()
+            ]);
+
             if ($carreraPlanResponse->getStatusCode() !== 201) {
                 DB::rollBack();
                 Log::error('Error al guardar CarreraPlan', [
@@ -176,10 +198,15 @@ class PlanEstudioController extends Controller
                 ]);
                 return response()->json($carreraPlanResponse->getData(), 500);
             }
-    
+
+            // Log de éxito al guardar CarreraPlan
+            Log::info('CarreraPlan guardado exitosamente', [
+                'id_plan' => $PE->id_plan,
+                'id_carrera' => $id_carrera
+            ]);
+
             DB::commit();
             return response()->json(['message' => 'Plan de estudio guardado con éxito'], 201);
-                
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al guardar el plan de estudio', [
@@ -189,7 +216,8 @@ class PlanEstudioController extends Controller
             return response()->json(['error' => 'Hubo un error al guardar el plan de estudio'], 500);
         }
     }
-    
+
+
 
 
     /**
@@ -232,7 +260,7 @@ class PlanEstudioController extends Controller
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
-        
+
         DB::beginTransaction();
 
         try {
@@ -241,12 +269,12 @@ class PlanEstudioController extends Controller
             $id_carrera = $request->input('id_carrera');
             $materias = $request->input('materias');
 
-           
-            
+
+
 
             // Actualizar el PlanEstudio
             $planEstudioResponse = $this->planEstudioService->actualizarPlanEstudio($data, $id);
-          
+
 
             if ($planEstudioResponse->getStatusCode() !== 200) {
                 DB::rollBack();
@@ -259,7 +287,7 @@ class PlanEstudioController extends Controller
             // Actualizar UCPlan si se envio materias
             if (isset($materias)) {
                 $ucplanResponse = $this->UCPlanService->actualizarUCPlan($materias, $id);
-               
+
 
                 if ($ucplanResponse->getStatusCode() !== 200) {
                     DB::rollBack();
@@ -274,7 +302,7 @@ class PlanEstudioController extends Controller
             // Actualizar CarreraPlan si se envio id_carrera
             if (isset($id_carrera)) {
                 $carreraPlanResponse = $this->CarreraPlanService->actualizarCarreraPlan($id_carrera, $id);
-               
+
 
                 if ($carreraPlanResponse->getStatusCode() !== 200) {
                     DB::rollBack();
@@ -288,13 +316,12 @@ class PlanEstudioController extends Controller
             $planEstudio = $planEstudioResponse->getData();
 
             $nombrePlanEstudio = $planEstudio->detalle;
-            $accion = "Actualización del plan de estudio " . $nombrePlanEstudio."(id:".$id.")";
-            
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+            $accion = "Actualización del plan de estudio " . $nombrePlanEstudio . "(id:" . $id . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
 
             DB::commit();
             return response()->json(['message' => 'Plan de estudio actualizado con éxito'], 200);
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al actualizar el plan de estudio', [
@@ -343,23 +370,22 @@ class PlanEstudioController extends Controller
 
         try {
             $planEstudioResponse = $this->planEstudioService->eliminarPlanEstudio($id);
-            
+
             $planEstudio = $planEstudioResponse->getData();
             if (!isset($planEstudio->nombre_plan_estudio)) {
                 throw new \Exception('No se pudo obtener el nombre del plan de estudio.');
             }
 
             $nombrePlanEstudio = $planEstudio->nombre_plan_estudio;
-            $accion = "Eliminación del plan de estudio " . $nombrePlanEstudio."(id:".$id.")";
-            
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+            $accion = "Eliminación del plan de estudio " . $nombrePlanEstudio . "(id:" . $id . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Plan de estudio eliminado correctamente.'
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -368,5 +394,4 @@ class PlanEstudioController extends Controller
             ], 500);
         }
     }
-
 }
