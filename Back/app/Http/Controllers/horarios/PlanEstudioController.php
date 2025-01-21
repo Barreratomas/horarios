@@ -7,6 +7,7 @@ use App\Http\Requests\horarios\PlanEstudioRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\LogModificacionEliminacionController;
 use App\Http\Requests\LogsRequest;
+use App\Models\horarios\PlanEstudio;
 use App\Services\CarreraPlanService;
 use App\Services\horarios\UCPlanService;
 use Exception;
@@ -217,6 +218,32 @@ class PlanEstudioController extends Controller
         }
     }
 
+
+
+
+
+    public function finalizar_plan($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $plan = PlanEstudio::find($id);
+
+            if (!$plan) {
+                return response()->json(['error' => 'El plan de estudio no existe'], 404);
+            }
+
+            $plan->fecha_fin = now();
+            $plan->save();
+
+            DB::commit();
+            return response()->json(['message' => 'El plan de estudio ha sido finalizado exitosamente'], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al finalizar el plan de estudio: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al finalizar el plan de estudio'], 500);
+        }
+    }
 
 
 

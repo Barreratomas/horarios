@@ -148,6 +148,8 @@ Route::get('/horarios/planEstudio/relaciones', [PlanEstudioController::class, 'i
 Route::get('/horarios/planEstudio/{id}', [PlanEstudioController::class, 'show']);
 Route::get('/horarios/planEstudio/relaciones/{id}', [PlanEstudioController::class, 'showConRelaciones']);
 Route::post('/horarios/planEstudio/guardar', [PlanEstudioController::class, 'store']);
+Route::post('/horarios/planEstudio/finalizar/{id}', [PlanEstudioController::class, 'finalizar_plan']);
+
 Route::put('/horarios/planEstudio/actualizar/{id}', [PlanEstudioController::class, 'update']);
 Route::delete('/horarios/planEstudio/eliminar/{id}', [PlanEstudioController::class, 'destroy']);
 

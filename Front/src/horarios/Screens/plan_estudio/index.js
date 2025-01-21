@@ -107,6 +107,31 @@ const Planes = () => {
     }
   };
 
+  const handleFinalizePlan = async (id_plan) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/planEstudio/finalizar/${id_plan}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+
+      if (!response.ok) throw new Error('Error al finalizar el plan');
+
+      setPlanes((prevPlanes) =>
+        prevPlanes.map((plan) =>
+          plan.id_plan === id_plan
+            ? { ...plan, fecha_fin: new Date().toISOString().split('T')[0] }
+            : plan
+        )
+      );
+      addNotification('El plan ha sido finalizado exitosamente', 'success');
+    } catch (error) {
+      addNotification(error.message, 'danger');
+    }
+  };
+
   return (
     <>
       {loading ? (
@@ -147,8 +172,24 @@ const Planes = () => {
                 }}
               >
                 <p>Detalle: {plan.detalle}</p>
-                <p>Fecha Inicio: {new Date(plan.fecha_inicio).toLocaleDateString()}</p>
-                <p>Fecha Fin: {new Date(plan.fecha_fin).toLocaleDateString()}</p>
+                <p>Fecha Inicio: {plan.fecha_inicio}</p>
+                <p>
+                  Fecha Fin:{' '}
+                  {plan.fecha_fin ? (
+                    plan.fecha_fin
+                  ) : (
+                    <>
+                      No disponible{' '}
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-primary ms-2"
+                        onClick={() => handleFinalizePlan(plan.id_plan)}
+                      >
+                        Finalizar
+                      </button>
+                    </>
+                  )}
+                </p>
 
                 {/* Accordion para las unidades curriculares */}
                 <Accordion title="Ver Unidades Curriculares">

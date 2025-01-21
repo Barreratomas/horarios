@@ -459,7 +459,10 @@ class AlumnoGradoService implements AlumnoGradoRepository
                     Log::info("Procesando id de carrera: $id_carrera para el alumno $id_alumno");
 
                     // Obtener el plan asociado a la carrera
-                    $id_plan = CarreraPlan::where('id_carrera', $id_carrera)->value('id_plan');
+                    $id_plan = CarreraPlan::where('id_carrera', $id_carrera)
+                        ->orderBy('updated_at', 'desc')
+                        ->value('id_plan');
+
                     if (!$id_plan) {
                         Log::warning("Alumno $id_alumno no tiene plan asociado.");
                         continue; // Si no hay plan asociado, pasar al siguiente UC
