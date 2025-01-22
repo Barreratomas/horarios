@@ -17,13 +17,12 @@ use App\Http\Requests\LogsRequest;
 class AulaController extends Controller
 {
     protected $aulaService;
-    protected $logModificacionEliminacionController; 
+    protected $logModificacionEliminacionController;
 
     public function __construct(AulaService $aulaService,  LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->aulaService = $aulaService;
         $this->logModificacionEliminacionController = $logModificacionEliminacionController;
-
     }
 
     /*
@@ -223,34 +222,33 @@ class AulaController extends Controller
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
-        
+
         DB::beginTransaction();
 
         try {
 
             $aulaResponse  = $this->aulaService->actualizarAulas($request, $id);
-    
+
             if ($aulaResponse->getStatusCode() != 200) {
                 DB::rollBack();
                 return response()->json(['error' => 'Hubo un error al actualizar el aula'], 500);
             }
-    
+
             $aula = $aulaResponse->getData();
-    
+
             $nombreAula = $aula->nombre;
-            $accion = "Actualizacion del aula " . $nombreAula."(id:".$aula->id_aula.")";
-            
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+            $accion = "Actualizacion del aula " . $nombreAula . "(id:" . $aula->id_aula . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
 
             DB::commit();
-    
+
             return response()->json(['message' => 'Aula actualizada exitosamente'], 200);
-            
         } catch (\Exception $e) {
             DB::rollBack();
-    
+
             Log::error("Error al actualizar el aula: " . $e->getMessage());
-    
+
             return response()->json(['error' => 'Hubo un error al actualizar el aula'], 500);
         }
     }
@@ -292,23 +290,22 @@ class AulaController extends Controller
 
         try {
             $aulaResponse = $this->aulaService->eliminarAulas($id);
-            
+
             $aula = $aulaResponse->getData();
             if (!isset($aula->nombre_aula)) {
                 throw new \Exception('No se pudo obtener el nombre del aula.');
             }
 
             $nombreAula = $aula->nombre_aula;
-            $accion = "Eliminación del aula " . $nombreAula."(id:".$id.")";
-            
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+            $accion = "Eliminación del aula " . $nombreAula . "(id:" . $id . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Aula eliminada correctamente.'
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -317,5 +314,4 @@ class AulaController extends Controller
             ], 500);
         }
     }
-
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 const Carreras = () => {
   const [detalles, setDetalles] = useState('');
   const usuario = sessionStorage.getItem('userType');
@@ -129,7 +130,7 @@ const Carreras = () => {
           ))}
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de carreras" statusCode={500} />
       )}
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>

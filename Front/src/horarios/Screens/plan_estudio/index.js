@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import '../../css/acordeon.css';
 import { Modal, Button } from 'react-bootstrap';
 import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -278,7 +279,7 @@ const Planes = () => {
           </Modal>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de planes de estudio" statusCode={500} />
       )}
     </>
   );

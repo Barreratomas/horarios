@@ -3,6 +3,8 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
 import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
+
 const Aulas = () => {
   const [detalles, setDetalles] = useState('');
   const usuario = sessionStorage.getItem('userType');
@@ -42,17 +44,20 @@ const Aulas = () => {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/aulas', {
           headers: { Accept: 'application/json' }
         });
-
-        if (!response.ok) throw new Error('Error al obtener aulas');
-
+        if (!response.ok) {
+          throw new Error(`Error`);
+        }
         const data = await response.json();
 
-        console.log(data);
-        setAulas(data);
-        setFilteredAulas(data);
-        setServerUp(true);
+        if (data.error) {
+          addNotification(data.error, 'danger');
+        } else {
+          setAulas(data);
+          setFilteredAulas(data);
+          setServerUp(true);
+        }
       } catch (error) {
-        console.log('Error al obtener aulas:', error.message);
+        setServerUp(false);
       } finally {
         setLoading(false);
       }
@@ -248,7 +253,7 @@ const Aulas = () => {
           </Modal>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de aulas" statusCode={500} />
       )}
     </>
   );

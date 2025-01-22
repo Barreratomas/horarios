@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import DataTable from 'react-data-table-component';
 import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const Materias = () => {
   const [detalles, setDetalles] = useState('');
@@ -272,7 +273,7 @@ const Materias = () => {
           </Modal>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de naterias" statusCode={500} />
       )}
     </>
   );

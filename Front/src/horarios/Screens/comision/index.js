@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 import '../../css/acordeon.css';
 import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -290,7 +291,7 @@ const Comisiones = () => {
           </Modal>
         </div>
       ) : (
-        <p>No se pudo conectar al servidor.</p>
+        <ErrorPage message="La seccion de grados" statusCode={500} />
       )}
     </>
   );
