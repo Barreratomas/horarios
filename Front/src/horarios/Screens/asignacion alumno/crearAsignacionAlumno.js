@@ -4,10 +4,13 @@ import { useNotification } from '../layouts/parcials/notification';
 
 const CrearAsignacionAlumno = () => {
   const [alumnos, setAlumnos] = useState([]);
-  const [grados, setGrados] = useState([]);
-  const [dni, setDni] = useState('');
-  const [grado, setGrado] = useState('');
+  const [filteredAlumnos, setFilteredAlumnos] = useState([]);
+  const [selectedAlumno, setSelectedAlumno] = useState(null);
 
+  const [grados, setGrados] = useState([]);
+  const [search, setSearch] = useState('');
+  const [grado, setGrado] = useState('');
+  const [showGrados, setShowGrados] = useState(false);
   const navigate = useNavigate();
   const { routes } = useOutletContext();
 
@@ -19,35 +22,67 @@ const CrearAsignacionAlumno = () => {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/alumnos');
       const data = await response.json();
       setAlumnos(data);
+      setFilteredAlumnos(data);
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');
     }
   };
 
   // Cargar grados y carreras desde la API
-  const fetchGrados = async () => {
+  const fetchGrados = async (id_alumno) => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados');
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/carreraGrados/materias/${id_alumno}`
+      );
       const data = await response.json();
-      console.log(data);
-      setGrados(data);
+      if (data.error) {
+        addNotification(data.error, 'danger');
+        setShowGrados(false);
+      } else {
+        console.log(data);
+        setGrados(data);
+        setShowGrados(true);
+      }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');
+      setShowGrados(false);
     }
   };
 
   useEffect(() => {
     fetchAlumnos();
-    fetchGrados();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const [id_grado, id_carrera] = grado.split('-');
-    console.log(`id_alumno: ${dni}, grado: ${id_grado}, carrera: ${id_carrera}`);
+  // Filtrar alumnos por DNI
+  const handleFilterDni = (e) => {
+    const searchValue = e.target.value;
+    setSearch(searchValue);
+
+    const filtered = alumnos.filter((alumno) => {
+      const dniString = String(alumno.DNI).toLowerCase();
+      const fullName = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
+      return (
+        dniString.includes(searchValue.toLowerCase()) ||
+        fullName.includes(searchValue.toLowerCase())
+      );
+    });
+    setFilteredAlumnos(filtered);
+  };
+
+  // Seleccionar alumno
+  const handleSelectAlumno = (alumno) => {
+    setSelectedAlumno(alumno);
+    fetchGrados(alumno.id_alumno);
+
+    setFilteredAlumnos([]);
+  };
+
+  const handleSubmit = async (id_carrera_grado) => {
     try {
+      console.log(selectedAlumno.id_alumno);
+      console.log(id_carrera_grado);
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${dni}/${id_grado}`,
+        `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${selectedAlumno.id_alumno}/${id_carrera_grado}`,
         {
           method: 'POST',
           headers: {
@@ -55,15 +90,13 @@ const CrearAsignacionAlumno = () => {
           }
         }
       );
-      if (response.ok) {
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
           state: { successMessage: 'El alumno fue asignado con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');
@@ -74,26 +107,39 @@ const CrearAsignacionAlumno = () => {
     <div className="container py-3">
       <div className="row align-items-center justify-content-center">
         <div className="col-6">
-          <form onSubmit={handleSubmit} className="text-center">
-            {/* Selección de Alumno */}
+          <form className="text-center">
+            {/* Input para filtrar por DNI */}
             <div className="mb-3">
               <label htmlFor="dni" className="form-label">
-                Seleccione el Alumno
+                Buscar por DNI o nombre del Alumno
               </label>
-              <select
-                name="dni"
-                value={dni}
-                onChange={(e) => setDni(e.target.value)}
-                className="form-select"
-                required
-              >
-                <option value="">Seleccione un alumno</option>
-                {alumnos.map((alumno) => (
-                  <option key={alumno.id_alumno} value={alumno.id_alumno}>
-                    {`${alumno.nombre} ${alumno.apellido} - DNI: ${alumno.DNI}`}
-                  </option>
-                ))}
-              </select>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Escriba el DNI o nombre del alumno"
+                value={search}
+                onChange={handleFilterDni}
+              />
+
+              {/* Mostrar los resultados filtrados debajo del campo de entrada solo si hay un filtro */}
+              {search && (
+                <div className="mt-2">
+                  {filteredAlumnos.length > 0 && (
+                    <ul className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      {filteredAlumnos.map((alumno) => (
+                        <li
+                          key={alumno.id_alumno}
+                          className="list-group-item"
+                          onClick={() => handleSelectAlumno(alumno)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {`${alumno.nombre} ${alumno.apellido} - DNI: ${alumno.DNI}`}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Selección de Grado y Carrera */}
@@ -107,20 +153,27 @@ const CrearAsignacionAlumno = () => {
                 onChange={(e) => setGrado(e.target.value)}
                 className="form-select"
                 required
+                disabled={!showGrados}
               >
-                <option value="">Seleccione un grado y carrera</option>
-                {grados.map((item) => (
-                  <option
-                    key={`${item.id_grado}-${item.carrera.id_carrera}`}
-                    value={`${item.id_grado}-${item.carrera.id_carrera}`}
-                  >
-                    {`Grado: ${item.grado.grado}, División: ${item.grado.division} - Carrera: ${item.carrera.carrera}`}
-                  </option>
-                ))}
+                <option value="">Seleccione una comision</option>
+                {grados && Array.isArray(grados) && grados.length > 0 ? (
+                  grados.map((item) => (
+                    <option key={`${item.id_carrera_grado}`} value={`${item.id_carrera_grado}`}>
+                      {`Grado: ${item.grado}, División: ${item.division} - Carrera: ${item.carrera} - Capacidad: ${item.capacidad}`}
+                    </option>
+                  ))
+                ) : (
+                  <option>No hay grados disponibles</option>
+                )}
               </select>
             </div>
             {/* Botón de Envío */}
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => handleSubmit(grado)}
+              disabled={!showGrados}
+            >
               Crear Asignación
             </button>
             <br />
