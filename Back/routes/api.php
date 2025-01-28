@@ -217,6 +217,7 @@ Route::delete('/horarios/docentes/eliminar/{id}', [DocenteController::class, 'de
 // CarreraGrado
 Route::get('/horarios/carreraGrados', [CarreraGradoController::class, 'index']);
 Route::get('/horarios/carreraGrados/{id_carreraGrado}', [CarreraGradoController::class, 'showByCarreraGrado']);
+Route::get('/horarios/carreraGrados/materias/{alumno}', [CarreraGradoController::class, 'showGradosByMaterias']);
 
 Route::get('/horarios/carreraGrados/carrera/{id_carrera}', [CarreraGradoController::class, 'showByCarrera']);
 Route::get('/horarios/carreraGrados/carrera/SinUC/{id_carrera}', [CarreraGradoController::class, 'showByCarreraSinUC']);

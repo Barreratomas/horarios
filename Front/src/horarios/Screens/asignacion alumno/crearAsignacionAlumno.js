@@ -79,8 +79,6 @@ const CrearAsignacionAlumno = () => {
 
   const handleSubmit = async (id_carrera_grado) => {
     try {
-      console.log(selectedAlumno.id_alumno);
-      console.log(id_carrera_grado);
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/alumnoGrados/guardar/${selectedAlumno.id_alumno}/${id_carrera_grado}`,
         {

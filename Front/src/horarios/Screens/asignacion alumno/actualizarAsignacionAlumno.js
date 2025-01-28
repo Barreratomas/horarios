@@ -8,57 +8,35 @@ const ActualizarAsignarAlumno = () => {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');
-
   const { alumnoId, idGradoActual } = useParams();
-  const [carrera, setCarrera] = useState('');
   const [grado, setGrado] = useState('');
-  const [carreras, setCarreras] = useState([]);
   const [grados, setGrados] = useState([]);
   const navigate = useNavigate();
   const { routes } = useOutletContext();
 
   const { addNotification } = useNotification();
 
-  // Obtener las carreras disponibles
+  // Obtener los grados disponibles según la carrera seleccionada
   useEffect(() => {
-    const fetchCarreras = async () => {
+    const fetchGrados = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras');
-        if (!response.ok) {
-          throw new Error('Error al obtener carreras');
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/horarios/carreraGrados/materias/${alumnoId}/`
+        );
+        const data = await response.json();
+        if (data.error) {
+          addNotification(data.error, 'danger');
+        } else {
+          console.log(data);
+          setGrados(data);
         }
-        const carrerasData = await response.json();
-        setCarreras(carrerasData);
       } catch (error) {
         addNotification(`Error de conexión`, 'danger');
       }
     };
 
-    fetchCarreras();
+    fetchGrados();
   }, []);
-
-  // Obtener los grados disponibles según la carrera seleccionada
-  useEffect(() => {
-    if (carrera) {
-      const fetchGrados = async () => {
-        try {
-          const response = await fetch(
-            `http://127.0.0.1:8000/api/horarios/carreraGrados/carrera/SinUC/${carrera}`
-          );
-          if (!response.ok) {
-            throw new Error('Error al obtener grados');
-          }
-          const gradosData = await response.json();
-          console.log(gradosData);
-          setGrados(gradosData);
-        } catch (error) {
-          addNotification(`Error de conexión`, 'danger');
-        }
-      };
-
-      fetchGrados();
-    }
-  }, [carrera]);
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowModal(true); // Mostrar el modal de confirmación
@@ -79,15 +57,14 @@ const ActualizarAsignarAlumno = () => {
         }
       );
 
-      if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
           state: { successMessage: 'El grado del alumno fue actualizado con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');
@@ -104,52 +81,30 @@ const ActualizarAsignarAlumno = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            {/* Selector de Carrera */}
-            <label htmlFor="carrera">Seleccione la carrera</label>
-            <br />
-            <select
-              className="form-select"
-              name="carrera"
-              value={carrera}
-              onChange={(e) => setCarrera(e.target.value)}
-              required
-            >
-              <option value="">Seleccione una carrera</option>
-              {carreras.map((c) => (
-                <option key={c.id_carrera} value={c.id_carrera}>
-                  {c.carrera} {/* Muestra el nombre de la carrera */}
-                </option>
-              ))}
-            </select>
-            <br />
-            <br />
-
             {/* Selector de Grado, solo se muestra después de seleccionar una carrera */}
-            {carrera && (
-              <>
-                <label htmlFor="grado">Seleccione el grado</label>
-                <br />
-                <select
-                  className="form-select"
-                  name="grado"
-                  value={grado}
-                  onChange={(e) => setGrado(e.target.value)}
-                  required
-                >
-                  <option value="">Seleccione un grado</option>
-                  {grados.map((g) => (
-                    <option key={g.id_carrera_grado} value={g.id_carrera_grado}>
-                      {`${g.grado.detalle} (Capacidad: ${g.grado.capacidad})`}
-                    </option>
-                  ))}
-                </select>
+            <>
+              <label htmlFor="grado">Seleccione el grado</label>
+              <br />
+              <select
+                className="form-select"
+                name="grado"
+                value={grado}
+                onChange={(e) => setGrado(e.target.value)}
+                required
+              >
+                <option value="">Seleccione un grado</option>
+                {grados.map((g) => (
+                  <option key={g.id_carrera_grado} value={g.id_carrera_grado}>
+                    {`Grado:${g.grado} división:${g.division} (Capacidad: ${g.capacidad})`}
+                  </option>
+                ))}
+              </select>
 
-                <br />
-                <br />
-              </>
-            )}
+              <br />
+              <br />
+            </>
 
-            <button type="submit" className="btn btn-primary mt-3">
+            <button type="submit" className="btn btn-primary mt-3" disabled={!grado}>
               {isSubmitting ? 'Actualizando...' : 'Actualizar asignación'}
             </button>
             <br />

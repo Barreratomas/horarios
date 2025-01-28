@@ -43,6 +43,16 @@ class CarreraGradoController extends Controller
         return $this->carreraGradoService->obtenerTodosCarreraGrado();
     }
 
+    //  devueve los registros de carrera grado que tiene las materias de un alumno
+    public function showGradosByMaterias($id_alumno)
+    {
+        log::info("en controlador {$id_alumno}");
+
+        return $this->carreraGradoService->obtenerCarreraGradoPorMaterias($id_alumno);
+    }
+
+
+
 
     public function showByCarreraGrado($id_carreraGrado)
     {
@@ -138,9 +148,9 @@ class CarreraGradoController extends Controller
     *      )
     * )
     */
-    public function store($id_carrera, $id_grado)
+    public function store($id_carrera, $id_grado, $capacidad)
     {
-        return $this->carreraGradoService->guardarCarreraGrado($id_carrera, $id_grado);
+        return $this->carreraGradoService->guardarCarreraGrado($id_carrera, $id_grado, $capacidad);
     }
 
 
