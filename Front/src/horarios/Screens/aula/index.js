@@ -77,18 +77,19 @@ const Aulas = () => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-
-      if (!response.ok) throw new Error('Error al eliminar aula');
       const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setAulas(aulas.filter((aula) => aula.id_aula !== aulaToDelete));
+        setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== aulaToDelete));
 
-      setAulas(aulas.filter((aula) => aula.id_aula !== aulaToDelete));
-      setFilteredAulas(filteredAulas.filter((aula) => aula.id_aula !== aulaToDelete));
+        addNotification(data.message, 'success');
 
-      addNotification(data.message, 'success');
-
-      setShowModal(false);
+        setShowModal(false);
+      }
     } catch (error) {
-      addNotification(error.message, 'danger');
+      addNotification('Error de conexion', 'danger');
     }
   };
 

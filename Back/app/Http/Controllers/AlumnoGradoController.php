@@ -205,6 +205,11 @@ class AlumnoGradoController extends Controller
         try {
             $alumnoGradoResponse = $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno, $id_grado);
 
+            if ($alumnoGradoResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+                return $alumnoGradoResponse;
+            }
+
             $alumnoGrado = $alumnoGradoResponse->getData();
             Log::info(json_encode($alumnoGrado));
             $dniAlumno = $alumnoGrado->dni_alumno;

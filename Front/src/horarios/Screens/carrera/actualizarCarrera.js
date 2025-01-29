@@ -23,12 +23,11 @@ const ActualizarCarrera = () => {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/horarios/carreras/${carreraId}`);
         const data = await response.json();
-
-        if (response.ok) {
+        if (data.error) {
+          console.error('Error al obtener los datos de la carrera:', data);
+        } else {
           setCarrera(data.carrera);
           setCupo(data.cupo);
-        } else {
-          console.error('Error al obtener los datos de la carrera:', data);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -55,16 +54,13 @@ const ActualizarCarrera = () => {
           body: JSON.stringify({ carrera, cupo, usuario, detalles })
         }
       );
-
-      if (response.ok) {
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.carreras.main}`, {
           state: { successMessage: 'Carrera actualizada con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

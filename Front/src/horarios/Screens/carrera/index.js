@@ -61,15 +61,16 @@ const Carreras = () => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-
-      if (!response.ok) throw new Error('Error al eliminar carrera');
       const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setCarreras(carreras.filter((carrera) => carrera.id_carrera !== carreraToDelete));
 
-      setCarreras(carreras.filter((carrera) => carrera.id_carrera !== carreraToDelete));
+        addNotification(data.message, 'success');
 
-      addNotification(data.message, 'success');
-
-      setShowModal(false); // Cerrar el modal
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
       addNotification(error.message, 'danger');
     }

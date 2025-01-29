@@ -24,16 +24,13 @@ const CrearCarrera = () => {
         },
         body: JSON.stringify({ carrera, cupo }) // Incluir capacidad aquí
       });
-
-      if (response.ok) {
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.carreras.main}`, {
           state: { successMessage: 'carrera creada con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

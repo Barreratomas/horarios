@@ -48,13 +48,13 @@ class UCPlanService implements UCPlanRepository
     {
         try {
             DB::beginTransaction();
-    
-    
+
+
             // Verificar si materias es un arreglo y no está vacío
             if (!is_array($materias) || empty($materias)) {
                 return response()->json(['error' => 'Las materias deben ser un arreglo no vacío'], 400);
             }
-    
+
             // Guardar cada UCPlan directamente en la tabla correspondiente
             foreach ($materias as $materia) {
                 // Puedes crear la relación directamente
@@ -63,64 +63,75 @@ class UCPlanService implements UCPlanRepository
                     'id_uc' => $materia, // ID de la materia
                 ]);
             }
-    
+
             DB::commit();
-    
-           
-    
+
+
+
             return response()->json(['message' => 'Materias asociadas con éxito'], 201);
         } catch (Exception $e) {
             DB::rollBack();
-    
+
             Log::error('Error al guardar las materias del plan de estudio: ' . $e->getMessage());
-    
+
             return response()->json(['error' => 'Hubo un error al guardar las materias del plan de estudio'], 500);
         }
     }
-    
+
 
 
 
 
     public function actualizarUCPlan($materias, $id_plan)
-{
-    // Obtener las relaciones actuales de UCPlan para el plan dado
-    $currentUCPlans = UCPlan::where('id_plan', $id_plan)->get();
+    {
+        try {
 
-    // Verificar si se enviaron materias en la request
-    $materiasFromRequest = $materias;  //  materias es un array de IDs que recibes desde el controlador
 
-    // Eliminar las relaciones que ya no están en la solicitud
-    foreach ($currentUCPlans as $ucPlan) {
-        if (!in_array($ucPlan->id_uc, $materiasFromRequest)) {
-            // Si la materia no está en la solicitud, eliminar la relación
-            UCPlan::where('id_uc', $ucPlan->id_uc)
-                  ->where('id_plan', $id_plan)
-                  ->delete();  // Eliminar usando las claves correctas
+            // Obtener las relaciones actuales de UCPlan para el plan dado
+            $currentUCPlans = UCPlan::where('id_plan', $id_plan)->get();
+
+            // Verificar si se enviaron materias en la request
+            $materiasFromRequest = $materias;  //  materias es un array de IDs que recibes desde el controlador
+
+            // Eliminar las relaciones que ya no están en la solicitud
+            foreach ($currentUCPlans as $ucPlan) {
+                if (!in_array($ucPlan->id_uc, $materiasFromRequest)) {
+                    // Si la materia no está en la solicitud, eliminar la relación
+                    UCPlan::where('id_uc', $ucPlan->id_uc)
+                        ->where('id_plan', $id_plan)
+                        ->delete();  // Eliminar usando las claves correctas
+                }
+            }
+
+            // Ahora, agregamos las nuevas relaciones de materias que no existen
+            foreach ($materiasFromRequest as $id_uc) {
+                // Verificar si la relación entre la materia (id_uc) y el plan (id_plan) ya existe
+                $exists = UCPlan::where('id_uc', $id_uc)->where('id_plan', $id_plan)->exists();
+
+                if (!$exists) {
+                    // Si no existe, crear una nueva relación entre la materia y el plan
+                    UCPlan::create([
+                        'id_uc' => $id_uc,
+                        'id_plan' => $id_plan,
+                    ]);
+                }
+            }
+
+            // Responder con un mensaje de éxito si todo fue bien
+            return response()->json(['success' => 'Relaciones de UCPlan actualizadas correctamente'], 200);
+        } catch (Exception $e) {
+            Log::error('Error al actualizar UCPlan: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Hubo un problema al actualizar UCPlan',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
-    // Ahora, agregamos las nuevas relaciones de materias que no existen
-    foreach ($materiasFromRequest as $id_uc) {
-        // Verificar si la relación entre la materia (id_uc) y el plan (id_plan) ya existe
-        $exists = UCPlan::where('id_uc', $id_uc)->where('id_plan', $id_plan)->exists();
 
-        if (!$exists) {
-            // Si no existe, crear una nueva relación entre la materia y el plan
-            UCPlan::create([
-                'id_uc' => $id_uc,
-                'id_plan' => $id_plan,
-            ]);
-        }
-    }
 
-    // Responder con un mensaje de éxito si todo fue bien
-    return response()->json(['success' => 'Relaciones de UCPlan actualizadas correctamente'], 200);
-}
 
-    
-
-    
 
 
 
@@ -128,7 +139,7 @@ class UCPlanService implements UCPlanRepository
     {
         try {
             $uCPlan = UCPlan::find($id);
-            
+
             if ($uCPlan) {
                 $uCPlan->delete();
                 return response()->json(['success' => 'Se eliminó el uCPlan'], 200);
@@ -141,4 +152,3 @@ class UCPlanService implements UCPlanRepository
         }
     }
 }
-

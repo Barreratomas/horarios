@@ -612,7 +612,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
             // Revertir la transacción en caso de error
             DB::rollBack();
             Log::error('Error al asignar grados: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al asignar grados: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al asignar a alumnos a los grados: '], 500);
         }
     }
 

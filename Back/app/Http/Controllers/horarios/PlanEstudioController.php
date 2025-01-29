@@ -148,6 +148,11 @@ class PlanEstudioController extends Controller
             // Guardar plan de estudio
             $PEResponse = $this->planEstudioService->guardarPlanEstudio($data);
 
+            if ($PEResponse->getStatusCode() !== 201) {
+                DB::rollBack();
+                return $PEResponse;
+            }
+
             Log::info('Respuesta al guardar plan de estudio', [
                 'PEResponse' => $PEResponse->getData()
             ]);
@@ -169,17 +174,16 @@ class PlanEstudioController extends Controller
             // Guardar UCPlan
             $ucplanResponse = $this->UCPlanService->guardarUCPlan($PE->id_plan, $materias);
 
+            if ($ucplanResponse->getStatusCode() !== 201) {
+                DB::rollBack();
+                return $ucplanResponse;
+            }
+
             Log::info('Respuesta al guardar UCPlan', [
                 'ucplanResponse' => $ucplanResponse->getData()
             ]);
 
-            if ($ucplanResponse->getStatusCode() !== 201) {
-                DB::rollBack();
-                Log::error('Error al guardar UCPlan', [
-                    'response' => $ucplanResponse->getData()
-                ]);
-                return response()->json($ucplanResponse->getData(), 500);
-            }
+
 
             // Log de éxito al guardar UCPlan
             Log::info('UCPlan guardado exitosamente', [
@@ -194,10 +198,7 @@ class PlanEstudioController extends Controller
 
             if ($carreraPlanResponse->getStatusCode() !== 201) {
                 DB::rollBack();
-                Log::error('Error al guardar CarreraPlan', [
-                    'response' => $carreraPlanResponse->getData()
-                ]);
-                return response()->json($carreraPlanResponse->getData(), 500);
+                return $carreraPlanResponse;
             }
 
             // Log de éxito al guardar CarreraPlan
@@ -305,10 +306,7 @@ class PlanEstudioController extends Controller
 
             if ($planEstudioResponse->getStatusCode() !== 200) {
                 DB::rollBack();
-                Log::error('Error al actualizar PlanEstudio', [
-                    'response' => $planEstudioResponse->getData()
-                ]);
-                return response()->json($planEstudioResponse->getData(), 500);
+                return $planEstudioResponse;
             }
 
             // Actualizar UCPlan si se envio materias
@@ -318,10 +316,8 @@ class PlanEstudioController extends Controller
 
                 if ($ucplanResponse->getStatusCode() !== 200) {
                     DB::rollBack();
-                    Log::error('Error al actualizar UCPlan', [
-                        'response' => $ucplanResponse->getData()
-                    ]);
-                    return response()->json($ucplanResponse->getData(), 500);
+
+                    return $planEstudioResponse;
                 }
             }
 
@@ -333,10 +329,8 @@ class PlanEstudioController extends Controller
 
                 if ($carreraPlanResponse->getStatusCode() !== 200) {
                     DB::rollBack();
-                    Log::error('Error al actualizar CarreraPlan', [
-                        'response' => $carreraPlanResponse->getData()
-                    ]);
-                    return response()->json($carreraPlanResponse->getData(), 500);
+
+                    return $carreraPlanResponse;
                 }
             }
 
@@ -398,7 +392,14 @@ class PlanEstudioController extends Controller
         try {
             $planEstudioResponse = $this->planEstudioService->eliminarPlanEstudio($id);
 
+            if ($planEstudioResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+
+                return $planEstudioResponse;
+            }
+
             $planEstudio = $planEstudioResponse->getData();
+
             if (!isset($planEstudio->nombre_plan_estudio)) {
                 throw new \Exception('No se pudo obtener el nombre del plan de estudio.');
             }

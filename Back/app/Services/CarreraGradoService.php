@@ -307,7 +307,7 @@ class CarreraGradoService implements CarreraGradoRepository
             // Valida si la suma de capacidades más la nueva supera el cupo de la carrera
             if (($capacidadExistente + $capacidad) > $carrera->cupo) {
                 return response()->json([
-                    'error' => 'No se puede asignar la capacidad. Supera el cupo total de la carrera.'
+                    'error' => 'No se puede crear la comisión proque la capacidad supera el cupo total de la carrera.'
                 ], 400);
             }
 
@@ -328,6 +328,7 @@ class CarreraGradoService implements CarreraGradoRepository
     public function eliminarCarreraGradoPorIdGradoYCarrera($id_carrera_grado)
     {
         $carreraGrado = CarreraGrado::where('id_carrera_grado', $id_carrera_grado)->first();
+        $carreraGradoCopy = CarreraGrado::with(["carrera", "grado"])->where("id_carrera_grado", $id_carrera_grado)->first();
         if (!$carreraGrado) {
             return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
         }
@@ -351,7 +352,7 @@ class CarreraGradoService implements CarreraGradoRepository
 
             // Eliminar CarreraGrado
             $carreraGrado->delete();
-            return response()->json($carreraGrado, 200);
+            return response()->json($carreraGradoCopy, 200);
         } catch (Exception $e) {
             Log::error('Error al eliminar la carreraGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al eliminar la carreraGrado'], 500);

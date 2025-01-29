@@ -111,18 +111,19 @@ const Comisiones = () => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-
-      if (!response.ok) throw new Error('Error al eliminar el grado');
       const data = await response.json();
-      console.log('el grado ', data);
-      setGrados(grados.filter((grado) => grado.id_carrera_grado !== gradoToDelete));
-      setFilteredComisiones(
-        filteredComisiones.filter((comision) => comision.id_carrera_grado !== gradoToDelete)
-      );
 
-      addNotification('Se eliminó el grado', 'success');
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setGrados(grados.filter((grado) => grado.id_carrera_grado !== gradoToDelete));
+        setFilteredComisiones(
+          filteredComisiones.filter((comision) => comision.id_carrera_grado !== gradoToDelete)
+        );
+        addNotification('Se eliminó el grado', 'success');
 
-      setShowModal(false); // Cerrar el modal
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
       addNotification(error.message, 'danger');
     }
