@@ -1,8 +1,7 @@
-import React from 'react';
 import '../../../css/tabla.css';
+import React, { useState } from 'react';
 
 const TablaHorario = ({ horarios }) => {
-  console.log(horarios);
   const dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
   const inicio = {
     1: '19:20',
@@ -32,6 +31,52 @@ const TablaHorario = ({ horarios }) => {
     'rgba(122, 22, 250, 0.28)',
     'rgba(250, 131, 22, 0.28)'
   ];
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+    contenido: null
+  });
+
+  const handleRightClick = (event, contenido) => {
+    event.preventDefault(); // Evita el menú contextual del navegador
+    const x = event.clientX + window.scrollX;
+    const y = event.clientY + window.scrollY;
+
+    setContextMenu({
+      visible: true,
+      x,
+      y,
+      contenido
+    });
+  };
+
+  const handleClickOutside = () => {
+    setContextMenu({ ...contextMenu, visible: false });
+  };
+
+  // Función para eliminar el horario
+  const handleEliminar = async (id_disp) => {
+    try {
+      const response = await fetch(
+        `https://127.0.0.1:8000/api/horarios/horarios/elminar/${id_disp}`,
+        {
+          method: 'DELETE'
+        }
+      );
+
+      if (response.ok) {
+        alert('Horario eliminado correctamente');
+      } else {
+        alert('Error al eliminar el horario');
+      }
+    } catch (error) {
+      console.error('Error al eliminar el horario:', error);
+      alert('Error al eliminar el horario');
+    } finally {
+      setContextMenu({ ...contextMenu, visible: false });
+    }
+  };
 
   // Agrupar los horarios por id_carrera_grado
   const horariosPorCarrera = horarios.reduce((acc, horario) => {
@@ -61,9 +106,15 @@ const TablaHorario = ({ horarios }) => {
       const docenteNombre = horario.disponibilidad.docente
         ? `${horario.disponibilidad.docente.nombre} ${horario.disponibilidad.docente.apellido}`
         : 'Sin Docente';
+      const id_disp = horario.id_disp;
 
       return (
-        <div className="horario-info">
+        <div
+          className="horario-info"
+          onContextMenu={(e) =>
+            handleRightClick(e, { unidadCurricular, modalidad, aula, docenteNombre, id_disp })
+          }
+        >
           <div>{unidadCurricular}</div>
           <div>{modalidad}</div>
           <div>{aula}</div>
@@ -76,7 +127,7 @@ const TablaHorario = ({ horarios }) => {
   };
 
   return (
-    <div>
+    <div onClick={handleClickOutside}>
       <h3>horarios bedelia</h3>
       {Object.entries(horariosPorCarrera).map(([idCarreraGrado, horariosGrado]) => {
         const grado =
@@ -134,6 +185,23 @@ const TablaHorario = ({ horarios }) => {
           </div>
         );
       })}
+      {/* Panel contextual */}
+      {contextMenu.visible && (
+        <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
+          <h4>{contextMenu.contenido.unidadCurricular}</h4>
+          <p>
+            <strong>Modalidad:</strong> {contextMenu.contenido.modalidad}
+          </p>
+          <p>
+            <strong>Aula:</strong> {contextMenu.contenido.aula}
+          </p>
+          <p>
+            <strong>Docente:</strong> {contextMenu.contenido.docenteNombre}
+          </p>
+          <p>ID: {contextMenu.contenido.id_disp}</p>
+          <button onClick={() => handleEliminar(contextMenu.contenido.id_disp)}>Eliminar</button>
+        </div>
+      )}
     </div>
   );
 };

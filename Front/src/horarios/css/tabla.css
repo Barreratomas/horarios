@@ -1282,3 +1282,26 @@ tbody {
   font-weight: bold;
   padding: 10px;
 }
+
+.context-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.context-menu h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.context-menu p {
+  margin: 5px 0;
+  font-size: 14px;
+}
