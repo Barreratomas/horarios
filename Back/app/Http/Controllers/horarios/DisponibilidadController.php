@@ -231,14 +231,8 @@ class DisponibilidadController extends Controller
 
 
 
-    public function eliminar(Request $request)
+    public function eliminar($id)
     {
-        $id = $request->input('id');
-        $response = $this->disponibilidadService->eliminarDisponibilidadPorId($id);
-        if (isset($response['success'])) {
-            return redirect()->route('disponibilidades.index')->with('success', $response['success']);
-        } else {
-            return redirect()->route('disponibilidades.index')->withErrors(['error' => $response['error']]);
-        }
+        return $this->disponibilidadService->eliminarDisponibilidadPorId($id);
     }
 }

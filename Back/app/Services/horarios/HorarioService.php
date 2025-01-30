@@ -30,7 +30,9 @@ class HorarioService implements HorarioRepository
                 'disponibilidad.unidadCurricular',
                 'disponibilidad.docente',
                 'disponibilidad.aula',
-                'disponibilidad.carreraGrado.grado'
+                'disponibilidad.carreraGrado.grado',
+                'disponibilidad.carreraGrado.carrera'
+
             ])->get();
 
             return response()->json($horarios, 200);

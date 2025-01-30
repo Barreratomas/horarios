@@ -531,15 +531,32 @@ class DisponibilidadService implements DisponibilidadRepository
 
     public function eliminarDisponibilidadPorId($id)
     {
+        Log::info("Intentando eliminar disponibilidad con ID: $id");
+
         try {
             $disponibilidad = Disponibilidad::find($id);
+
             if (!$disponibilidad) {
-                return ['error' => 'hubo un error al buscar disponibilidad'];
+                Log::warning("No se encontró la disponibilidad con ID: $id");
+                return response()->json([
+                    'error' => 'No se encontró la disponibilidad con el ID proporcionado.'
+                ], 404);
             }
+
+            Log::info("Disponibilidad encontrada, procediendo a eliminar: $id");
+            $disponibilidadCopy = $disponibilidad;
             $disponibilidad->delete();
-            return ['success' => 'Disponibilidad eliminada correctamente'];
+
+            Log::info("Disponibilidad eliminada correctamente: $id");
+            return response()->json([
+                'success' => 'Disponibilidad eliminada correctamente.',
+                'data' => $disponibilidadCopy
+            ], 200);
         } catch (Exception $e) {
-            return ['error' => 'Hubo un error al eliminar la disponibilidad'];
+            Log::error("Error al eliminar la disponibilidad con ID: $id - " . $e->getMessage());
+            return response()->json([
+                'error' => 'Hubo un error al eliminar la disponibilidad.'
+            ], 500);
         }
     }
 

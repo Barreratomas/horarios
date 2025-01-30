@@ -113,8 +113,8 @@ Route::delete('/horarios/gradoUC/eliminar/idUC/{id}', [GradoUcController::class,
 //Route::get('/horarios/disponibilidad/{id}', [DisponibilidadController::class, 'show']);
 //Route::post('/horarios/disponibilidad/store', [DisponibilidadController::class, 'store']);
 //Route::put('/horarios/disponibilidad/update/{id}', [DisponibilidadController::class, 'update']);
-//Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'destroy']);
 Route::get('/horarios/disponibilidad/guardarDisponibilidades', [DisponibilidadController::class, 'guardarDisponibilidades']);
+Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'eliminar']);
 
 
 // Route::get('/disponibilidad/guardar', [DisponibilidadController::class, 'guardar'])->name('storeDisponibilidad');
@@ -122,7 +122,7 @@ Route::get('/horarios/disponibilidad/guardarDisponibilidades', [DisponibilidadCo
 
 //Route::get('/disponibilidad/disponibilidad-index',[DisponibilidadController::class,'redireccionar'])->name('redireccionarDisponibilidad');
 Route::get('/disponibilidad/actualizar-disponibilidad/{h_p_d}/{dm}', [DisponibilidadController::class, 'actualizar'])->name('actualizarDisponibilidad');
-Route::get('/disponibilidad/disponibilidad-index-error', [DisponibilidadController::class, 'redireccionarError'])->name('redireccionarDisponibilidadError');
+
 
 
 // horario
