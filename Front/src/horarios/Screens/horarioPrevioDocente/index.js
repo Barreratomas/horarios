@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import '../../css/acordeon.css';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 
 const HorarioPrevio = () => {
   const usuario = sessionStorage.getItem('userType');
@@ -84,7 +85,10 @@ const HorarioPrevio = () => {
   return (
     <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center col-11">

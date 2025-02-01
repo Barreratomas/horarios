@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 
 const Logs = () => {
   const [logs, setLogs] = useState([]);
@@ -44,7 +46,10 @@ const Logs = () => {
   return (
     <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center mb-3">

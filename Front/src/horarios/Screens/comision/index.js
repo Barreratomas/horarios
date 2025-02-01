@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 import '../../css/acordeon.css';
 import { useNotification } from '../layouts/parcials/notification';
 import ErrorPage from '../layouts/parcials/errorPage';
@@ -154,7 +155,10 @@ const Comisiones = () => {
   return (
     <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
