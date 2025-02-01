@@ -79,6 +79,11 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
 
 
+
+
+
+
+
     public function obtenerAlumnoGradoPorIdAlumno($id_alumno)
     {
         $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)->get();
@@ -138,6 +143,11 @@ class AlumnoGradoService implements AlumnoGradoRepository
 
     public function guardarAlumnoGrado($id_alumno, $id_carrera_grado)
     {
+        $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)
+            ->where('id_carrera_grado', $id_carrera_grado);
+        if ($alumnoGrado->exists()) {
+            return response()->json(['error' => 'El alumno ya está asignado a este grado'], 400);
+        }
 
         $carreraGradoResponse = CarreraGrado::find($id_carrera_grado);
         Log::info('carrera grado: ' . json_encode($carreraGradoResponse));
@@ -166,6 +176,14 @@ class AlumnoGradoService implements AlumnoGradoRepository
     public function actualizarAlumnoGrado($id_alumno, $id_grado_actual, $id_grado_nuevo)
     {
         try {
+            // verificar si el alumno ya esta asignado en el grado nuevo
+            $alumnoGrado = AlumnoGrado::where('id_alumno', $id_alumno)
+                ->where('id_carrera_grado', $id_grado_nuevo)
+                ->first();
+            if ($alumnoGrado) {
+                return response()->json(['error' => 'El alumno ya está asignado a este grado'], 400);
+            }
+
             // Verificar si el alumno está asignado al grado actual
             $alumnoGradoActual = AlumnoGrado::where('id_alumno', $id_alumno)
                 ->where('id_carrera_grado', $id_grado_actual)
@@ -594,7 +612,7 @@ class AlumnoGradoService implements AlumnoGradoRepository
             // Revertir la transacción en caso de error
             DB::rollBack();
             Log::error('Error al asignar grados: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al asignar grados: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al asignar a alumnos a los grados: '], 500);
         }
     }
 

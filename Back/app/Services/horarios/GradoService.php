@@ -82,7 +82,7 @@ class GradoService implements GradoRepository
 
             // Si ya existe, retornar un mensaje indicando que no se puede crear
             if ($existingGrado) {
-                return response()->json($existingGrado, 200);
+                return response()->json($existingGrado, 409);
             }
 
             // Si no existe, proceder a guardar el nuevo grado

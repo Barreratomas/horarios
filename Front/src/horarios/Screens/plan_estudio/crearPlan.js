@@ -76,16 +76,13 @@ const CrearPlan = () => {
           materias: selectedMaterias
         })
       });
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.planes.main}`, {
-          state: { successMessage: 'Plan creado con éxito', updated: true }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.errors, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
+        navigate(`${routes.base}/${routes.planes.main}`, {
+          state: { successMessage: 'Plan de estudio creado con éxito', updated: true }
+        });
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

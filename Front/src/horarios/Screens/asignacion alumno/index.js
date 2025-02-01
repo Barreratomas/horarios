@@ -117,17 +117,19 @@ const AsignacionAlumno = () => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-
-      if (!response.ok) throw new Error('Error al asignar alumno');
-
-      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
-        state: {
-          successMessage: 'Los alumnos ingresantes fueron asignados a los grados con éxito',
-          updated: true
-        }
-      });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
+          state: {
+            successMessage: 'Los alumnos ingresantes fueron asignados a los grados con éxito',
+            updated: true
+          }
+        });
+      }
     } catch (error) {
-      addNotification(error.message, 'danger');
+      addNotification('Error de conexión', 'danger');
     }
   };
   const handleAssignNoIngresantes = async () => {
@@ -138,17 +140,19 @@ const AsignacionAlumno = () => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
-
-      if (!response.ok) throw new Error('Error al asignar alumnos no ingresantes');
-
-      navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
-        state: {
-          successMessage: 'Los alumnos no ingresantes fueron asignados a los grados con éxito',
-          updated: true
-        }
-      });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        navigate(`${routes.base}/${routes.asignacionesAlumno.main}`, {
+          state: {
+            successMessage: 'Los alumnos no ingresantes fueron asignados a los grados con éxito',
+            updated: true
+          }
+        });
+      }
     } catch (error) {
-      addNotification(error.message, 'danger');
+      addNotification('Error de conexión', 'danger');
     } finally {
       console.log();
     }

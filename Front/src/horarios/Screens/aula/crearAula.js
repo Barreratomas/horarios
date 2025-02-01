@@ -25,16 +25,13 @@ const CrearAula = () => {
         body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad })
       });
 
-      if (response.ok) {
-        console.log();
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.aulas.main}`, {
           state: { successMessage: 'Aula creada con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

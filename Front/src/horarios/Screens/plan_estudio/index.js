@@ -97,15 +97,17 @@ const Planes = () => {
         }
       );
 
-      if (!response.ok) throw new Error('Error al eliminar el plan');
       const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setPlanes(planes.filter((plan) => plan.id_plan !== planToDelete));
+        addNotification(data.message, 'success');
 
-      setPlanes(planes.filter((plan) => plan.id_plan !== planToDelete));
-      addNotification(data.message, 'success');
-
-      setShowModal(false); // Cerrar el modal
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
-      addNotification(error.message, 'danger');
+      addNotification('Error de conexión', 'danger');
     }
   };
 
@@ -119,16 +121,19 @@ const Planes = () => {
         }
       );
 
-      if (!response.ok) throw new Error('Error al finalizar el plan');
-
-      setPlanes((prevPlanes) =>
-        prevPlanes.map((plan) =>
-          plan.id_plan === id_plan
-            ? { ...plan, fecha_fin: new Date().toISOString().split('T')[0] }
-            : plan
-        )
-      );
-      addNotification('El plan ha sido finalizado exitosamente', 'success');
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setPlanes((prevPlanes) =>
+          prevPlanes.map((plan) =>
+            plan.id_plan === id_plan
+              ? { ...plan, fecha_fin: new Date().toISOString().split('T')[0] }
+              : plan
+          )
+        );
+        addNotification('El plan ha sido finalizado exitosamente', 'success');
+      }
     } catch (error) {
       addNotification(error.message, 'danger');
     }
@@ -184,7 +189,7 @@ const Planes = () => {
                     plan.fecha_fin
                   ) : (
                     <>
-                      No disponible{' '}
+                      Sin definir{' '}
                       <button
                         type="button"
                         className="btn btn-sm btn-primary ms-2"

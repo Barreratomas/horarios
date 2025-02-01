@@ -24,16 +24,15 @@ const ActualizarAula = () => {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/horarios/aulas/${aulaId}`);
         const data = await response.json();
-        console.log(data);
-        if (response.ok) {
+        if (data.error) {
+          addNotification(data.error, 'danger');
+        } else {
           setNombre(data.nombre);
           setTipoAula(data.tipo_aula);
           setCapacidad(data.capacidad);
-        } else {
-          console.error('Error al obtener los datos del aula');
         }
       } catch (error) {
-        console.error('Error de red al obtener el aula:', error);
+        addNotification('Error de conexión', 'danger');
       }
     };
 
@@ -59,16 +58,13 @@ const ActualizarAula = () => {
           body: JSON.stringify({ nombre, tipo_aula: tipoAula, capacidad, detalles, usuario })
         }
       );
-
-      if (response.ok) {
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.errors, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.aulas.main}`, {
           state: { successMessage: 'Aula actualizada con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

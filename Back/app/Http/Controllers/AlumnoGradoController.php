@@ -94,6 +94,7 @@ class AlumnoGradoController extends Controller
      */
     public function store($id_alumno, $id_grado)
     {
+
         return $this->alumnoGradoService->guardarAlumnoGrado($id_alumno, $id_grado);
     }
 
@@ -123,6 +124,8 @@ class AlumnoGradoController extends Controller
      *      )
      * )
      */
+
+
     public function showByAlumno($id_alumno)
     {
         return $this->alumnoGradoService->obtenerAlumnoGradoPorIdAlumno($id_alumno);
@@ -202,6 +205,11 @@ class AlumnoGradoController extends Controller
         try {
             $alumnoGradoResponse = $this->alumnoGradoService->eliminarAlumnoGrado($id_alumno, $id_grado);
 
+            if ($alumnoGradoResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+                return $alumnoGradoResponse;
+            }
+
             $alumnoGrado = $alumnoGradoResponse->getData();
             Log::info(json_encode($alumnoGrado));
             $dniAlumno = $alumnoGrado->dni_alumno;
@@ -259,6 +267,9 @@ class AlumnoGradoController extends Controller
             if (!$alumnoGradoResponse || !$alumnoGradoResponse->getData()) {
                 Log::error("Error: La respuesta de la actualización del grado es nula o vacía para el alumno con ID $id_alumno.");
                 throw new \Exception('Error al obtener los datos del alumno y los grados.');
+            }
+            if ($alumnoGradoResponse->status() !== 200) {
+                return $alumnoGradoResponse;
             }
 
             $alumnoGrado = $alumnoGradoResponse->getData();

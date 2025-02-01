@@ -100,16 +100,13 @@ const CrearComision = () => {
           materias: materiasSeleccionadas
         })
       });
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Grado creado con éxito', updated: true }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        console.log(data);
-        if (data.error) {
-          addNotification(data.error, 'danger');
-        }
+        navigate(`${routes.base}/${routes.comisiones.main}`, {
+          state: { successMessage: 'Comisión creada con éxito', updated: true }
+        });
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

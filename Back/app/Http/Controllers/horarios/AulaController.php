@@ -291,6 +291,12 @@ class AulaController extends Controller
         try {
             $aulaResponse = $this->aulaService->eliminarAulas($id);
 
+
+            if ($aulaResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+                return $aulaResponse;
+            }
+
             $aula = $aulaResponse->getData();
             if (!isset($aula->nombre_aula)) {
                 throw new \Exception('No se pudo obtener el nombre del aula.');

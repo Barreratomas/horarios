@@ -47,7 +47,7 @@ class CarreraRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'errors' => $validator->errors()->all(),
+            'error' => $validator->errors()->all(),
             'message' => 'Error de validación en los datos enviados.',
         ], 422));
     }

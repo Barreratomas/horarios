@@ -136,16 +136,13 @@ const ActualizarComision = () => {
           })
         }
       );
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Grado actualizado con éxito', updated: true }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
+        navigate(`${routes.base}/${routes.comisiones.main}`, {
+          state: { successMessage: 'Comisión actualizada con éxito', updated: true }
+        });
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

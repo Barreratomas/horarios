@@ -72,16 +72,13 @@ const ActualizarMateria = () => {
           })
         }
       );
-
-      if (response.ok) {
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
         navigate(`${routes.base}/${routes.materias.main}`, {
           state: { successMessage: 'Materia actualizada con éxito', updated: true }
         });
-      } else {
-        const data = await response.json();
-        if (data.errors) {
-          addNotification(data.errors, 'danger');
-        }
       }
     } catch (error) {
       addNotification(`Error de conexión`, 'danger');

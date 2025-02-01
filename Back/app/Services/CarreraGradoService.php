@@ -8,6 +8,8 @@ use App\Repositories\CarreraGradoRepository;
 use App\Services\horarios\GradoService;
 use App\Services\horarios\CarreraService;
 use App\Mappers\CarreraGradoMapper;
+use App\Models\Alumno;
+use App\Models\horarios\GradoUC;
 use Exception;
 
 class CarreraGradoService implements CarreraGradoRepository
@@ -70,6 +72,59 @@ class CarreraGradoService implements CarreraGradoRepository
             return response()->json(['error' => 'Hubo un error al obtener los carrerasGrados'], 500);
         }
     }
+
+    public function obtenerCarreraGradoPorMaterias($id_alumno)
+    {
+
+        $alumno = Alumno::find($id_alumno);
+        if (!$alumno) {
+            return response()->json(['error' => 'Alumno no encontrado'], 404);
+        }
+        try {
+            $uc = [];
+            foreach ($alumno->alumno_uc as $alumnoUC) {
+                $uc[] = $alumnoUC->id_uc;
+            }
+
+            $id_carrera = $alumno->alumno_carrera->first()->id_carrera;
+
+            $carreraGrados = GradoUC::whereIn('id_uc', $uc)
+                ->whereHas('carreraGrado', function ($query) use ($id_carrera) {
+                    $query->where('id_carrera', $id_carrera);
+                })
+                ->get()
+                ->pluck('id_carrera_grado');
+
+
+
+            $grados = CarreraGrado::with(['grado', 'carrera'])
+                ->whereIn('id_carrera_grado', $carreraGrados)
+                ->get()
+                ->map(function ($carreraGrado) {
+                    $totalAlumnos = $carreraGrado->alumno_grado()->count(); // Obtener el número de alumnos asignados
+                    $capacidadDisponible = $carreraGrado->capacidad - $totalAlumnos; // Capacidad total menos alumnos actuales
+
+                    return [
+                        'id_carrera_grado' => $carreraGrado->id_carrera_grado,
+                        'capacidad' => $capacidadDisponible,
+                        'grado' => $carreraGrado->grado->grado,
+                        'division' => $carreraGrado->grado->division,
+                        'carrera' => $carreraGrado->carrera->carrera,
+                    ];
+                });
+            if ($grados->isEmpty()) {
+                return response()->json(['error' => "No se encontraron grados para el alumno {$alumno->DNI}"], 404);
+            }
+            log::info("grados {$grados}");
+            return response()->json($grados, 200);
+
+            return response()->json(200);
+        } catch (Exception $e) {
+            Log::error('Error al obtener el alumnoGrado: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener el alumnoGrado'], 500);
+        }
+    }
+
 
 
     public function obtenerCarreraGrado($id_carreraGrado)
@@ -252,7 +307,7 @@ class CarreraGradoService implements CarreraGradoRepository
             // Valida si la suma de capacidades más la nueva supera el cupo de la carrera
             if (($capacidadExistente + $capacidad) > $carrera->cupo) {
                 return response()->json([
-                    'error' => 'No se puede asignar la capacidad. Supera el cupo total de la carrera.'
+                    'error' => 'No se puede crear la comisión proque la capacidad supera el cupo total de la carrera.'
                 ], 400);
             }
 
@@ -273,6 +328,7 @@ class CarreraGradoService implements CarreraGradoRepository
     public function eliminarCarreraGradoPorIdGradoYCarrera($id_carrera_grado)
     {
         $carreraGrado = CarreraGrado::where('id_carrera_grado', $id_carrera_grado)->first();
+        $carreraGradoCopy = CarreraGrado::with(["carrera", "grado"])->where("id_carrera_grado", $id_carrera_grado)->first();
         if (!$carreraGrado) {
             return response()->json(['error' => 'CarreraGrado no encontrado'], 404);
         }
@@ -296,7 +352,7 @@ class CarreraGradoService implements CarreraGradoRepository
 
             // Eliminar CarreraGrado
             $carreraGrado->delete();
-            return response()->json($carreraGrado, 200);
+            return response()->json($carreraGradoCopy, 200);
         } catch (Exception $e) {
             Log::error('Error al eliminar la carreraGrado: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al eliminar la carreraGrado'], 500);
