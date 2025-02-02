@@ -3,17 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LogsRequest;
 use App\Services\CarreraGradoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\LogModificacionEliminacionController;
+
 
 class CarreraGradoController extends Controller
 {
     protected $carreraGradoService;
+    protected $logModificacionEliminacionController;
 
-    public function __construct(CarreraGradoService $carreraGradoService)
+    public function __construct(CarreraGradoService $carreraGradoService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
         $this->carreraGradoService = $carreraGradoService;
+        $this->logModificacionEliminacionController = $logModificacionEliminacionController;
     }
 
 
@@ -42,8 +48,23 @@ class CarreraGradoController extends Controller
     {
         return $this->carreraGradoService->obtenerTodosCarreraGrado();
     }
-    
-    
+
+    //  devueve los registros de carrera grado que tiene las materias de un alumno
+    public function showGradosByMaterias($id_alumno)
+    {
+        log::info("en controlador {$id_alumno}");
+
+        return $this->carreraGradoService->obtenerCarreraGradoPorMaterias($id_alumno);
+    }
+
+
+
+
+    public function showByCarreraGrado($id_carreraGrado)
+    {
+        return $this->carreraGradoService->obtenerCarreraGrado($id_carreraGrado);
+    }
+
     /*
     * @OA\Get(
     *      path="/api/horarios/carreraGrados/carrera/{id_carrera}",
@@ -78,7 +99,7 @@ class CarreraGradoController extends Controller
     {
         return $this->carreraGradoService->obtenerCarreraGradoPorIdCarrera($id_carrera);
     }
-    
+
 
     /*
     * @OA\Get(
@@ -133,12 +154,12 @@ class CarreraGradoController extends Controller
     *      )
     * )
     */
-    public function store($id_carrera, $id_grado)
+    public function store($id_carrera, $id_grado, $capacidad)
     {
-        return $this->carreraGradoService->guardarCarreraGrado($id_carrera, $id_grado);
+        return $this->carreraGradoService->guardarCarreraGrado($id_carrera, $id_grado, $capacidad);
     }
 
-   
+
     /*
     * @OA\Delete(
     *      path="/api/horarios/carreraGrados/eliminar/{id_carrera}/{id_grado}",
@@ -170,8 +191,39 @@ class CarreraGradoController extends Controller
     *      )
     * )
     */
-    public function destroy($id_carrera, $id_grado)
+    public function destroy($id_carrera_grado, LogsRequest $request)
     {
-       return $this->carreraGradoService->eliminarCarreraGradoPorIdGradoYCarrera( $id_carrera, $id_grado);
+        $detalle = $request->input('detalles');
+        $usuario = $request->input('usuario');
+        DB::beginTransaction();
+        try {
+            $carreraGradoResponse = $this->carreraGradoService->eliminarCarreraGradoPorIdGradoYCarrera($id_carrera_grado);
+            if ($carreraGradoResponse->getStatusCode() !== 200) {
+                DB::rollBack();
+
+                return $carreraGradoResponse;
+            }
+            $carreraGrado = $carreraGradoResponse->getData();
+            $grado = $carreraGrado->grado->grado;
+            $division = $carreraGrado->grado->division;
+            $carrera = $carreraGrado->carrera->carrera;
+            Log::info('Datos del grado eliminado:', (array) $carreraGrado->grado);
+            Log::info('Datos del grado carrera eliminado:', (array) $carreraGrado->carrera);
+
+            $accion = "Eliminación del grado: " . $grado . " división: " . $division . " carrera: " . $carrera;
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Comisión eliminada correctamente.'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => 'Hubo un problema al eliminar la comisión: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

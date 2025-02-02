@@ -45,6 +45,7 @@ import CrearAsignacionAlumno from '../horarios/Screens/asignacion alumno/crearAs
 import Comisiones from '../horarios/Screens/comision';
 import HorarioPrevio from '../horarios/Screens/horarioPrevioDocente';
 import Logs from '../horarios/Screens/logs/logs';
+import ErrorPage from '../horarios/Screens/layouts/parcials/errorPage';
 const RoutesLanding = () => {
   const { pathname } = useLocation();
   const routes = getRoutes(); // Llamada a la función para obtener las rutas
@@ -135,6 +136,8 @@ const RoutesLanding = () => {
         {/* logs */}
         <Route path={routes.logs.main} element={<Logs />} />
       </Route>
+      {/* Ruta para manejar URLs no válidas */}
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 };

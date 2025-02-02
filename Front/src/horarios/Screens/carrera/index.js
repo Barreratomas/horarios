@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
-
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
+import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 const Carreras = () => {
   const [detalles, setDetalles] = useState('');
   const usuario = sessionStorage.getItem('userType');
@@ -15,26 +17,16 @@ const Carreras = () => {
   const [carreras, setCarreras] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
-  const [errors, setErrors] = useState([]);
+
+  const { addNotification } = useNotification();
 
   useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
 
-      // Mostrar el mensaje durante 3 segundos
-      setTimeout(() => {
-        setHideMessage(true); // Ocultar con la clase CSS
-      }, 3000);
-
-      // Limpiar después de la transición
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-
-        navigate(location.pathname, { replace: true }); // Reemplaza la entrada en el historial para no tener el state
-      }, 3500);
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchCarreras = async () => {
@@ -43,18 +35,14 @@ const Carreras = () => {
           headers: { Accept: 'application/json' }
         });
 
-        if (!response.ok) throw new Error(' ');
+        if (!response.ok) throw new Error('Error al obtener carreras ');
 
-        const jsonResponse = await response.json();
-        if (jsonResponse) {
-          setCarreras(jsonResponse);
-          setServerUp(true);
-        } else {
-          alert('Servidor fuera de servicio...');
-        }
+        const data = await response.json();
+
+        setCarreras(data);
+        setServerUp(true);
       } catch (error) {
-        console.error('Error checking server status:', error);
-        alert('Error al verificar el servidor...');
+        console.log('Error al obtener carreras:', error.message);
       } finally {
         setLoading(false);
       }
@@ -67,95 +55,98 @@ const Carreras = () => {
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/horarios/carreras/eliminar/${carreraToDelete}`,
+
         {
           method: 'DELETE',
           body: JSON.stringify({ detalles: detalles, usuario }),
           headers: { 'Content-Type': 'application/json' }
         }
       );
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setCarreras(carreras.filter((carrera) => carrera.id_carrera !== carreraToDelete));
 
-      if (!response.ok) throw new Error('Error al eliminar carrera');
+        addNotification(data.message, 'success');
 
-      setCarreras(carreras.filter((carrera) => carrera.id_carrera !== carreraToDelete));
-      setSuccessMessage('Carrera eliminada con éxito');
-
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-      }, 3500);
-      setShowModal(false); // Cerrar el modal
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar carrera']);
+      addNotification(error.message, 'danger');
     }
   };
 
   return (
-    <div className="container py-3">
-      <div className="row align-items-center justify-content-center">
-        <div className="col-6 text-center">
-          <button
-            className="btn btn-primary me-2"
-            onClick={() => navigate(`${routes.base}/${routes.carreras.crear}`)}
-          >
-            Crear
-          </button>
-        </div>
-      </div>
-
+    <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
-        <div className="container">
-          {carreras.map((carrera) => (
-            <div
-              key={carrera.id_carrera}
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '5px',
-                padding: '10px',
-                marginBottom: '10px',
-                width: '30vw'
-              }}
-            >
-              <p>Carrera: {carrera.carrera}</p>
-              <p>Cupo: {carrera.cupo} </p>
-
-              <div className="botones">
-                <button
-                  className="btn btn-primary me-2"
-                  onClick={() =>
-                    navigate(`${routes.base}/${routes.carreras.actualizar(carrera.id_carrera)}`)
-                  }
-                >
-                  Actualizar
-                </button>
-
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    setCarreraToDelete(carrera.id_carrera); // Establecer el grado a eliminar
-                    setShowModal(true); // Mostrar el modal
-                  }}
-                >
-                  Eliminar
-                </button>
-              </div>
+        <div className="container py-3">
+          <div className="row align-items-center justify-content-center">
+            <div className="col-6 text-center">
+              <button
+                className="btn btn-primary me-2"
+                onClick={() => navigate(`${routes.base}/${routes.carreras.crear}`)}
+              >
+                Crear
+              </button>
             </div>
-          ))}
+          </div>
+          <div className="container">
+            {carreras.map((carrera) => (
+              <div
+                key={carrera.id_carrera}
+                style={{
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                  padding: '10px',
+                  marginBottom: '10px',
+                  width: '30vw'
+                }}
+              >
+                <p>Carrera: {carrera.carrera}</p>
+                <p>Cupo: {carrera.cupo}</p>
+
+                <div className="botones">
+                  <button
+                    className="btn btn-primary me-2"
+                    onClick={() =>
+                      navigate(`${routes.base}/${routes.carreras.actualizar(carrera.id_carrera)}`)
+                    }
+                  >
+                    Actualizar
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => {
+                      setCarreraToDelete(carrera.id_carrera); // Establecer el grado a eliminar
+                      setShowModal(true); // Mostrar el modal
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La sección de carreras" statusCode={500} />
       )}
+
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar eliminación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>¿Estás seguro de que quieres eliminar esta carrera?</p>
           <div className="form-group">
-            <label htmlFor="detalles">Detalles:</label>
+            <label htmlFor="detalles">Por favor, ingrese el motivo de eliminacion:</label>
             <textarea
               id="detalles"
               className="form-control"
@@ -174,19 +165,7 @@ const Carreras = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <div id="messages-container" className={`container ${hideMessage ? 'hide-messages' : ''}`}>
-        {errors.length > 0 && (
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-      </div>
-    </div>
+    </>
   );
 };
 

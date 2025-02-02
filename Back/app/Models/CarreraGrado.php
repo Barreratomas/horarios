@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Models\horarios\Carrera;
+use App\Models\horarios\Disponibilidad;
 use App\Models\horarios\Grado;
+use App\Models\horarios\GradoUC;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @OA\Schema(
@@ -26,9 +29,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CarreraGrado extends Model
 {
-    protected $fillable = ['id_carrera', 'id_grado'];
+    protected $fillable = ['id_carrera', 'id_grado', 'capacidad'];
     protected $table = 'carrera_grado';
-    public $incrementing = false;
+    protected $primaryKey = 'id_carrera_grado';
+    public $incrementing = true;
     public $timestamps = false;
 
 
@@ -45,5 +49,22 @@ class CarreraGrado extends Model
     public function grado(): BelongsTo
     {
         return $this->belongsTo(Grado::class, 'id_grado');
+    }
+    public function disponibilidad(): HasMany
+    {
+        return $this->hasMany(Disponibilidad::class, 'id_carrera_grado', 'id_carrera_grado');
+    }
+
+    // Un grado tiene uno o muchos alumno_grado
+    public function alumno_grado(): HasMany
+    {
+        return $this->hasMany(AlumnoGrado::class, 'id_carrera_grado', 'id_carrera_grado');
+    }
+
+
+    // Un grado tiene uno o muchos grado_uc
+    public function grado_uc(): HasMany
+    {
+        return $this->hasMany(GradoUC::class, 'id_carrera_grado', 'id_carrera_grado');
     }
 }

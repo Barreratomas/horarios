@@ -13,14 +13,15 @@ use App\Services\CarreraGradoService;
 use App\Services\horarios\GradoUcService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 class GradoController extends Controller
 {
     protected $gradoService;
-    protected $carreraGradoService; 
-    protected $gradoUcService; 
-    protected $logModificacionEliminacionController; 
+    protected $carreraGradoService;
+    protected $gradoUcService;
+    protected $logModificacionEliminacionController;
 
-    
+
 
     public function __construct(GradoService $gradoService, CarreraGradoService $carreraGradoService, GradoUcService $gradoUcService, LogModificacionEliminacionController $logModificacionEliminacionController)
     {
@@ -28,7 +29,6 @@ class GradoController extends Controller
         $this->carreraGradoService = $carreraGradoService;
         $this->gradoUcService = $gradoUcService;
         $this->logModificacionEliminacionController = $logModificacionEliminacionController;
-
     }
 
     //-------------------------------------------------------------------------------------------------------------
@@ -122,38 +122,73 @@ class GradoController extends Controller
         DB::beginTransaction();
 
         try {
+            // Log inicial
+            Log::info('Iniciando la creación de un nuevo grado', [
+                'datos_recibidos' => $request->all()
+            ]);
+
             // Guardar el grado (solo los campos necesarios para grado)
-            $gradoResponse = $this->gradoService->guardarGrados($request->only(['grado', 'division', 'detalle', 'capacidad']));
-            $grado = $gradoResponse->getData();  // Extrae el contenido del JSON
-        
+            Log::info('Guardando el grado', ['campos' => $request->only(['grado', 'division', 'detalle'])]);
+
+            $gradoResponse = $this->gradoService->guardarGrados($request->only(['grado', 'division', 'detalle']));
+            if ($gradoResponse->getStatusCode() !== 201) {
+                return $gradoResponse;
+            }
+            $grado = $gradoResponse->getData(); // Extrae el contenido del JSON
+
+            Log::info('Grado guardado correctamente', ['grado' => $grado]);
+
             // Obtener el ID de la carrera
             $id_carrera = $request->input('id_carrera');
-            
+
             // Guardar la relación entre carrera y grado
-            $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado);
-            
+            Log::info('Guardando la relación Carrera-Grado', [
+                'id_carrera' => $id_carrera,
+                'id_grado' => $grado->id_grado,
+                'capacidad' => $request->input('capacidad')
+            ]);
+
+            $carreraGradoResponse = $this->carreraGradoService->guardarCarreraGrado($id_carrera, $grado->id_grado, $request->input('capacidad'));
+
+            if ($carreraGradoResponse->getStatusCode() !== 201) {
+                return $carreraGradoResponse;
+            }
+
+            $carreraGrado = $carreraGradoResponse->getData();
+
+            Log::info('Relación Carrera-Grado guardada correctamente', ['carreraGrado' => $carreraGrado]);
+
             // Guardar las materias relacionadas con el grado
             $materias = $request->input('materias');
             if ($materias) {
-                $this->gradoUcService->guardarGradoUC( $grado->id_grado, $materias);
+                Log::info('Guardando materias relacionadas con el grado', [
+                    'id_carrera_grado' => $carreraGrado->id_carrera_grado,
+                    'materias' => $materias
+                ]);
+                $graduUCResponse = $this->gradoUcService->guardarGradoUC($carreraGrado->id_carrera_grado, $materias);
+                if ($graduUCResponse->getStatusCode() !== 201) {
+                    return $graduUCResponse;
+                }
+                Log::info('Materias guardadas correctamente');
             }
-    
-            // Si todo va bien, hacer commit
+
             DB::commit();
-    
+
             // Responder con el mensaje de éxito
             return response()->json([
-                'message' => 'Grado creado y asignado a carrera exitosamente', 
+                'message' => 'Grado creado y asignado a carrera exitosamente',
                 'data' => $grado
             ], 201);
-    
         } catch (\Exception $e) {
             // Si ocurre un error, hacer rollback de la transacción
             DB::rollBack();
-            
+
             // Registrar el error
-            Log::error('Error al guardar el grado y las relaciones: ' . $e->getMessage());
-            
+            Log::error('Error al guardar el grado y las relaciones', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             // Responder con un error
             return response()->json(['error' => 'Hubo un error al guardar el grado y sus relaciones'], 500);
         }
@@ -193,46 +228,53 @@ class GradoController extends Controller
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
-        
-        // Iniciar la transacción para asegurar la atomicidad
-        DB::beginTransaction();
-    
-        try {
-            // Primero, actualizamos el grado con la información de la solicitud
-            $gradoResponse = $this->gradoService->actualizarGrados($request, $id);
-    
-            if ($gradoResponse->getStatusCode() != 200) {
-                DB::rollBack();
-                return response()->json(['error' => 'Hubo un error al actualizar el grado'], 500);
-            }
-    
-            // Obtenemos el objeto de grado actualizado
-            $grado = $gradoResponse->getData();
 
-            // Validamos si hay materias para actualizar
+
+        DB::beginTransaction();
+
+        try {
+            // actualiza el grado con la información de la solicitud
+            $CarreraGradoResponse = $this->carreraGradoService->update($id, $request->input('capacidad'));
+
+
+            if ($CarreraGradoResponse->getStatusCode() != 200) {
+                DB::rollBack();
+                return $CarreraGradoResponse;
+            }
+
+            // obteniene el objeto de grado actualizado
+            $carreraGrado = json_decode(json_encode($CarreraGradoResponse->getData()), true);
+
+            Log::info(json_encode($carreraGrado));
+
+            // valida si hay materias para actualizar
             $materias = $request->input('materias');
             if ($materias) {
-                // Actualizamos las materias asociadas al grado
-                $this->gradoUcService->actualizarGradoUC($grado->id_grado, $materias);
-            }
-            $nombreGrado = $grado->detalle;
-            $accion = "Actualización del grado " . $nombreGrado."(id:".$grado->id_grado.")";
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+                // Actualiza las materias asociadas al grado
+                $graduUCResponse = $this->gradoUcService->actualizarGradoUC($carreraGrado['data']['id_carrera_grado'], $materias);
+                if ($graduUCResponse->getStatusCode() !== 200) {
+                    DB::rollBack();
 
-    
+                    return $graduUCResponse;
+                }
+            }
+            $nombreGrado = $carreraGrado['data']['grado']['detalle'];
+            $accion = "Actualización del grado " . $nombreGrado . "(id:" . $carreraGrado['data']['id_carrera_grado'] . ")";
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
+
+
             DB::commit();
-    
+
             return response()->json(['message' => 'Grado y materias actualizados exitosamente'], 200);
-            
         } catch (\Exception $e) {
             DB::rollBack();
-    
+
             Log::error("Error al actualizar el grado y sus materias: " . $e->getMessage());
-    
+
             return response()->json(['error' => 'Hubo un error al actualizar el grado'], 500);
         }
     }
-    
+
 
     /**
      * @OA\Delete(
@@ -260,7 +302,7 @@ class GradoController extends Controller
      * )
      * )
      */
-        public function destroy($id, LogsRequest $request)
+    public function destroy($id, LogsRequest $request)
     {
         $detalle = $request->input('detalles');
         $usuario = $request->input('usuario');
@@ -269,23 +311,22 @@ class GradoController extends Controller
 
         try {
             $gradoResponse = $this->gradoService->eliminarGrados($id);
-            
+
             $grado = $gradoResponse->getData();
             if (!isset($grado->nombre_grado)) {
                 throw new \Exception('No se pudo obtener el nombre del grado.');
             }
 
             $nombreGrado = $grado->nombre_grado;
-            $accion = "Eliminación del grado " . $nombreGrado."(id:".$id.")";
-            
-            $this->logModificacionEliminacionController->store($accion,$usuario,$detalle);
+            $accion = "Eliminación del grado " . $nombreGrado . "(id:" . $id . ")";
+
+            $this->logModificacionEliminacionController->store($accion, $usuario, $detalle);
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Grado eliminado correctamente.'
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -294,5 +335,4 @@ class GradoController extends Controller
             ], 500);
         }
     }
-
 }

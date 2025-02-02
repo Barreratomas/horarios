@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\horarios\Carrera; 
-use App\Models\horarios\PlanEstudio; 
+use App\Models\horarios\Carrera;
+use App\Models\horarios\PlanEstudio;
 
 
 /**
@@ -31,10 +31,10 @@ class CarreraPlan extends Model
     use HasFactory;
 
     protected $fillable = ['id_plan', 'id_carrera'];
-    protected $table = 'carrera_plan'; 
+    protected $table = 'carrera_plan';
 
     public $incrementing = false;
-    public $timestamps = false;
+    public $timestamps = true;
 
     // Especificar las claves compuestas
     protected $primaryKey = ['id_carrera', 'id_plan'];
@@ -50,7 +50,4 @@ class CarreraPlan extends Model
     {
         return $this->belongsTo(PlanEstudio::class, 'id_plan', 'id_plan');
     }
-    
-
-    
 }

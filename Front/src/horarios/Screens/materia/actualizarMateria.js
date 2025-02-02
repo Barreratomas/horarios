@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
-
+import { useNotification } from '../layouts/parcials/notification';
 const ActualizarMateria = () => {
   const usuario = sessionStorage.getItem('userType');
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
-  const [detalles, setDetalles] = useState(''); // Detalle de actualización
+  console.log(usuario);
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [detalles, setDetalles] = useState('');
 
-  const { materiaId } = useParams(); // Obtener ID de la materia desde la URL
+  const { materiaId } = useParams();
   const [unidadCurricular, setUnidadCurricular] = useState('');
   const [tipo, setTipo] = useState('');
   const [horasSem, setHorasSem] = useState('');
   const [horasAnual, setHorasAnual] = useState('');
   const [formato, setFormato] = useState('');
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { routes } = useOutletContext(); // Obtener rutas desde el contexto
+  const { routes } = useOutletContext();
+  const { addNotification } = useNotification();
 
   // Obtener los datos de la materia por ID
   useEffect(() => {
     const obtenerMateria = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/horaios/unidadCurricular/${materiaId}`
+          `http://127.0.0.1:8000/api/horarios/unidadCurricular/${materiaId}`
         );
         const data = await response.json();
 
@@ -34,10 +35,10 @@ const ActualizarMateria = () => {
           setHorasAnual(data.horas_anual);
           setFormato(data.formato);
         } else {
-          console.error('Error al obtener la materia:', data);
+          console.error('Error al obtener los datos de la materia:');
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error de red al obtener la materia:', error);
       }
     };
 
@@ -46,9 +47,9 @@ const ActualizarMateria = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setShowModal(true); // Mostrar el modal de confirmación
+    setShowModal(true);
   };
-  // Manejar el envío del formulario
+
   const handleConfirmUpdate = async () => {
     setIsSubmitting(true);
 
@@ -71,27 +72,24 @@ const ActualizarMateria = () => {
           })
         }
       );
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.materias.main}`, {
-          state: { successMessage: 'Materia actualizada con éxito' }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          setErrors(data.errors);
-        }
+        navigate(`${routes.base}/${routes.materias.main}`, {
+          state: { successMessage: 'Materia actualizada con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error al actualizar la materia:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
-      setIsSubmitting(false); // Finalizar el proceso de envío
-      setShowModal(false); // Cerrar el modal de confirmación
+      setIsSubmitting(false);
+      setShowModal(false);
     }
   };
-  // Cancelar la actualización
+
   const handleCancelUpdate = () => {
-    setShowModal(false); // Cerrar el modal de confirmación sin hacer nada
+    setShowModal(false);
   };
 
   return (
@@ -108,9 +106,7 @@ const ActualizarMateria = () => {
               onChange={(e) => setUnidadCurricular(e.target.value)}
               maxLength="60"
             />
-            {errors.unidad_curricular && (
-              <div className="text-danger">{errors.unidad_curricular}</div>
-            )}
+
             <br />
             <br />
 
@@ -123,7 +119,6 @@ const ActualizarMateria = () => {
               onChange={(e) => setTipo(e.target.value)}
               maxLength="20"
             />
-            {errors.tipo && <div className="text-danger">{errors.tipo}</div>}
             <br />
             <br />
 
@@ -135,7 +130,6 @@ const ActualizarMateria = () => {
               value={horasSem}
               onChange={(e) => setHorasSem(e.target.value)}
             />
-            {errors.horas_sem && <div className="text-danger">{errors.horas_sem}</div>}
             <br />
             <br />
 
@@ -147,7 +141,6 @@ const ActualizarMateria = () => {
               value={horasAnual}
               onChange={(e) => setHorasAnual(e.target.value)}
             />
-            {errors.horas_anual && <div className="text-danger">{errors.horas_anual}</div>}
             <br />
             <br />
 
@@ -159,35 +152,32 @@ const ActualizarMateria = () => {
               value={formato}
               onChange={(e) => setFormato(e.target.value)}
             />
-            {errors.formato && <div className="text-danger">{errors.formato}</div>}
             <br />
             <br />
 
             <button type="submit" className="btn btn-primary mt-3">
               {isSubmitting ? 'Actualizando...' : 'Actualizar materia'}
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.materias.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>
 
-      {Object.keys(errors).length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar actualización</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <label htmlFor="detalles">Detalles:</label>
+          <label htmlFor="detalles">Por favor, ingrese el motivo de actualización:</label>
+
           <textarea
             name="detalles"
             value={detalles}

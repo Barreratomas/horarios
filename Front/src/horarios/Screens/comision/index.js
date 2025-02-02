@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 import '../../css/acordeon.css';
+import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const Accordion = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +26,8 @@ const Accordion = ({ title, children }) => {
 const Comisiones = () => {
   const usuario = sessionStorage.getItem('userType');
   const navigate = useNavigate();
-  const { routes } = useOutletContext(); // Acceder a las rutas definidas
-  const location = useLocation(); // Manejar el estado de navegación
+  const { routes } = useOutletContext();
+  const location = useLocation();
 
   const [filteredComisiones, setFilteredComisiones] = useState([]);
   const [searchCriteria, setSearchCriteria] = useState({
@@ -35,24 +38,20 @@ const Comisiones = () => {
   const [serverUp, setServerUp] = useState(false);
   const [grados, setGrados] = useState([]);
   const [carreras, setCarreras] = useState([]);
-  const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [gradoToDelete, setGradoToDelete] = useState(null);
   const [detalles, setDetalles] = useState('');
 
-  useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
+  const { addNotification } = useNotification();
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
+
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchGrados = async () => {
@@ -80,7 +79,8 @@ const Comisiones = () => {
             grado_uc: item.grado.grado_uc
           },
           id_carrera: item.id_carrera,
-          id_grado: item.id_grado
+          id_grado: item.id_grado,
+          id_carrera_grado: item.id_carrera_grado
         }));
 
         setGrados(normalizedData);
@@ -94,7 +94,6 @@ const Comisiones = () => {
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener grados:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
       } finally {
         setLoading(false);
       }
@@ -106,32 +105,28 @@ const Comisiones = () => {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/grados/eliminar/${gradoToDelete}`,
+        `http://127.0.0.1:8000/api/horarios/carreraGrados/eliminar/${gradoToDelete}`,
         {
           method: 'DELETE',
-          body: JSON.stringify({ detalles: detalles, usuario }), // Enviar detalles con la eliminación
+          body: JSON.stringify({ detalles: detalles, usuario }),
           headers: { 'Content-Type': 'application/json' }
         }
       );
+      const data = await response.json();
 
-      if (!response.ok) throw new Error('Error al eliminar el grado');
+      if (data.error) {
+        addNotification(data.error, 'danger');
+      } else {
+        setGrados(grados.filter((grado) => grado.id_carrera_grado !== gradoToDelete));
+        setFilteredComisiones(
+          filteredComisiones.filter((comision) => comision.id_carrera_grado !== gradoToDelete)
+        );
+        addNotification('Se eliminó el grado', 'success');
 
-      setGrados(grados.filter((grado) => grado.grado.id_grado !== gradoToDelete));
-      setFilteredComisiones(
-        filteredComisiones.filter((comision) => comision.grado.id_grado !== gradoToDelete)
-      );
-      setSuccessMessage('Grado eliminado correctamente');
-
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
-      setShowModal(false); // Cerrar el modal
+        setShowModal(false); // Cerrar el modal
+      }
     } catch (error) {
-      console.error('Error al eliminar grado:', error);
-      setErrors([error.message || 'Error al eliminar el grado']);
+      addNotification(error.message, 'danger');
     }
   };
 
@@ -161,7 +156,10 @@ const Comisiones = () => {
   return (
     <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center">
@@ -213,9 +211,9 @@ const Comisiones = () => {
 
           <div className="container">
             {filteredComisiones.length > 0 ? (
-              filteredComisiones.map(({ id_grado, id_carrera, carrera, grado }) => (
+              filteredComisiones.map(({ id_carrera_grado, carrera, grado }) => (
                 <div
-                  key={`${id_grado}-${id_carrera}`}
+                  key={id_carrera_grado} // Usar id_carrera_grado como clave única
                   style={{
                     border: '1px solid #ccc',
                     borderRadius: '5px',
@@ -225,7 +223,6 @@ const Comisiones = () => {
                   }}
                 >
                   <h5>Carrera: {carrera.carrera}</h5>
-                  <p>Cupo: {carrera.cupo}</p>
                   <p>Grado: {grado.grado}</p>
                   <p>División: {grado.division}</p>
                   <p>Detalle: {grado.detalle}</p>
@@ -250,7 +247,7 @@ const Comisiones = () => {
                       type="button"
                       className="btn btn-primary me-2"
                       onClick={() =>
-                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
+                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_carrera_grado)}`)
                       }
                     >
                       Actualizar
@@ -258,7 +255,7 @@ const Comisiones = () => {
                     <button
                       className="btn btn-danger"
                       onClick={() => {
-                        setGradoToDelete(grado.id_grado);
+                        setGradoToDelete(id_carrera_grado);
                         setShowModal(true);
                       }}
                     >
@@ -274,11 +271,9 @@ const Comisiones = () => {
 
           {/* Modal de confirmación */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>Confirmar eliminación</Modal.Title>
-            </Modal.Header>
+            <Modal.Header closeButton></Modal.Header>
             <Modal.Body>
-              <p>¿Estás seguro de que quieres eliminar este grado?</p>
+              <label htmlFor="detalles">Por favor, ingrese el motivo de eliminacion:</label>
               <div className="form-group">
                 <label htmlFor="detalles">Detalles:</label>
                 <textarea
@@ -299,25 +294,9 @@ const Comisiones = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
-          <div
-            id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`}
-          >
-            {errors.length > 0 && (
-              <div className="alert alert-danger">
-                <ul>
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          </div>
         </div>
       ) : (
-        <p>No se pudo conectar al servidor.</p>
+        <ErrorPage message="La seccion de grados" statusCode={500} />
       )}
     </>
   );

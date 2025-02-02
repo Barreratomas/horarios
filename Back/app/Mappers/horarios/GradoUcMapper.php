@@ -9,7 +9,7 @@ class GradoUcMapper
     public static function toGradoUC($gradoUCData)
     {
         return new GradoUC([
-            'id_grado' => $gradoUCData['id_grado'],
+            'id_carrera_grado' => $gradoUCData['id_carrera_grado'],
             'id_uc' => $gradoUCData['id_uc'],
         ]);
     }

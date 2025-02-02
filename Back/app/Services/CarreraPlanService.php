@@ -60,20 +60,21 @@ class CarreraPlanService
             // Carga la relación 'planEstudio.ucPlan.unidadCurricular' para incluir las materias
             $carreraPlan = CarreraPlan::with(['carrera', 'planEstudio.ucPlan.unidadCurricular'])
                 ->where('id_carrera', $id_carrera)
+                ->orderBy('updated_at', 'desc')
                 ->get();
-    
+
             if ($carreraPlan->isEmpty()) {
                 return response()->json(['error' => 'CarreraPlan no encontrado'], 404);
             }
-    
+
             return response()->json($carreraPlan, 200);
         } catch (Exception $e) {
             Log::error('Error al obtener el carreraPlan: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener el carreraPlan con materias'], 500);
         }
     }
-    
-    
+
+
 
 
     public function obtenerCarreraPlanPorIdPlan($id_plan)
@@ -94,7 +95,7 @@ class CarreraPlanService
         }
     }
 
-    public function guardarCarreraPlan( $id_plan,$id_carrera)
+    public function guardarCarreraPlan($id_plan, $id_carrera)
     {
         $carrera = $this->carreraService->obtenerCarreraPorId($id_carrera);
 
@@ -116,30 +117,30 @@ class CarreraPlanService
     {
         $id_carrera = (int) $id_carrera;
         $id_plan = (int) $id_plan;
-        
-        
-    
+
+
+
         // Buscar la relación CarreraPlan existente solo por id_plan
         $carreraPlan = CarreraPlan::where('id_plan', $id_plan)->first();
-    
-      
-    
+
+
+
         if (!$carreraPlan) {
             return response()->json(['error' => 'Relación Carrera-Plan no encontrada'], 404);
         }
-    
+
         // Verificar si id_carrera que viene por parámetro es igual al id_carrera en la base de datos
         if ($id_carrera == $carreraPlan->id_carrera) {
             // Si son iguales, no realizamos la actualización y solo devolvemos un 200
             return response()->json(['message' => 'Los valores de id_carrera son iguales, no se realiza actualización'], 200);
         }
-    
+
         try {
             // Si son diferentes, actualizamos la relación
             $updated = DB::table('carrera_plan')
                 ->where('id_plan', $id_plan)  // aseguramos que estamos actualizando el registro correcto
                 ->update(['id_carrera' => $id_carrera]);  // actualizamos solo el id_carrera
-    
+
             if ($updated) {
                 return response()->json(['success' => 'Relación actualizada correctamente']);
             } else {
@@ -151,11 +152,11 @@ class CarreraPlanService
         }
     }
 
-    
 
-    
 
-    
+
+
+
 
 
     public function eliminarCarreraPlanPorIdPlan($id_plan)
@@ -163,12 +164,12 @@ class CarreraPlanService
         try {
             // Eliminar todos los registros de CarreraPlan que corresponden al id_plan
             $deletedCount = CarreraPlan::where('id_plan', $id_plan)->delete();
-    
+
             // Si no se eliminaron registros, retornar un mensaje informativo
             if ($deletedCount === 0) {
                 return response()->json(['message' => 'No se encontraron relaciones de CarreraPlan para eliminar'], 404);
             }
-    
+
             return response()->json(['success' => 'Se eliminaron las relaciones de CarreraPlan'], 200);
         } catch (Exception $e) {
             Log::error('Error al eliminar las relaciones de CarreraPlan para el plan de estudio ' . $id_plan . ': ' . $e->getMessage());

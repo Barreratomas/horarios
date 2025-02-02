@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 
-const FormularioHoraio = ({ comisiones = [] }) => {
+const FormularioHorario = ({ comisiones = [], onComisionSeleccionada }) => {
   const [comisionSeleccionada, setComisionSeleccionada] = useState('');
   const [error, setError] = useState('');
-
-  const handleChange = (event) => {
-    setComisionSeleccionada(event.target.value);
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -14,10 +10,7 @@ const FormularioHoraio = ({ comisiones = [] }) => {
     if (!comisionSeleccionada) {
       setError('Por favor selecciona una comisión');
     } else {
-      setError('');
-      // Aquí manejarías la lógica de envío, como hacer un fetch o enviar los datos a la API
-      console.log(`Comisión seleccionada: ${comisionSeleccionada}`);
-      // Aquí harías la llamada a la API en lugar de solo un console.log
+      onComisionSeleccionada(comisionSeleccionada);
     }
   };
 
@@ -35,23 +28,19 @@ const FormularioHoraio = ({ comisiones = [] }) => {
                 className="form-select"
                 name="comision"
                 value={comisionSeleccionada}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setComisionSeleccionada(e.target.value);
+                  setError('');
+                }}
                 aria-label="Comisión"
               >
                 <option value="">Selecciona una comisión</option>
                 {comisiones.length > 0 ? (
-                  comisiones
-                    .sort((a, b) => {
-                      if (a.anio === b.anio) {
-                        return a.division.localeCompare(b.division);
-                      }
-                      return a.anio - b.anio;
-                    })
-                    .map((comision) => (
-                      <option key={comision.id_comision} value={comision.id_comision}>
-                        {comision.anio}°{comision.division} | {comision.carrera.nombre}
-                      </option>
-                    ))
+                  comisiones.map((comision) => (
+                    <option key={comision.id_carrera_grado} value={comision.id_carrera_grado}>
+                      {comision.grado.grado}°{comision.grado.division} | {comision.carrera.carrera}
+                    </option>
+                  ))
                 ) : (
                   <option value="" disabled>
                     No hay comisiones disponibles
@@ -72,4 +61,4 @@ const FormularioHoraio = ({ comisiones = [] }) => {
   );
 };
 
-export default FormularioHoraio;
+export default FormularioHorario;

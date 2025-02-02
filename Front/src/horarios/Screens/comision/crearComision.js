@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNotification } from '../layouts/parcials/notification';
 
 const CrearComision = () => {
   const [grado, setGrado] = useState('');
@@ -10,10 +11,10 @@ const CrearComision = () => {
   const [materias, setMaterias] = useState([]);
   const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
   const [carreras, setCarreras] = useState([]);
-  const [errors, setErrors] = useState([]);
   const [isLoadingCarreras, setIsLoadingCarreras] = useState(true);
   const [isLoadingMaterias, setIsLoadingMaterias] = useState(false);
-  const [fetchError, setFetchError] = useState('');
+
+  const { addNotification } = useNotification();
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
@@ -21,19 +22,19 @@ const CrearComision = () => {
   // Cargar carreras
   useEffect(() => {
     const fetchCarreras = async () => {
-      setFetchError('');
       setIsLoadingCarreras(true);
 
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras');
+        const data = await response.json();
+
         if (response.ok) {
-          const data = await response.json();
           setCarreras(data);
         } else {
-          setFetchError('Error al cargar las carreras.');
+          addNotification(data.errors, 'danger');
         }
       } catch (error) {
-        setFetchError('Error de red al intentar cargar las carreras.');
+        addNotification(`Error de conexión`, 'danger');
       } finally {
         setIsLoadingCarreras(false);
       }
@@ -50,21 +51,21 @@ const CrearComision = () => {
         return;
       }
 
-      setFetchError('');
       setIsLoadingMaterias(true);
 
       try {
         const response = await fetch(
           `http://127.0.0.1:8000/api/horarios/uCPlan/${carreraSeleccionada}/relaciones`
         );
+        const data = await response.json();
+
         if (response.ok) {
-          const data = await response.json();
           setMaterias(data[0]?.plan_estudio?.uc_plan || []);
         } else {
-          setFetchError('Error al cargar las materias.');
+          addNotification(data.errors, 'danger');
         }
       } catch (error) {
-        setFetchError('Error de red al intentar cargar las materias.');
+        addNotification(`Error de conexión`, 'danger');
       } finally {
         setIsLoadingMaterias(false);
       }
@@ -83,12 +84,6 @@ const CrearComision = () => {
   // Validar y enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors([]);
-
-    if (capacidad <= 0) {
-      setErrors(['La capacidad debe ser un número positivo.']);
-      return;
-    }
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/grados/guardar', {
@@ -105,20 +100,16 @@ const CrearComision = () => {
           materias: materiasSeleccionadas
         })
       });
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.comisiones.main}`, {
-          state: { successMessage: 'Comisión creada con éxito' }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          setErrors(data.errors);
-        }
+        navigate(`${routes.base}/${routes.comisiones.main}`, {
+          state: { successMessage: 'Comisión creada con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error creando la comisión:', error);
-      setErrors(['Hubo un error al intentar crear la comisión.']);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -127,8 +118,6 @@ const CrearComision = () => {
       <div className="row align-items-center justify-content-center">
         <div className="col-6 text-center">
           <form onSubmit={handleSubmit}>
-            {fetchError && <div className="alert alert-danger">{fetchError}</div>}
-
             <label htmlFor="carrera">Seleccione una carrera</label>
             <select
               className="form-select"
@@ -207,16 +196,16 @@ const CrearComision = () => {
             <button type="submit" className="btn btn-primary mt-3">
               Crear Comisión
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
-          {errors.length > 0 && (
-            <div className="alert alert-danger mt-3">
-              <ul>
-                {errors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
     </div>

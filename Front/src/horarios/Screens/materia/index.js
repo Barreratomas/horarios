@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
+import DataTable from 'react-data-table-component';
+import { useNotification } from '../layouts/parcials/notification';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const Materias = () => {
-  const [detalles, setDetalles] = useState(''); // Estado para los detalles
+  const [detalles, setDetalles] = useState('');
   const usuario = sessionStorage.getItem('userType');
   const [showModal, setShowModal] = useState(false);
   const [materiaToDelete, setMateriaToDelete] = useState(null);
@@ -21,23 +25,20 @@ const Materias = () => {
     tipo: '',
     formato: ''
   });
-  const [errors, setErrors] = useState([]);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [hideMessage, setHideMessage] = useState(false);
+
+  const { addNotification } = useNotification();
 
   // Opciones para los selects
   const tipos = ['Anual', 'Cuatrimestral'];
   const formatos = ['Taller', 'Materia', 'Laboratorio'];
 
   useEffect(() => {
-    if (location.state && location.state.successMessage) {
-      setSuccessMessage(location.state.successMessage);
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
+    if (location.state?.successMessage) {
+      addNotification(location.state.successMessage, 'success');
+
+      if (location.state.updated) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
     }
 
     const fetchMaterias = async () => {
@@ -79,36 +80,32 @@ const Materias = () => {
 
       setMaterias(materias.filter((materia) => materia.id_uc !== materiaToDelete));
       setFilteredMaterias(filteredMaterias.filter((materia) => materia.id_uc !== materiaToDelete));
-      setSuccessMessage('Materia eliminada correctamente');
+      const data = await response.json();
 
-      setTimeout(() => setHideMessage(true), 3000);
-      setTimeout(() => {
-        setSuccessMessage('');
-        setHideMessage(false);
-        navigate(location.pathname, { replace: true });
-      }, 3500);
-      setShowModal(false); // Cerrar el modal
+      addNotification(data.message, 'success');
+
+      setShowModal(false);
     } catch (error) {
-      setErrors([error.message || 'Error al eliminar materia']);
+      addNotification(error.message, 'danger');
     }
   };
 
   const handleSearch = (event) => {
     const { name, value } = event.target;
 
-    // Actualiza los criterios de búsqueda
     const newCriteria = {
       ...searchCriteria,
-      [name]: value.toLowerCase()
+      [name]: value.trim().toLowerCase()
     };
     setSearchCriteria(newCriteria);
 
     // Aplica los filtros considerando todos los criterios seleccionados
     const filtered = materias.filter(
       (materia) =>
-        materia.unidad_curricular.toLowerCase().includes(newCriteria.unidad_curricular) &&
-        (!newCriteria.tipo || materia.tipo.toLowerCase() === newCriteria.tipo) &&
-        (!newCriteria.formato || materia.formato.toLowerCase() === newCriteria.formato)
+        (!newCriteria.unidad_curricular ||
+          materia.unidad_curricular?.toLowerCase().includes(newCriteria.unidad_curricular)) &&
+        (!newCriteria.tipo || materia.tipo?.toLowerCase() === newCriteria.tipo) &&
+        (!newCriteria.formato || materia.formato?.toLowerCase() === newCriteria.formato)
     );
 
     setFilteredMaterias(filtered);
@@ -123,16 +120,68 @@ const Materias = () => {
     setFilteredMaterias(materias);
   };
 
+  const columns = [
+    {
+      name: 'Unidad Curricular',
+      selector: (row) => row.unidad_curricular,
+      sortable: true
+    },
+    {
+      name: 'Tipo',
+      selector: (row) => row.tipo,
+      sortable: true
+    },
+    {
+      name: 'Horas Semanales',
+      selector: (row) => row.horas_sem,
+      sortable: true
+    },
+    {
+      name: 'Horas Anuales',
+      selector: (row) => row.horas_anual,
+      sortable: true
+    },
+    {
+      name: 'Formato',
+      selector: (row) => row.formato,
+      sortable: true
+    },
+    {
+      name: 'Acciones',
+      cell: (row) => (
+        <>
+          <button
+            className="btn btn-primary me-2"
+            onClick={() => navigate(`${routes.base}/${routes.materias.actualizar(row.id_uc)}`)}
+          >
+            Actualizar
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              setMateriaToDelete(row.id_uc);
+              setShowModal(true);
+            }}
+          >
+            Eliminar
+          </button>
+        </>
+      )
+    }
+  ];
+
   return (
     <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
         <div className="container py-3">
           <div className="row align-items-center justify-content-center mb-3">
             <div className="col-12 text-center">
               <div className="filter mb-2 d-flex flex-wrap align-items-center">
-                {/* Input ocupa el 70% del espacio */}
                 <input
                   type="text"
                   className="form-control mb-2 mb-md-0 me-md-2"
@@ -140,16 +189,15 @@ const Materias = () => {
                   name="unidad_curricular"
                   value={searchCriteria.unidad_curricular}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 50%' }} // El input ocupa el 70%
+                  style={{ flex: '0 0 50%' }}
                 />
 
-                {/* Select tipo ocupa el 15% del espacio */}
                 <select
                   className="form-select mb-2 mb-md-0 me-md-2"
                   name="tipo"
                   value={searchCriteria.tipo}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
+                  style={{ flex: '0 0 15%' }}
                 >
                   <option value="">Filtrar por tipo...</option>
                   {tipos.map((tipo) => (
@@ -159,13 +207,12 @@ const Materias = () => {
                   ))}
                 </select>
 
-                {/* Select formato ocupa el 15% del espacio */}
                 <select
                   className="form-select mb-2 mb-md-0"
                   name="formato"
                   value={searchCriteria.formato}
                   onChange={handleSearch}
-                  style={{ flex: '0 0 15%' }} // El select formato ocupa el 15%
+                  style={{ flex: '0 0 15%' }}
                 >
                   <option value="">Filtrar por formato...</option>
                   {formatos.map((formato) => (
@@ -179,7 +226,7 @@ const Materias = () => {
                   type="button"
                   className="btn btn-secondary me-2 px-0 py-1 mx-2"
                   onClick={handleClearFilters}
-                  style={{ flex: '0 0 15%' }} // El select tipo ocupa el 15%
+                  style={{ flex: '0 0 15%' }}
                 >
                   Limpiar Filtros
                 </button>
@@ -194,62 +241,22 @@ const Materias = () => {
             </div>
           </div>
 
-          <div className="container">
-            {filteredMaterias.length > 0 ? (
-              filteredMaterias.map((materia) => (
-                <div
-                  key={materia.id_uc}
-                  style={{
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    marginBottom: '10px',
-                    width: '30vw'
-                  }}
-                >
-                  <p>Unidad Curricular: {materia.unidad_curricular}</p>
-                  <p>Tipo: {materia.tipo}</p>
-                  <p>Horas Semanales: {materia.horas_sem}</p>
-                  <p>Horas Anuales: {materia.horas_anual}</p>
-                  <p>Formato: {materia.formato}</p>
+          <DataTable
+            title="Materias"
+            columns={columns}
+            data={filteredMaterias} /* Usar datos filtrados */
+            pagination
+            highlightOnHover
+            responsive
+          />
 
-                  <div className="botones">
-                    <button
-                      type="button"
-                      className="btn btn-primary me-2"
-                      onClick={() =>
-                        navigate(`${routes.base}/${routes.materias.actualizar(materia.id_uc)}`)
-                      }
-                    >
-                      Actualizar
-                    </button>
-
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={() => {
-                        setMateriaToDelete(materia.id_uc); // Establecer el grado a eliminar
-                        setShowModal(true); // Mostrar el modal
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No se encontraron materias que coincidan con la búsqueda.</p>
-            )}
-          </div>
-          {/* Modal de confirmación */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Confirmar eliminación</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>¿Estás seguro de que quieres eliminar esta materia?</p>
               <div className="form-group">
-                <label htmlFor="detalles">Detalles:</label>
+                <label htmlFor="detalles">Por favor, ingrese el motivo de eliminación:</label>
                 <textarea
                   id="detalles"
                   className="form-control"
@@ -268,24 +275,9 @@ const Materias = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-          <div
-            id="messages-container"
-            className={`container ${hideMessage ? 'hide-messages' : ''}`}
-          >
-            {errors.length > 0 && (
-              <div className="alert alert-danger">
-                <ul>
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {successMessage && <div className="alert alert-success">{successMessage}</div>}
-          </div>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de naterias" statusCode={500} />
       )}
     </>
   );

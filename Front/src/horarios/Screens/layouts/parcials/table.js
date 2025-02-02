@@ -1,7 +1,8 @@
 import React from 'react';
-import '../../../css/tabla.css';
-// ESTO ES SOLAMENTE LA ESTRUCTURA
-const Tabla = () => {
+import '../../../css/tabla.css'; // Asegúrate de que la ruta sea correcta
+
+const TablaHorario = ({ horarios }) => {
+  const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
     1: '19:20',
     2: '20:00',
@@ -20,8 +21,6 @@ const Tabla = () => {
     6: '23:30'
   };
 
-  const dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
-
   const colores = [
     'rgba(250, 22, 22, 0.38)',
     'rgba(22, 72, 250, 0.28)',
@@ -33,13 +32,48 @@ const Tabla = () => {
     'rgba(250, 131, 22, 0.28)'
   ];
 
+  const obtenerContenidoCelda = (dia, modulo) => {
+    const horario = horarios.find((h) => {
+      return (
+        h.disponibilidad.dia.toLowerCase() === dia &&
+        parseInt(h.disponibilidad.modulo_inicio) <= modulo &&
+        parseInt(h.disponibilidad.modulo_fin) >= modulo
+      );
+    });
+
+    if (horario) {
+      const unidadCurricular =
+        horario.disponibilidad.unidad_curricular?.unidad_curricular || 'Sin Unidad Curricular';
+      const modalidad = horario.modalidad.toUpperCase();
+      const aula = horario.disponibilidad.aula?.nombre || 'Sin Aula';
+      const docenteNombre = horario.disponibilidad.docente
+        ? `${horario.disponibilidad.docente.nombre} ${horario.disponibilidad.docente.apellido}`
+        : 'Sin Docente';
+
+      return (
+        <div className="horario-info">
+          <div>{unidadCurricular}</div>
+          <div>{modalidad}</div>
+          <div>{aula}</div>
+          <div>{docenteNombre}</div>
+        </div>
+      );
+    }
+
+    return '';
+  };
+
+  const grado = horarios?.[0]?.disponibilidad?.carreraGrado?.grado?.grado || 'Sin Grado';
+  const division = horarios?.[0]?.disponibilidad?.carreraGrado?.grado?.division || 'Sin División';
+
   return (
     <>
       <div className="comision">
-        <h4 style={{ fontFamily: 'sans-serif' }}>Año: 1</h4>
-        <h4 style={{ fontFamily: 'sans-serif' }}>División: A</h4>
+        <h4>Grado: {grado}</h4>
+        <h4>División: {division}</h4>
       </div>
-      <div className="bedelia-horario" style={{ padding: 0 }}>
+
+      <div className="bedelia-horario">
         <table className="planilla1">
           <thead className="horarios">
             <tr>
@@ -51,6 +85,7 @@ const Tabla = () => {
               ))}
             </tr>
           </thead>
+
           <tbody>
             {dias.map((dia) => (
               <tr className="xd" key={dia}>
@@ -58,15 +93,19 @@ const Tabla = () => {
                   className="dias"
                   style={dia === 'viernes' ? { borderRadius: '0 0 0 20px' } : {}}
                 >
-                  {dia}
+                  {dia.charAt(0).toUpperCase() + dia.slice(1)}
                 </th>
+
                 {Object.keys(inicio).map((modulo) => (
                   <td
                     className="thhh"
-                    style={{ backgroundColor: colores[modulo % colores.length] }}
+                    style={{
+                      backgroundColor: colores[modulo % colores.length],
+                      textAlign: 'center'
+                    }}
                     key={modulo}
                   >
-                    {' '}
+                    {obtenerContenidoCelda(dia, parseInt(modulo))}
                   </td>
                 ))}
               </tr>
@@ -78,11 +117,10 @@ const Tabla = () => {
   );
 };
 
-export default Tabla;
+export default TablaHorario;
 
 // import React from 'react';
 // import '../../../css/tabla.css';
-
 // const Tabla = ({ userType, horariosAgrupados, horarios }) => {
 //   const inicio = {
 //     1: '19:20',
@@ -111,7 +149,6 @@ export default Tabla;
 //     'rgba(122, 22, 250, 0.28)',
 //     'rgba(250, 131, 22, 0.28)'
 //   ];
-
 //   const horasPermitidas = {
 //     1: '19:20',
 //     2: '20:00',
@@ -121,7 +158,6 @@ export default Tabla;
 //     6: '22:10',
 //     7: '22:50'
 //   };
-
 //   // Tabla para 'bedelia' o 'admin'
 //   const TablaHorario = ({ horariosPorDivision }) => (
 //     <table className="planilla1">
@@ -169,7 +205,6 @@ export default Tabla;
 //       </tbody>
 //     </table>
 //   );
-
 //   // Tabla para 'estudiante'
 //   const TablaEstudiante = ({ horarios }) => (
 //     <table border="1">
@@ -201,7 +236,6 @@ export default Tabla;
 //       </tbody>
 //     </table>
 //   );
-
 //   // Tabla para 'docente'
 //   const TablaDocente = ({ horariosPorDivision }) => (
 //     <table border="1">
@@ -231,7 +265,6 @@ export default Tabla;
 //       </tbody>
 //     </table>
 //   );
-
 //   return (
 //     <div className="container">
 //       {userType === 'bedelia' || userType === 'admin' ? (
@@ -266,5 +299,4 @@ export default Tabla;
 //     </div>
 //   );
 // };
-
 // export default Tabla;

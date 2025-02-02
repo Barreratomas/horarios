@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Sesiones from './sesiones';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../../css/menu.css';
 import { getRoutes } from '../../../Routes';
 
+import { useNotification } from './notification';
 const Menu = () => {
-  const routes = getRoutes(); // Llamada a la función para obtener las rutas
+  const routes = getRoutes();
 
   const [isCollapsed, setIsCollapsed] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { addNotification } = useNotification();
 
   // Maneja el toggle del menú
   const handleToggle = () => {
@@ -30,12 +34,14 @@ const Menu = () => {
       botonMenu.style.transition = '0.3s';
     }
   };
+  const isActive = (path) => location.pathname === path;
+
   const crearDisponibilidades = async () => {
     try {
       const response = await fetch(
         'http://127.0.0.1:8000/api/horarios/disponibilidad/guardarDisponibilidades',
         {
-          method: 'GET', // Método GET
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json'
           }
@@ -46,17 +52,21 @@ const Menu = () => {
         throw new Error('Error al obtener los datos');
       }
 
-      const data = await response.json(); // Convertimos la respuesta en JSON
+      const data = await response.json();
 
-      // Verificamos el estado recibido en el JSON
+      console.log(data);
+
       if (data.status === 'success') {
-        console.log(data.message); // "Horarios creados con éxito"
-        console.log(`Asignados: ${data.data.asignados}, No asignados: ${data.data.noAsignados}`);
+        addNotification(data.message, 'success');
+        addNotification(
+          `Asignados: ${data.data.asignados}, No asignados: ${data.data.noAsignados}`,
+          'info'
+        );
       } else {
-        console.error('Ocurrió un error en el servidor:', data.message);
+        addNotification(data.errors, 'danger');
       }
     } catch (error) {
-      console.error('Error al crear disponibilidades:', error);
+      addNotification('Error al crear disponibilidades:', 'error');
     }
   };
 
@@ -82,13 +92,15 @@ const Menu = () => {
             <ul className="nav flex-column">
               <li className="nav-item">
                 <button
-                  className="nav-link"
+                  className={`nav-link ${
+                    isActive(`${routes.base}/${routes.home}`) ? 'active' : ''
+                  }`}
                   onClick={() => navigate(`${routes.base}/${routes.home}`)}
                 >
                   Home
                 </button>
               </li>
-              {sessionStorage.getItem('userType') === 'estudiante' && (
+              {sessionStorage.getItem('userType') === 'alumno' && (
                 <li className="nav-item">
                   <button
                     className="nav-link"
@@ -115,7 +127,9 @@ const Menu = () => {
                     <>
                       <li className="nav-item">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            isActive(`${routes.base}/${routes.planilla.alumnos}`) ? 'active' : ''
+                          }`}
                           onClick={() => navigate(`${routes.base}/${routes.planilla.alumnos}`)}
                         >
                           Horarios alumno
@@ -123,7 +137,9 @@ const Menu = () => {
                       </li>
                       <li className="nav-item">
                         <button
-                          className="nav-link"
+                          className={`nav-link ${
+                            isActive(`${routes.base}/${routes.planilla.docente}`) ? 'active' : ''
+                          }`}
                           onClick={() => navigate(`${routes.base}/${routes.planilla.docente}`)}
                         >
                           Horarios docente
@@ -133,7 +149,9 @@ const Menu = () => {
                   )}
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.planilla.bedelia}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.planilla.bedelia}`)}
                     >
                       Horarios bedelia
@@ -141,7 +159,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.aulas.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.aulas.main}`)}
                     >
                       Aulas
@@ -149,7 +169,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.materias.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.materias.main}`)}
                     >
                       Materias
@@ -157,7 +179,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.carreras.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.carreras.main}`)}
                     >
                       Carreras
@@ -165,7 +189,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.comisiones.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.comisiones.main}`)}
                     >
                       Grados
@@ -173,7 +199,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.planes.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
                     >
                       Planes de estudio
@@ -186,7 +214,11 @@ const Menu = () => {
                   </li> */}
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.horariosPreviosDocente.main}`)
+                          ? 'active'
+                          : ''
+                      }`}
                       onClick={() =>
                         navigate(`${routes.base}/${routes.horariosPreviosDocente.main}`)
                       }
@@ -196,7 +228,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.disponibilidad.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.disponibilidad.main}`)}
                     >
                       asignaciones del docente(en desarrollo)
@@ -204,7 +238,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.asignacionesAlumno.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.asignacionesAlumno.main}`)}
                     >
                       Asignacion alumnos a grados
@@ -212,7 +248,9 @@ const Menu = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${
+                        isActive(`${routes.base}/${routes.logs.main}`) ? 'active' : ''
+                      }`}
                       onClick={() => navigate(`${routes.base}/${routes.logs.main}`)}
                     >
                       Logs
@@ -234,11 +272,7 @@ const Menu = () => {
               </a>
             </div>
             <div className="userType">
-              {sessionStorage.getItem('userType') && (
-                <p style={{ color: 'red' }}>
-                  Tipo de usuario: {sessionStorage.getItem('userType')}
-                </p>
-              )}
+              <Sesiones />
             </div>
           </div>
         </nav>

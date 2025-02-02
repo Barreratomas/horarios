@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Controller;
+use App\Models\CarreraGrado;
 use Illuminate\Support\Facades\Log;
 
 
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Log;
 class DisponibilidadController extends Controller
 {
     protected $disponibilidadService;
+
 
     public function __construct(DisponibilidadService $disponibilidadService)
     {
@@ -57,24 +59,24 @@ class DisponibilidadController extends Controller
         try {
 
             $grados = Grado::all();
-
+            $carrerasGrados = CarreraGrado::all();
 
             // recorrer solo los grado en bucle
             $asignados = 0; // Contador para asignaciones exitosas
-            $noAsignados = 0; // Contador para asignaciones no realizadas        
-            foreach ($grados as $grado) {
+            $noAsignados = 0; // Contador para asignaciones no realizadas   
+
+            foreach ($carrerasGrados as $carreraGrado) {
                 // obtener todas las materias de $gradp
-                $materias = DB::table('grado')
-                    ->join('grado_uc', 'grado.id_grado', '=', 'grado_uc.id_grado')
+                $materias = DB::table('carrera_grado')
+                    ->join('grado_uc', 'carrera_grado.id_carrera_grado', '=', 'grado_uc.id_carrera_grado')
                     ->join('unidad_curricular', 'grado_uc.id_uc', '=', 'unidad_curricular.id_uc')
                     ->select(
                         'unidad_curricular.id_uc',
                         'unidad_curricular.formato',
                         'unidad_curricular.horas_sem'
                     )
-                    ->where('grado.id_grado', '=', $grado->id_grado) // Filtrar solo por el grado actual
+                    ->where('carrera_grado.id_carrera_grado', '=', $carreraGrado->id_carrera_grado)
                     ->get();
-
 
 
 
@@ -89,30 +91,31 @@ class DisponibilidadController extends Controller
                         )
                         ->where('unidad_curricular.id_uc', '=', $materia->id_uc)  // Filtrar por la materia actual
                         ->get();
-                    Log::info("- docentes: {$docentes} ");
+
+                    // Log::info("- docentes: {$docentes} ");
 
                     foreach ($docentes as $docente) {
                         // verificar si el docente tiene horarios previos
                         $horariosPrevios = DB::table('horario_previo_docente')
                             ->where('id_docente', $docente->id_docente)
                             ->get();  // Devuelve una colección con todos los campos
-                        Log::info("- entro horarios  $horariosPrevios");
+                        // Log::info("- entro horarios  $horariosPrevios");
 
                         if (is_array($horariosPrevios) && !empty($horariosPrevios)) {
                             //se asigna el modulo de inicio dependiendo la hora previa del docente 
                             foreach ($horariosPrevios as $previo) {
 
                                 $horaPrevia = $this->disponibilidadService->horaPrevia($previo->hora);
-                                Log::info("- hora previa: {$horaPrevia} ");
+                                // Log::info("- hora previa: {$horaPrevia} ");
 
                                 // llamar a modulosRepartidos
-                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
+                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
                             }
                         } else {
 
 
                             // llamar a modulosRepartidos   
-                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $grado->id_grado, $materia->id_uc);
+                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc);
                         }
 
                         if ($response) {
@@ -135,12 +138,12 @@ class DisponibilidadController extends Controller
                     }
                 }
             }
-            // Loguear los resultados
             Log::info("Total asignados: $asignados");
             Log::info("Total no asignados: $noAsignados");
 
-            Log::info("Total asignados: $asignados");
-            Log::info("Total no asignados: $noAsignados");
+
+
+
             DB::commit();
             return response()->json([
                 'status' => 'success',
@@ -155,7 +158,7 @@ class DisponibilidadController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Se produjo un error al crear los horarios',
- 
+
             ], 200);
         }
     }
@@ -228,14 +231,8 @@ class DisponibilidadController extends Controller
 
 
 
-    public function eliminar(Request $request)
+    public function eliminar($id)
     {
-        $id = $request->input('id');
-        $response = $this->disponibilidadService->eliminarDisponibilidadPorId($id);
-        if (isset($response['success'])) {
-            return redirect()->route('disponibilidades.index')->with('success', $response['success']);
-        } else {
-            return redirect()->route('disponibilidades.index')->withErrors(['error' => $response['error']]);
-        }
+        return $this->disponibilidadService->eliminarDisponibilidadPorId($id);
     }
 }

@@ -54,3 +54,10 @@ width: 100%;
    margin-left: 10px;
     color: red;
 }
+
+.nav-link.active {
+    font-weight: bold;
+    color: #007bff;
+    background-color: #e9ecef;
+  }
+  

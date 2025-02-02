@@ -57,7 +57,7 @@ class Grado extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['grado', 'division', 'detalle', 'capacidad'];
+    protected $fillable = ['grado', 'division', 'detalle'];
     protected $table = 'grado';
     protected $primaryKey = 'id_grado';
 
@@ -79,26 +79,16 @@ class Grado extends Model
     }
     */
 
-    // Un grado tiene uno o muchos disponibilidad
-    public function disponibilidad():HasMany{
-        return $this->hasMany(Disponibilidad::class, 'id_grado', 'id_grado');
-    }
+  
 
     // Un grado tiene uno o muchos horarios
     public function horarios():HasMany{
         return $this->hasMany(Horario::class, 'id_grado', 'id_grado');
     }
 
-    // Un grado tiene uno o muchos alumno_grado
-    public function alumno_grado():HasMany{
-        return $this->hasMany(AlumnoGrado::class, 'id_grado', 'id_grado');
-    }
+ 
 
-    // Un grado tiene uno o muchos grado_uc
-    public function grado_uc():HasMany{
-        return $this->hasMany(GradoUC::class, 'id_grado', 'id_grado');
-    }
-
+  
     // Un grado pertenece a una carrera. esto tiene que asociarse a la tabla intermedia(carreraGrado)
     public function carrera():BelongsTo{
         return $this->belongsTo(Carrera::class, 'carrera_id', 'id_Carrera');

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { useNotification } from '../layouts/parcials/notification';
 
 const ActualizarPlan = () => {
   const usuario = sessionStorage.getItem('userType');
@@ -15,7 +16,8 @@ const ActualizarPlan = () => {
   const [selectedMaterias, setSelectedMaterias] = useState([]);
   const [carreras, setCarreras] = useState([]);
   const [selectedCarrera, setSelectedCarrera] = useState('');
-  const [errors, setErrors] = useState([]);
+
+  const { addNotification } = useNotification();
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
@@ -37,14 +39,14 @@ const ActualizarPlan = () => {
         setDetalle(data.detalle);
         setFechaInicio(data.fecha_inicio);
         setFechaFin(data.fecha_fin);
-        setSelectedCarrera(data.carreras[0]?.id_carrera || ''); // Asumiendo que hay una sola carrera asociada
-        setSelectedMaterias(data.unidades_curriculares.map((materia) => materia.id_uc)); // Asumiendo que materias ya están mapeadas por id_uc
+        setSelectedCarrera(data.carreras[0]?.id_carrera || '');
+        setSelectedMaterias(data.unidades_curriculares.map((materia) => materia.id_uc));
       } catch (error) {
-        console.error('Error al obtener el plan:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
+    // Obtener materias
     const fetchMaterias = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/unidadCurricular', {
@@ -54,11 +56,11 @@ const ActualizarPlan = () => {
         const data = await response.json();
         setMaterias(data);
       } catch (error) {
-        console.error('Error al obtener materias:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
+    // Obtener carreras
     const fetchCarreras = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras', {
@@ -68,8 +70,7 @@ const ActualizarPlan = () => {
         const data = await response.json();
         setCarreras(data);
       } catch (error) {
-        console.error('Error al obtener carreras:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
@@ -114,20 +115,20 @@ const ActualizarPlan = () => {
           })
         }
       );
+      const data = await response.json();
 
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.planes.main}`, {
-          state: { successMessage: 'Plan actualizado con éxito' }
-        });
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) setErrors(data.errors);
+        navigate(`${routes.base}/${routes.planes.main}`, {
+          state: { successMessage: 'Plan actualizado con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error actualizando el plan:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
-      setIsSubmitting(false); // Finalizar el proceso de envío
-      setShowModal(false); // Cerrar el modal de confirmación
+      setIsSubmitting(false);
+      setShowModal(false);
     }
   };
   // Cancelar la actualización
@@ -151,7 +152,6 @@ const ActualizarPlan = () => {
             />
             <br />
             <br />
-            {errors.detalle && <div className="text-danger">{errors.detalle}</div>}
 
             <label htmlFor="fecha_inicio">Fecha de inicio</label>
             <br />
@@ -164,7 +164,6 @@ const ActualizarPlan = () => {
             />
             <br />
             <br />
-            {errors.fecha_inicio && <div className="text-danger">{errors.fecha_inicio}</div>}
 
             <label htmlFor="fecha_fin">Fecha de fin</label>
             <br />
@@ -173,11 +172,9 @@ const ActualizarPlan = () => {
               name="fecha_fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              required
             />
             <br />
             <br />
-            {errors.fecha_fin && <div className="text-danger">{errors.fecha_fin}</div>}
 
             <label htmlFor="carrera">Seleccione la carrera</label>
             <br />
@@ -196,7 +193,6 @@ const ActualizarPlan = () => {
               ))}
             </select>
             <br />
-            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
 
             <label>Seleccione las materias</label>
             <div className="materias-list">
@@ -216,34 +212,31 @@ const ActualizarPlan = () => {
                 </div>
               ))}
             </div>
-            {errors.materias && <div className="text-danger">{errors.materias}</div>}
 
             <br />
             <button type="submit" className="btn btn-primary mt-3">
               {isSubmitting ? 'Actualizando...' : 'Actualizar plan'}
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>
 
-      {errors.length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar actualización</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <label htmlFor="detalles">Detalles:</label>
+          <label htmlFor="detalles">Por favor, ingrese el motivo de actualización:</label>
           <textarea
             name="detalles"
             value={detalles}

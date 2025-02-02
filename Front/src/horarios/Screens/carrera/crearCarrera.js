@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom'; // Para redirigir después de la creación
+import { useNotification } from '../layouts/parcials/notification';
 
 const CrearCarrera = () => {
   const [carrera, setCarrera] = useState('');
   const [cupo, setCupo] = useState('');
-  const [errors, setErrors] = useState([]);
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
 
+  const { addNotification } = useNotification();
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({}); // Reiniciar los errores antes de la validacion
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras/guardar', {
@@ -23,19 +24,16 @@ const CrearCarrera = () => {
         },
         body: JSON.stringify({ carrera, cupo }) // Incluir capacidad aquí
       });
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.carreras.main}`, {
-          state: { successMessage: 'Carrera creada con éxito' }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          setErrors(data.errors); // Manejar errores de validación
-        }
+        navigate(`${routes.base}/${routes.carreras.main}`, {
+          state: { successMessage: 'carrera creada con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error creando carrera:', error);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -54,7 +52,6 @@ const CrearCarrera = () => {
             />
             <br />
             <br />
-            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
             <label htmlFor="cupo">Ingrese el cupo de la carrera</label>
             <br />
             <input
@@ -65,26 +62,22 @@ const CrearCarrera = () => {
             />
             <br />
             <br />
-            {errors.cupo && <div className="text-danger">{errors.cupo}</div>}
             <br />
             <button type="submit" className="btn btn-primary me-2">
               Crear
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.carreras.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>
-
-      {errors.length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

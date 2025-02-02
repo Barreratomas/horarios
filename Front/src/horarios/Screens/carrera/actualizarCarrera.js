@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
+import { useNotification } from '../layouts/parcials/notification';
 
 const ActualizarCarrera = () => {
   const usuario = sessionStorage.getItem('userType');
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para controlar el envío del formulario
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');
 
   const [carrera, setCarrera] = useState('');
   const [cupo, setCupo] = useState('');
-  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { routes } = useOutletContext();
   const { carreraId } = useParams(); // Obtener el ID de la carrera desde la URL
+
+  const { addNotification } = useNotification();
 
   // Obtener los datos de la carrera existente
   useEffect(() => {
@@ -21,12 +23,11 @@ const ActualizarCarrera = () => {
       try {
         const response = await fetch(`http://127.0.0.1:8000/api/horarios/carreras/${carreraId}`);
         const data = await response.json();
-
-        if (response.ok) {
+        if (data.error) {
+          console.error('Error al obtener los datos de la carrera:', data);
+        } else {
           setCarrera(data.carrera);
           setCupo(data.cupo);
-        } else {
-          console.error('Error al obtener los datos de la carrera:', data);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -53,22 +54,19 @@ const ActualizarCarrera = () => {
           body: JSON.stringify({ carrera, cupo, usuario, detalles })
         }
       );
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.carreras.main}`, {
-          state: { successMessage: 'Carrera actualizada con éxito' }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.error, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) {
-          setErrors(data.errors); // Manejar errores de validación
-        }
+        navigate(`${routes.base}/${routes.carreras.main}`, {
+          state: { successMessage: 'Carrera actualizada con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error actualizando carrera:', error);
+      addNotification(`Error de conexión`, 'danger');
     } finally {
-      setIsSubmitting(false); // Finalizar el proceso de envío
-      setShowModal(false); // Cerrar el modal de confirmación
+      setIsSubmitting(false);
+      setShowModal(false);
     }
   };
   const handleCancelUpdate = () => {
@@ -89,7 +87,6 @@ const ActualizarCarrera = () => {
               onChange={(e) => setCarrera(e.target.value)}
             />
             <br />
-            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
             <br />
             <label htmlFor="cupo">Ingrese el cupo</label>
             <br />
@@ -100,33 +97,30 @@ const ActualizarCarrera = () => {
               onChange={(e) => setCupo(e.target.value)}
             />
             <br />
-            {errors.cupo && <div className="text-danger">{errors.cupo}</div>}
             <br />
             <button type="submit" className="btn btn-primary mt-3">
               {isSubmitting ? 'Actualizando...' : 'Actualizar carrera'}
+            </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.carreras.main}`)}
+            >
+              Volver Atrás
             </button>
           </form>
         </div>
       </div>
 
-      {Object.keys(errors).length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {Object.values(errors).map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={handleCancelUpdate}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar actualización</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <label htmlFor="detalles">Detalles:</label>
+          <label htmlFor="detalles">Por favor, ingrese el motivo de actualización:</label>
           <textarea
             name="detalles"
             value={detalles}

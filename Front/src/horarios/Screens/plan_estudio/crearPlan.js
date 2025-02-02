@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNotification } from '../layouts/parcials/notification';
 
 const CrearPlan = () => {
   const [detalle, setDetalle] = useState('');
@@ -9,10 +10,11 @@ const CrearPlan = () => {
   const [selectedMaterias, setSelectedMaterias] = useState([]);
   const [carreras, setCarreras] = useState([]);
   const [selectedCarrera, setSelectedCarrera] = useState('');
-  const [errors, setErrors] = useState([]);
 
   const navigate = useNavigate();
   const { routes } = useOutletContext();
+
+  const { addNotification } = useNotification();
 
   // Obtener materias y carreras al cargar el componente
   useEffect(() => {
@@ -25,8 +27,7 @@ const CrearPlan = () => {
         const data = await response.json();
         setMaterias(data);
       } catch (error) {
-        console.error('Error al obtener materias:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
@@ -35,12 +36,12 @@ const CrearPlan = () => {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/carreras', {
           headers: { Accept: 'application/json' }
         });
+
         if (!response.ok) throw new Error('Error al obtener carreras');
         const data = await response.json();
         setCarreras(data);
       } catch (error) {
-        console.error('Error al obtener carreras:', error);
-        setErrors([error.message || 'Servidor fuera de servicio...']);
+        addNotification(`Error de conexión`, 'danger');
       }
     };
 
@@ -60,7 +61,6 @@ const CrearPlan = () => {
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors([]);
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/horarios/planEstudio/guardar', {
@@ -76,17 +76,16 @@ const CrearPlan = () => {
           materias: selectedMaterias
         })
       });
-
-      if (response.ok) {
-        navigate(`${routes.base}/${routes.planes.main}`, {
-          state: { successMessage: 'Plan creado con éxito' }
-        });
+      const data = await response.json();
+      if (data.error) {
+        addNotification(data.errors, 'danger');
       } else {
-        const data = await response.json();
-        if (data.errors) setErrors(data.errors);
+        navigate(`${routes.base}/${routes.planes.main}`, {
+          state: { successMessage: 'Plan de estudio creado con éxito', updated: true }
+        });
       }
     } catch (error) {
-      console.error('Error creando plan:', error);
+      addNotification(`Error de conexión`, 'danger');
     }
   };
 
@@ -107,7 +106,6 @@ const CrearPlan = () => {
             />
             <br />
             <br />
-            {errors.detalle && <div className="text-danger">{errors.detalle}</div>}
 
             <label htmlFor="fecha_inicio">Ingrese la fecha de inicio</label>
             <br />
@@ -120,7 +118,6 @@ const CrearPlan = () => {
             />
             <br />
             <br />
-            {errors.fecha_inicio && <div className="text-danger">{errors.fecha_inicio}</div>}
 
             <label htmlFor="fecha_fin">Ingrese la fecha de fin</label>
             <br />
@@ -129,11 +126,9 @@ const CrearPlan = () => {
               name="fecha_fin"
               value={fechaFin}
               onChange={(e) => setFechaFin(e.target.value)}
-              required
             />
             <br />
             <br />
-            {errors.fecha_fin && <div className="text-danger">{errors.fecha_fin}</div>}
 
             <label htmlFor="carrera">Seleccione la carrera</label>
             <br />
@@ -152,7 +147,6 @@ const CrearPlan = () => {
               ))}
             </select>
             <br />
-            {errors.carrera && <div className="text-danger">{errors.carrera}</div>}
 
             <label>Seleccione las materias</label>
             <div className="materias-list">
@@ -171,27 +165,23 @@ const CrearPlan = () => {
                 </div>
               ))}
             </div>
-            {errors.materias && <div className="text-danger">{errors.materias}</div>}
 
             <br />
             <button type="submit" className="btn btn-primary me-2">
               Crear
             </button>
+            <br />
+            <br />
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => navigate(`${routes.base}/${routes.planes.main}`)}
+            >
+              Volver Atrás
+            </button>
           </form>
         </div>
       </div>
-
-      {errors.length > 0 && (
-        <div className="container" style={{ width: '500px' }}>
-          <div className="alert alert-danger">
-            <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
