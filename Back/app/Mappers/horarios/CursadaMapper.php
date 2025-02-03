@@ -6,7 +6,7 @@ use App\Models\horarios\Cursada;
 
 class CursadaMapper
 {
-    public static function toAula(Cursada $cursadaData)
+    public static function toCursada(Cursada $cursadaData)
     {
         return new Cursada([
             'inicio' => $cursadaData['inicio'],

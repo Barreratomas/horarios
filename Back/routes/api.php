@@ -18,6 +18,7 @@ use App\Http\Controllers\horarios\HorarioPrevioDocenteController;
 use App\Http\Controllers\horarios\PlanEstudioController;
 use App\Http\Controllers\horarios\UCPlanController;
 use App\Http\Controllers\horarios\UnidadCurricularController;
+use App\Http\Controllers\horarios\CursadaController;
 use App\Http\Controllers\CarreraUCController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\AlumnoGradoController;
@@ -229,3 +230,10 @@ Route::delete('/horarios/carreraGrados/eliminar/{id_carrera_grado}', [CarreraGra
 // Logs
 Route::get('/horarios/logs', [LogModificacionEliminacionController::class, 'index']);
 Route::post('/horarios/logs', [LogModificacionEliminacionController::class, 'store']);
+
+// Cursada
+Route::get('/horarios/cursadas', [CursadaController::class, 'index']);
+Route::get('/horarios/cursadas/{id}', [CursadaController::class, 'show']);
+Route::post('/horarios/cursadas/guardar', [CursadaController::class, 'store']);
+Route::put('/horarios/cursadas/actualizar/{id}', [CursadaController::class, 'update']);
+Route::delete('/horarios/cursadas/eliminar/{id}', [CursadaController::class, 'destroy']);

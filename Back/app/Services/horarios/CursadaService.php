@@ -29,66 +29,65 @@ class CursadaService implements CursadaRepository
         }
     }
 
-    public function obtenerAulaPorId($id)
-    {
-        $aula = Aula::find($id);
-        if (!$aula) {
-            return response()->json(['error' => 'Aula no encontrada'], 404);
-        }
-        try {
-            return response()->json($aula, 200);
-        } catch (Exception $e) {
-            Log::error('Error al obtener el aula: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al obtener el aula'], 500);
-        }
-    }
-
-    public function guardarAulas($request)
+    public function obtenerCursadasPorId($id)
     {
         try {
-            $aulaData = $request->all(); 
-            $aula = new Aula($aulaData); 
-            $aulaModel = $this->aulaMapper->toAula($aula);
-            $aulaModel->save();
-            return response()->json($aulaModel, 201);
-        } catch (Exception $e) {
-            Log::error('Error al guardar el aula: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al guardar el aula'], 500);
-        }
-    }
-
-
-    public function actualizarAulas($request, $id)
-    {
-        $aula = Aula::find($id);
-        if (!$aula) {
-            return response()->json(['error' => 'Aula no encontrada'], 404);
-        }
-        try {
-            $aula->update($request->all());
-            return response()->json($aula, 200);
-        } catch (Exception $e) {
-            Log::error('Error al actualizar el aula: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al actualizar el aula'], 500);
-        }
-    }
-
-
-
-    public function eliminarAulas($id)
-    {
-        try {
-            $aula = Aula::find($id);
-            if ($aula) {
-                $nombreAula=$aula->nombre;
-                $aula->delete();
-                return response()->json(['nombre_aula' => $nombreAula], 200);
+            $cursada = Cursada::find($id);
+            if ($cursada) {
+                return response()->json($cursada, 200);
             } else {
-                return response()->json(['error' => 'No existe el aula'], 404);
+                return response()->json(['error' => 'No existe la cursada'], 404);
             }
         } catch (Exception $e) {
-            Log::error('Error al eliminar el aula: ' . $e->getMessage());
-            return response()->json(['error' => 'Hubo un error al eliminar el aula'], 500);
+            Log::error('Error al obtener la cursada: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al obtener la cursada'], 500);
+        }
+    }
+
+    public function guardarCursadas($request)
+    {
+        try {
+            $cursadaData = $request->all(); 
+            $cursada = new Cursada($cursadaData); 
+            $cursadaModel = $this->cursadaMapper->toCursada($cursada);
+            $cursadaModel->save();
+            return response()->json($cursadaModel, 201);
+        } catch (Exception $e) {
+            Log::error('Error al guardar la cursada: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al guardar la cursada'], 500);
+        }
+    }
+
+
+    public function actualizarCursadas($request, $id)
+    {
+        $cursada = Cursada::find($id);
+        if (!$cursada) {
+            return response()->json(['error' => 'Cursada no encontrada'], 404);
+        }
+        try {
+            $cursada->update($request->all());
+            return response()->json($cursada, 200);
+        } catch (Exception $e) {
+            Log::error('Error al actualizar la cursada: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al actualizar la cursada'], 500);
+        }
+    }
+
+
+
+    public function eliminarCursadas($id)
+    {
+        $cursada = Cursada::find($id);
+        if (!$cursada) {
+            return response()->json(['error' => 'Cursada no encontrada'], 404);
+        }
+        try {
+            $cursada->delete();
+            return response()->json(['message' => 'Cursada eliminada correctamente'], 200);
+        } catch (Exception $e) {
+            Log::error('Error al eliminar la cursada: ' . $e->getMessage());
+            return response()->json(['error' => 'Hubo un error al eliminar la cursada'], 500);
         }
     }
 

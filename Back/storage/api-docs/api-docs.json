@@ -862,6 +862,170 @@
                 }
             }
         },
+        "/api/horarios/carreraPlan": {
+            "get": {
+                "tags": [
+                    "CarreraPlan"
+                ],
+                "summary": "Get list of CarreraPlan",
+                "description": "Returns list of CarreraPlan",
+                "operationId": "getCarreraPlanList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CarreraPlan"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraPlan/idCarrera/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraPlan"
+                ],
+                "summary": "Get CarreraPlan information by Carrera ID",
+                "description": "Returns CarreraPlan data",
+                "operationId": "getCarreraPlanByIdCarrera",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of Carrera",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraPlan/idPlan/{id}": {
+            "get": {
+                "tags": [
+                    "CarreraPlan"
+                ],
+                "summary": "Get CarreraPlan information by Plan ID",
+                "description": "Returns CarreraPlan data",
+                "operationId": "getCarreraPlanByIdPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of Plan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraPlan/guardar": {
+            "post": {
+                "tags": [
+                    "CarreraPlan"
+                ],
+                "summary": "Store CarreraPlan",
+                "description": "Save a new CarreraPlan",
+                "operationId": "guardarCarreraPlan",
+                "requestBody": {
+                    "description": "CarreraPlan to be stored",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarreraPlan"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "CarreraPlan successfully saved"
+                    },
+                    "500": {
+                        "description": "Error saving CarreraPlan"
+                    }
+                }
+            }
+        },
+        "/api/horarios/carreraPlan/eliminar/idPlan/{id}": {
+            "delete": {
+                "tags": [
+                    "CarreraPlan"
+                ],
+                "summary": "Delete CarreraPlan by Plan ID",
+                "description": "Delete CarreraPlan by Plan ID",
+                "operationId": "eliminarCarreraPlanPorIdPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of CarreraPlan",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CarreraPlan successfully deleted"
+                    },
+                    "404": {
+                        "description": "CarreraPlan not found"
+                    },
+                    "500": {
+                        "description": "Error deleting CarreraPlan"
+                    }
+                }
+            }
+        },
         "/api/horarios/carreraUC": {
             "get": {
                 "tags": [
@@ -2112,35 +2276,47 @@
                 }
             }
         },
-        "/api/horarios/disponibilidad": {
+        "/api/horarios/cursadas": {
             "get": {
                 "tags": [
-                    "Disponibilidad"
+                    "Cursada"
                 ],
-                "summary": "Obtener todas las disponibilidades",
-                "operationId": "4591fb6007f80bcc6b75b41b6945a26e",
+                "summary": "Obtener todas las cursadas",
+                "description": "Devuelve todas las cursadas",
+                "operationId": "getCursadas",
                 "responses": {
                     "200": {
-                        "description": "Devuelve todas las disponibilidades"
+                        "description": "Cursadas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Cursada"
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "No se encontraron disponibilidades"
+                    "500": {
+                        "description": "Error al obtener las cursadas"
                     }
                 }
             }
         },
-        "/api/horarios/disponibilidad/{id}": {
+        "/api/horarios/cursadas/{id}": {
             "get": {
                 "tags": [
-                    "Disponibilidad"
+                    "Cursada"
                 ],
-                "summary": "Obtener disponibilidad por id",
-                "operationId": "d44f1bc1ba73b7f21de131ae05b30200",
+                "summary": "Obtener una cursada por id",
+                "description": "Obtener una cursada por id",
+                "operationId": "obtenerCursadaPorId",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la disponibilidad",
+                        "description": "Id de la cursada",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2149,52 +2325,72 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Devuelve la disponibilidad"
+                        "description": "Cursada obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cursada"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "No se encontró la disponibilidad"
+                        "description": "No se encontró la cursada"
+                    },
+                    "500": {
+                        "description": "Error al obtener la cursada"
                     }
                 }
             }
         },
-        "/api/horarios/disponibilidad/store": {
+        "/api/horarios/cursadas/guardar": {
             "post": {
                 "tags": [
-                    "Disponibilidad"
+                    "Cursada"
                 ],
-                "summary": "Guardar disponibilidad",
-                "operationId": "d8503ca654802e7592ed29e225a69d7a",
+                "summary": "Guardar un cursada",
+                "description": "Guardar un cursada",
+                "operationId": "guardarCursada",
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DisponibilidadDTO"
+                                "$ref": "#/components/schemas/CursadaDTO"
                             }
                         }
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Disponibilidad guardada correctamente"
+                    "201": {
+                        "description": "Cursada guardada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CursadaDTO"
+                                }
+                            }
+                        }
                     },
-                    "500": {
-                        "description": "Error al guardar la disponibilidad"
+                    "400": {
+                        "description": "Error al guardar el cursada"
                     }
                 }
             }
         },
-        "/api/horarios/disponibilidad/update/{id}": {
+        "/api/horarios/cursadas/actualizar/{id}": {
             "put": {
                 "tags": [
-                    "Disponibilidad"
+                    "Cursada"
                 ],
-                "summary": "Actualizar disponibilidad",
-                "operationId": "c797737ceaae1e746b597b322ce5725a",
+                "summary": "Actualizar un cursada",
+                "description": "Actualizar un cursada",
+                "operationId": "actualizarCursada",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la disponibilidad",
+                        "description": "Id de la cursada",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2202,36 +2398,45 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DisponibilidadDTO"
+                                "$ref": "#/components/schemas/CursadaDTO"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Disponibilidad actualizada correctamente"
+                        "description": "Cursada actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cursada"
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Error al actualizar la disponibilidad"
+                        "description": "Error al actualizar la cursada"
                     }
                 }
             }
         },
-        "/api/horarios/disponibilidad/eliminar/{id}": {
+        "/api/horarios/cursadas/eliminar/{id}": {
             "delete": {
                 "tags": [
-                    "Disponibilidad"
+                    "Cursada"
                 ],
-                "summary": "Eliminar disponibilidad por id",
-                "operationId": "e94afb685ab94bfb2c6822d2f48e5831",
+                "summary": "Eliminar un cursada",
+                "description": "Eliminar un cursada",
+                "operationId": "eliminarCursada",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la disponibilidad",
+                        "description": "Id de la cursada",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -2240,10 +2445,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Disponibilidad eliminada correctamente"
+                        "description": "Cursada eliminada correctamente"
                     },
                     "500": {
-                        "description": "Error al eliminar la disponibilidad"
+                        "description": "Error al eliminar la cursada"
                     }
                 }
             }
@@ -2846,6 +3051,194 @@
                 }
             }
         },
+        "/horarios": {
+            "get": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Obtener todos los horarios",
+                "operationId": "777af2f5782943150a946a5b86e70448",
+                "responses": {
+                    "200": {
+                        "description": "Lista de horarios obtenida correctamente"
+                    },
+                    "500": {
+                        "description": "Error al obtener los horarios"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Crear un nuevo horario",
+                "operationId": "c0fc589e6ebee94bdfb741714fd434de",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "grado_id": {
+                                        "description": "ID del grado",
+                                        "type": "integer"
+                                    },
+                                    "unidad_curricular_id": {
+                                        "description": "ID de la unidad curricular",
+                                        "type": "integer"
+                                    },
+                                    "aula_id": {
+                                        "description": "ID del aula",
+                                        "type": "integer"
+                                    },
+                                    "dia": {
+                                        "description": "Día de la semana",
+                                        "type": "string"
+                                    },
+                                    "hora_inicio": {
+                                        "description": "Hora de inicio",
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "hora_fin": {
+                                        "description": "Hora de finalización",
+                                        "type": "string",
+                                        "format": "time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Horario creado correctamente"
+                    },
+                    "400": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/horarios/{id}": {
+            "get": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Obtener un horario por ID",
+                "operationId": "c9664d36a7ef06f6f678463a9f465ce8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horario obtenido correctamente"
+                    },
+                    "404": {
+                        "description": "Horario no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Actualizar un horario",
+                "operationId": "d71c2ab3fc8029588bdd0724813a58ba",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "grado_id": {
+                                        "description": "ID del grado",
+                                        "type": "integer"
+                                    },
+                                    "unidad_curricular_id": {
+                                        "description": "ID de la unidad curricular",
+                                        "type": "integer"
+                                    },
+                                    "aula_id": {
+                                        "description": "ID del aula",
+                                        "type": "integer"
+                                    },
+                                    "dia": {
+                                        "description": "Día de la semana",
+                                        "type": "string"
+                                    },
+                                    "hora_inicio": {
+                                        "description": "Hora de inicio",
+                                        "type": "string",
+                                        "format": "time"
+                                    },
+                                    "hora_fin": {
+                                        "description": "Hora de finalización",
+                                        "type": "string",
+                                        "format": "time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Horario actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Horario no encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Horarios"
+                ],
+                "summary": "Eliminar un horario",
+                "operationId": "3c87bd06f81451884da2ef8395e8ab93",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horario eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "Horario no encontrado"
+                    }
+                }
+            }
+        },
         "/api/horarios": {
             "get": {
                 "tags": [
@@ -2999,6 +3392,146 @@
                     },
                     "500": {
                         "description": "Error al eliminar el horario"
+                    }
+                }
+            }
+        },
+        "/api/horarios/horariosPreviosDocentes": {
+            "get": {
+                "tags": [
+                    "HorarioPrevioDocente"
+                ],
+                "summary": "Obtener todos los horarios previos de docentes",
+                "description": "Devuelve una lista de horarios previos de docentes",
+                "operationId": "getHorariosPreviosDocentes",
+                "responses": {
+                    "200": {
+                        "description": "Lista de horarios previos de docentes"
+                    },
+                    "500": {
+                        "description": "Error al obtener los horarios"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "HorarioPrevioDocente"
+                ],
+                "summary": "Crear un horario previo para un docente",
+                "description": "Crea un nuevo horario previo para un docente",
+                "operationId": "crearHorarioPrevioDocente",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HorarioPrevioDocente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Horario previo de docente creado correctamente"
+                    },
+                    "400": {
+                        "description": "Error al crear el horario previo"
+                    }
+                }
+            }
+        },
+        "/api/horarios/horariosPreviosDocentes/{id}": {
+            "get": {
+                "tags": [
+                    "HorarioPrevioDocente"
+                ],
+                "summary": "Obtener un horario previo de docente por ID",
+                "description": "Devuelve un horario previo de docente por su ID",
+                "operationId": "getHorarioPrevioDocentePorId",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario previo de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horario previo de docente obtenido correctamente"
+                    },
+                    "404": {
+                        "description": "No se encontró el horario previo"
+                    },
+                    "500": {
+                        "description": "Error al obtener el horario previo"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "HorarioPrevioDocente"
+                ],
+                "summary": "Actualizar un horario previo de docente",
+                "description": "Actualiza un horario previo de docente existente",
+                "operationId": "actualizarHorarioPrevioDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario previo de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HorarioPrevioDocente"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Horario previo de docente actualizado correctamente"
+                    },
+                    "400": {
+                        "description": "Error al actualizar el horario previo"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "HorarioPrevioDocente"
+                ],
+                "summary": "Eliminar un horario previo de docente",
+                "description": "Elimina un horario previo de docente por su ID",
+                "operationId": "eliminarHorarioPrevioDocente",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del horario previo de docente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Horario previo eliminado correctamente"
+                    },
+                    "400": {
+                        "description": "Error al eliminar el horario previo"
                     }
                 }
             }
@@ -3840,6 +4373,23 @@
                 },
                 "type": "object"
             },
+            "CursadaDTO": {
+                "title": "CursadaDTO",
+                "description": "Esquema del objeto CursadaDTO",
+                "properties": {
+                    "inicio": {
+                        "description": "Inicio de la cursada",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fin": {
+                        "description": "Fin de la cursada",
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
             "DisponibilidadDTO": {
                 "title": "DisponibilidadDTO",
                 "description": "DTO para una disponibilidad",
@@ -4214,6 +4764,21 @@
                 },
                 "type": "object"
             },
+            "CarreraPlan": {
+                "title": "CarreraPlan",
+                "description": "Modelo CarreraPlan",
+                "properties": {
+                    "id_carrera": {
+                        "description": "ID de la carrera",
+                        "type": "integer"
+                    },
+                    "id_plan": {
+                        "description": "ID del plan de estudio",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "CarreraUC": {
                 "title": "CarreraUC",
                 "description": "CarreraUC model",
@@ -4380,6 +4945,27 @@
                     "cupo": {
                         "description": "Cupo de la carrera",
                         "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Cursada": {
+                "title": "Cursada",
+                "description": "Esquema del objeto Cursada",
+                "properties": {
+                    "id_cursada": {
+                        "description": "ID de la cursada",
+                        "type": "integer"
+                    },
+                    "inicio": {
+                        "description": "Inicio de la cursada",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "fin": {
+                        "description": "Fin de la cursada",
+                        "type": "string",
+                        "format": "date"
                     }
                 },
                 "type": "object"
@@ -4634,6 +5220,10 @@
     },
     "tags": [
         {
+            "name": "HorarioPrevioDocente",
+            "description": "Gestión de horarios previos de docentes"
+        },
+        {
             "name": "AlumnoCarrera",
             "description": "AlumnoCarrera"
         },
@@ -4652,6 +5242,10 @@
         {
             "name": "AlumnoUC",
             "description": "AlumnoUC"
+        },
+        {
+            "name": "CarreraPlan",
+            "description": "CarreraPlan"
         },
         {
             "name": "CarreraUC",
@@ -4682,8 +5276,8 @@
             "description": "Carrera"
         },
         {
-            "name": "Disponibilidad",
-            "description": "Disponibilidad"
+            "name": "Cursada",
+            "description": "Cursada"
         },
         {
             "name": "DocenteUC",
