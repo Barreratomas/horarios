@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import TablaHorario from '../layouts/parcials/table';
 import FormularioHorario from '../layouts/parcials/formularioHorario';
+import { Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 
 const Horario = () => {
   const [comisiones, setComisiones] = useState([]);
@@ -61,7 +63,12 @@ const Horario = () => {
   };
 
   if (loading) {
-    return <div className="container text-center">Cargando datos...</div>;
+    return (
+      <div className="loading-container">
+        <Spinner animation="border" role="status" className="spinner" variant="primary" />
+        <p className="text-center">Cargando...</p>
+      </div>
+    );
   }
 
   if (error) {

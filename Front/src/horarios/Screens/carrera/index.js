@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 import { useNotification } from '../layouts/parcials/notification';
 import ErrorPage from '../layouts/parcials/errorPage';
 const Carreras = () => {
@@ -77,62 +78,67 @@ const Carreras = () => {
   };
 
   return (
-    <div className="container py-3">
-      <div className="row align-items-center justify-content-center">
-        <div className="col-6 text-center">
-          <button
-            className="btn btn-primary me-2"
-            onClick={() => navigate(`${routes.base}/${routes.carreras.crear}`)}
-          >
-            Crear
-          </button>
-        </div>
-      </div>
-
+    <>
       {loading ? (
-        <p>Cargando...</p>
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
       ) : serverUp ? (
-        <div className="container">
-          {carreras.map((carrera) => (
-            <div
-              key={carrera.id_carrera}
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '5px',
-                padding: '10px',
-                marginBottom: '10px',
-                width: '30vw'
-              }}
-            >
-              <p>Carrera: {carrera.carrera}</p>
-              <p>Cupo: {carrera.cupo} </p>
-
-              <div className="botones">
-                <button
-                  className="btn btn-primary me-2"
-                  onClick={() =>
-                    navigate(`${routes.base}/${routes.carreras.actualizar(carrera.id_carrera)}`)
-                  }
-                >
-                  Actualizar
-                </button>
-
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    setCarreraToDelete(carrera.id_carrera); // Establecer el grado a eliminar
-                    setShowModal(true); // Mostrar el modal
-                  }}
-                >
-                  Eliminar
-                </button>
-              </div>
+        <div className="container py-3">
+          <div className="row align-items-center justify-content-center">
+            <div className="col-6 text-center">
+              <button
+                className="btn btn-primary me-2"
+                onClick={() => navigate(`${routes.base}/${routes.carreras.crear}`)}
+              >
+                Crear
+              </button>
             </div>
-          ))}
+          </div>
+          <div className="container">
+            {carreras.map((carrera) => (
+              <div
+                key={carrera.id_carrera}
+                style={{
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                  padding: '10px',
+                  marginBottom: '10px',
+                  width: '30vw'
+                }}
+              >
+                <p>Carrera: {carrera.carrera}</p>
+                <p>Cupo: {carrera.cupo}</p>
+
+                <div className="botones">
+                  <button
+                    className="btn btn-primary me-2"
+                    onClick={() =>
+                      navigate(`${routes.base}/${routes.carreras.actualizar(carrera.id_carrera)}`)
+                    }
+                  >
+                    Actualizar
+                  </button>
+
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => {
+                      setCarreraToDelete(carrera.id_carrera); // Establecer el grado a eliminar
+                      setShowModal(true); // Mostrar el modal
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
-        <ErrorPage message="La seccion de carreras" statusCode={500} />
+        <ErrorPage message="La sección de carreras" statusCode={500} />
       )}
+
       {/* Modal de confirmación */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -159,7 +165,7 @@ const Carreras = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   );
 };
 

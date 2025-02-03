@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TablaHorario from '../layouts/parcials/tableBedelia';
+import { Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 
 const HorarioBedelia = () => {
   const [horarios, setHorarios] = useState([]);
@@ -29,7 +31,14 @@ const HorarioBedelia = () => {
   return (
     <div className="container py-3">
       <div className="row">
-        {loading ? <div>Cargando horarios...</div> : <TablaHorario horarios={horarios} />}
+        {loading ? (
+          <div className="loading-container">
+            <Spinner animation="border" role="status" className="spinner" variant="primary" />
+            <p className="text-center">Cargando...</p>
+          </div>
+        ) : (
+          <TablaHorario horarios={horarios} />
+        )}
       </div>
     </div>
   );

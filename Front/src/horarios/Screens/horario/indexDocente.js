@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import TablaHorario from '../layouts/parcials/tableDocente'; // El componente de la tabla de horarios
 import FormularioHorarioDocente from '../layouts/parcials/formularioHorarioDocente';
+import { Spinner } from 'react-bootstrap';
+import '../../css/loading.css';
 
 const HorarioDocente = () => {
   const [docentes, setDocentes] = useState([]); // Lista de docentes
@@ -64,7 +66,12 @@ const HorarioDocente = () => {
 
   // Condicionales de carga y error
   if (loading) {
-    return <div className="container text-center">Cargando datos...</div>;
+    return (
+      <div className="loading-container">
+        <Spinner animation="border" role="status" className="spinner" variant="primary" />
+        <p className="text-center">Cargando...</p>
+      </div>
+    );
   }
 
   if (error) {

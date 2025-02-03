@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { Modal, Button, Spinner } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import { useNotification } from '../layouts/parcials/notification';
 const ActualizarMateria = () => {
   const usuario = sessionStorage.getItem('userType');
@@ -8,7 +8,6 @@ const ActualizarMateria = () => {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [detalles, setDetalles] = useState('');
-  const [loading, setLoading] = useState(true); // Estado para controlar si se están cargando los datos
 
   const { materiaId } = useParams();
   const [unidadCurricular, setUnidadCurricular] = useState('');
@@ -36,12 +35,10 @@ const ActualizarMateria = () => {
           setHorasAnual(data.horas_anual);
           setFormato(data.formato);
         } else {
-          console.error('Error al obtener la materia:', data);
+          console.error('Error al obtener los datos de la materia:');
         }
       } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false); // Desactivar el estado de carga
+        console.error('Error de red al obtener la materia:', error);
       }
     };
 
@@ -94,14 +91,6 @@ const ActualizarMateria = () => {
   const handleCancelUpdate = () => {
     setShowModal(false);
   };
-
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="container py-3">
