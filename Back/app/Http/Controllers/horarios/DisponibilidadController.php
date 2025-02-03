@@ -231,8 +231,10 @@ class DisponibilidadController extends Controller
 
 
 
-    public function eliminar($id)
+    public function eliminar(DisponibilidadRequest $request)
     {
-        return $this->disponibilidadService->eliminarDisponibilidadPorId($id);
+        $disponibilidades = $request->input('disponibilidades');
+
+        return $this->disponibilidadService->eliminarDisponibilidad($disponibilidades);
     }
 }

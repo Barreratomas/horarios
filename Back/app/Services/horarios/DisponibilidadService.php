@@ -529,37 +529,87 @@ class DisponibilidadService implements DisponibilidadRepository
         }
     }
 
-    public function eliminarDisponibilidadPorId($id)
+    public function eliminarDisponibilidad($disponibilidades)
     {
-        Log::info("Intentando eliminar disponibilidad con ID: $id");
-
         try {
-            $disponibilidad = Disponibilidad::find($id);
+            // Recorrer el array de disponibilidades
+            usort($disponibilidades, function ($a, $b) {
+                return $a['id_disp'] <=> $b['id_disp']; // Ordena en orden ascendente
+            });
+            foreach ($disponibilidades as $disponibilidad) {
+                // Verificar si la disponibilidad existe antes de intentar eliminarla
+                $disponibilidadBD = Disponibilidad::find($disponibilidad['id_disp']);
 
-            if (!$disponibilidad) {
-                Log::warning("No se encontró la disponibilidad con ID: $id");
-                return response()->json([
-                    'error' => 'No se encontró la disponibilidad con el ID proporcionado.'
-                ], 404);
+                Log::info($disponibilidad);
+                Log::info($disponibilidadBD);
+
+
+                // Si el modulo_inicio es igual a modulo_fin, se elimina el registro
+                if ($disponibilidadBD->modulo_inicio == $disponibilidadBD->modulo_fin) {
+                    $disponibilidadBD->delete();
+                    Log::info('Registro eliminado: ' . $disponibilidadBD->id_disp);
+                }
+                // Si el módulo es igual a modulo_inicio, incrementamos modulo_inicio
+                elseif ($disponibilidad['modulo'] == $disponibilidadBD->modulo_inicio) {
+                    $disponibilidadBD->modulo_inicio += 1;
+                    $disponibilidadBD->save();
+                    Log::info('Modulo_inicio actualizado: ' . $disponibilidadBD->modulo_inicio);
+                }
+                // Si el módulo es igual a modulo_fin, decrementamos modulo_fin
+                elseif ($disponibilidad['modulo'] == $disponibilidadBD->modulo_fin) {
+                    $disponibilidadBD->modulo_fin -= 1;
+                    $disponibilidadBD->save();
+                    Log::info('Modulo_fin actualizado: ' . $disponibilidadBD->modulo_fin);
+                }
+                // Verificar si el módulo que se quiere eliminar está dentro del rango
+                elseif ($disponibilidad['modulo'] > $disponibilidadBD->modulo_inicio && $disponibilidad['modulo'] < $disponibilidadBD->modulo_fin) {
+                    $test = [];
+                    foreach ($disponibilidades as &$mod) {
+                        if ($mod['modulo'] > $disponibilidad['modulo'] && $mod['id_disp'] == $disponibilidad['id_disp']) {
+                            $test[] = &$mod; // Agregar todas las coincidencias al array
+                        }
+                    }
+
+                    // Actualizar el registro actual
+                    $disponibilidadBD->modulo_fin = $disponibilidad['modulo'] - 1; // Ajustamos el modulo_fin
+                    $disponibilidadBD->save();
+
+                    // Crear un nuevo registro con el módulo posterior
+                    $nuevoRegistro = new Disponibilidad();
+                    $nuevoRegistro->id_uc = $disponibilidadBD->id_uc;
+                    $nuevoRegistro->id_docente = $disponibilidadBD->id_docente;
+                    $nuevoRegistro->id_h_p_d = $disponibilidadBD->id_h_p_d;
+                    $nuevoRegistro->id_aula = $disponibilidadBD->id_aula;
+                    $nuevoRegistro->dia = $disponibilidadBD->dia;
+                    $nuevoRegistro->modulo_inicio = $disponibilidad['modulo'] + 1; // El módulo posterior
+                    $nuevoRegistro->modulo_fin = $disponibilidadBD->modulo_fin;
+                    $nuevoRegistro->id_carrera_grado = $disponibilidadBD->id_carrera_grado;
+                    $nuevoRegistro->save();
+                    $this->horarioService->guardarHorarios($nuevoRegistro->dia, $nuevoRegistro->modulo_inicio, $nuevoRegistro->modulo_fin,  $nuevoRegistro->id_disp);
+
+
+                    Log::info('Registro actualizado y nuevo registro creado.');
+                    if ($test) {
+                        Log::info($test);
+                        foreach ($test as &$t) {
+                            $t['id_disp'] = $nuevoRegistro->id_disp;
+                        }
+                        Log::info($test);
+                    }
+                }
             }
 
-            Log::info("Disponibilidad encontrada, procediendo a eliminar: $id");
-            $disponibilidadCopy = $disponibilidad;
-            $disponibilidad->delete();
-
-            Log::info("Disponibilidad eliminada correctamente: $id");
+            // Si todo ha ido bien, retornamos una respuesta exitosa
+            return response()->json(['success' => true, 'message' => 'Disponibilidades eliminadas con éxito.']);
+        } catch (\Exception $e) {
+            // Si ocurre algún error, capturamos la excepción y devolvemos un mensaje de error
             return response()->json([
-                'success' => 'Disponibilidad eliminada correctamente.',
-                'data' => $disponibilidadCopy
-            ], 200);
-        } catch (Exception $e) {
-            Log::error("Error al eliminar la disponibilidad con ID: $id - " . $e->getMessage());
-            return response()->json([
-                'error' => 'Hubo un error al eliminar la disponibilidad.'
+                'success' => false,
+                'error' => $e->getMessage(),
+                'message' => 'Ocurrió un error al intentar eliminar las disponibilidades.',
             ], 500);
         }
     }
-
 
     //------------------------------------------------------------------------------------------------------------------
     // swagger
