@@ -5,6 +5,8 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
   const [horarios, setHorarios] = useState(initialHorarios);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [isSelecting, setIsSelecting] = useState(false);
+
   const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
     1: '19:20',
@@ -47,36 +49,53 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     const x = event.clientX + window.scrollX;
     const y = event.clientY + window.scrollY;
 
-    // Almacena el módulo seleccionado
     setSelectedModule({ dia, modulo });
-    setSelectedIds((prev) => new Set(prev.add(id_disp))); // Añade el id_disp al conjunto
 
-    setContextMenu({
-      visible: true,
-      x,
-      y,
-      contenido
-    });
+    if (isSelecting) {
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(JSON.stringify({ dia, modulo, id_disp })); // Guarda día, módulo e ID como string
+        console.log('ids actualizados:', Array.from(newSet)); // Se loguea dentro de la actualización
+        return newSet;
+      });
+    } else {
+      setContextMenu({ visible: true, x, y, contenido });
+    }
   };
 
   const handleClickOutside = () => {
+    if (isSelecting) {
+      return;
+    }
+
     setContextMenu({ ...contextMenu, visible: false });
     setSelectedModule(null); // Limpia el módulo seleccionado al hacer clic fuera
+    if (!isSelecting) setSelectedIds(new Set());
+  };
+
+  const iniciarSeleccion = () => {
+    setSelectedIds(new Set()); // Limpiar selecciones anteriores
+    setIsSelecting(true);
+    setContextMenu({ visible: false, x: 0, y: 0, contenido: null });
+  };
+
+  const cancelarSeleccion = () => {
+    setIsSelecting(false);
+    setSelectedIds(new Set());
+    setSelectedModule(null); // Limpia el módulo seleccionado
   };
 
   // Función para eliminar el horario
-  const handleEliminar = async (id_disp) => {
+  const confirmarEliminacion = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/horarios/disponibilidad/eliminar/${id_disp}`,
-        {
-          method: 'DELETE'
-        }
-      );
+      const disponibilidades = Array.from(selectedIds).map((item) => JSON.parse(item));
 
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
+      console.log(Array.from(disponibilidades));
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios/disponibilidad/eliminar`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ disponibilidades }) // Enviar el array de objetos en formato JSON
+      });
 
       const data = await response.json();
 
@@ -86,9 +105,7 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
         console.log('Horario eliminado:', data.data);
 
         // Actualizar el estado de horarios eliminando el horario con el id_disp
-        setHorarios((prevHorarios) =>
-          prevHorarios.filter((horario) => horario.id_disp !== id_disp)
-        );
+        setHorarios((prev) => prev.filter((h) => !selectedIds.has(h.id_disp)));
       }
     } catch (error) {
       console.error('Error al eliminar el horario:', error);
@@ -153,7 +170,19 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
 
   return (
     <div onClick={handleClickOutside}>
-      <h3>horarios bedelia</h3>
+      <h3>Horarios Bedelia</h3>
+      {isSelecting ? (
+        <div className="seleccion-container">
+          <div className="barra-opciones">
+            <p>Selecciona los módulos a eliminar</p>
+            <div className="buttons">
+              <button onClick={confirmarEliminacion}>Confirmar Eliminación</button>
+              <button onClick={cancelarSeleccion}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {Object.entries(horariosPorCarrera).map(([idCarreraGrado, horariosGrado]) => {
         const grado =
           horariosGrado?.[0]?.disponibilidad?.carrera_grado?.grado?.grado || 'Sin Grado';
@@ -234,15 +263,16 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
           </div>
         );
       })}
+
       {/* Panel contextual */}
-      {contextMenu.visible && (
+      {contextMenu.visible && !isSelecting && (
         <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
           <h4>{contextMenu.contenido.unidadCurricular}</h4>
           <p>Modalidad: {contextMenu.contenido.modalidad}</p>
           <p>Aula: {contextMenu.contenido.aula}</p>
           <p>Docente: {contextMenu.contenido.docenteNombre}</p>
           <p>ID: {contextMenu.contenido.id_disp}</p>
-          <button onClick={() => handleEliminar(contextMenu.contenido.id_disp)}>Eliminar</button>
+          <button onClick={iniciarSeleccion}>Eliminar</button>
         </div>
       )}
     </div>

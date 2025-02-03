@@ -1305,3 +1305,40 @@ tbody {
   margin: 5px 0;
   font-size: 14px;
 }
+
+.seleccion-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  z-index: 100;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.barra-opciones {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  border-radius: 25px;
+  /* gap: 10px; */
+}
+.buttons button {
+  background-color: red;
+  color: white;
+  border: none;
+  margin: 0 10px;
+  padding: 5px 30px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.buttons button:hover {
+  background-color: darkred;
+}

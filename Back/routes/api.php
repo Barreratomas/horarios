@@ -114,7 +114,7 @@ Route::delete('/horarios/gradoUC/eliminar/idUC/{id}', [GradoUcController::class,
 //Route::post('/horarios/disponibilidad/store', [DisponibilidadController::class, 'store']);
 //Route::put('/horarios/disponibilidad/update/{id}', [DisponibilidadController::class, 'update']);
 Route::get('/horarios/disponibilidad/guardarDisponibilidades', [DisponibilidadController::class, 'guardarDisponibilidades']);
-Route::delete('/horarios/disponibilidad/eliminar/{id}', [DisponibilidadController::class, 'eliminar']);
+Route::delete('/horarios/disponibilidad/eliminar', [DisponibilidadController::class, 'eliminar']);
 
 
 // Route::get('/disponibilidad/guardar', [DisponibilidadController::class, 'guardar'])->name('storeDisponibilidad');
