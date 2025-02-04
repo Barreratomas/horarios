@@ -185,7 +185,7 @@ class CursadaController extends Controller
      * )
      * )
      */
-    public function destroy($id, LogsRequest $request)
+    public function destroy($id)
     {
         return $this->cursadaService->eliminarCursadas($id);
     }
