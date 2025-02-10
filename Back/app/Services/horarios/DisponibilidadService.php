@@ -404,48 +404,42 @@ class DisponibilidadService implements DisponibilidadRepository
 
 
 
-    public function verificarModulosDiaIndividual($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $id_aula)
+    public function verificarModulosActualizacion($dia, $modulo, $id_docente, $id_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $id_aula, $excluir_id_1, $excluir_id_2)
     {
         // Calcular el rango de módulos que se intentan asignar
-        $modulosPorAsignar = range($modulo_inicio, $modulo_fin);
         // Consultar la base de datos para obtener todos los módulos ya asignados de lunes a viernes
-        $modulosAsignados = DB::table('disponibilidad')
-            ->where('id_uc', $id_uc)
-            ->where('id_grado', $id_grado)
-            ->whereIn('dia', ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'])
-            ->get(['modulo_inicio', 'modulo_fin']);
+        // $modulosAsignados = DB::table('disponibilidad')
+        //     ->where('id_uc', $id_uc)
+        //     ->where('id_grado', $id_grado)
+        //     ->whereIn('dia', ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'])
+        //     ->where('id_disp', '!=', $excluir_id)
+        //     ->get(['modulo_inicio', 'modulo_fin']);
 
-        $totalModulosAsignados = 0;
 
-        // Calcular el número total de módulos asignados en la semana
-        foreach ($modulosAsignados as $modulo) {
-            $inicio = (int)$modulo->modulo_inicio;
-            $fin = (int)$modulo->modulo_fin;
-            $totalModulosAsignados += $fin - $inicio + 1;
-        }
+  
+        // // Calcular los nuevos módulos que se sumarían
+       
 
-        // Calcular los nuevos módulos que se sumarían
-        $modulosNuevos = count($modulosPorAsignar);
-
-        // Verificar si el total excede los módulos semanales permitidos
-        if ($totalModulosAsignados + $modulosNuevos > $modulos_semanales_o) {
-            Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} sin espcio en modulos semanales");
-            return false; // No es posible asignar más módulos
-        } else {
-            Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} tiene modulos disponibles semanales.");
-        }
+        // // Verificar si el total excede los módulos semanales permitidos
+        // if ($modulosAsignados  > $modulos_semanales_o) {
+        //     Log::info("modulo inico ");
+        //     return false; // No es posible asignar más módulos
+        // } else {
+        //     Log::info("modulo inico ");
+        // }
 
         // Verificar si el docente está asignado en el rango de módulos
         $disponibilidadDocente = DB::table('disponibilidad')
             ->where('id_docente', $id_docente) // Filtrar por el docente
             ->where('dia', $dia)               // Filtrar por el día
-            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+            ->whereNotIn('id_disp', [$excluir_id_1, $excluir_id_2]) // Excluir los dos IDs indicados
+            ->where(function ($query) use ($modulo) {
                 // Verificar si hay superposición de módulos
-                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
-                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
-                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
-                        $query->where('modulo_inicio', '<=', $modulo_inicio)
-                            ->where('modulo_fin', '>=', $modulo_fin);
+                $query->whereBetween('modulo_inicio', $modulo)
+                    ->orWhereBetween('modulo_fin',  $modulo)
+                    ->orWhere(function ($query) use ($modulo) {
+                        $query->where('modulo_inicio', '<=',  $modulo)
+                            ->where('modulo_fin', '>=',  $modulo);
                     });
             })
             ->exists();
@@ -463,14 +457,15 @@ class DisponibilidadService implements DisponibilidadRepository
         $disponibilidadGrado = DB::table('disponibilidad')
             ->where('id_grado', $id_grado)    // Filtrar por el grado
             ->where('dia', $dia)               // Filtrar por el día
-            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+            ->whereNotIn('id_disp', [$excluir_id_1, $excluir_id_2]) // Excluir los dos IDs indicados
+            ->where(function ($query) use ($modulo) {
                 // Verificar si hay superposición de módulos para el grado
-                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])  // Verificar si el inicio se solapa
-                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])  // Verificar si el fin se solapa
-                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                $query->whereBetween('modulo_inicio',  $modulo)// Verificar si el inicio se solapa
+                    ->orWhereBetween('modulo_fin',  $modulo) // Verificar si el fin se solapa
+                    ->orWhere(function ($query) use ($modulo) {
                         // Verificar si la asignación cubre todo el rango
-                        $query->where('modulo_inicio', '<=', $modulo_inicio)
-                            ->where('modulo_fin', '>=', $modulo_fin);
+                        $query->where('modulo_inicio', '<=', $modulo)
+                            ->where('modulo_fin', '>=',  $modulo);
                     });
             })
             ->exists();
@@ -489,13 +484,14 @@ class DisponibilidadService implements DisponibilidadRepository
         $disponibilidadAula = DB::table('disponibilidad')
             ->where('id_aula', $id_aula)
             ->where('dia', $dia)
-            ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+            ->whereNotIn('id_disp', [$excluir_id_1, $excluir_id_2]) // Excluir los dos IDs indicados
+            ->where(function ($query) use ($modulo) {
                 // Verificar si hay coincidencia de los módulos
-                $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
-                    ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
-                    ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
-                        $query->where('modulo_inicio', '<=', $modulo_inicio)
-                            ->where('modulo_fin', '>=', $modulo_fin);
+                $query->whereBetween('modulo_inicio',  $modulo)
+                    ->orWhereBetween('modulo_fin',  $modulo)
+                    ->orWhere(function ($query) use ($modulo) {
+                        $query->where('modulo_inicio', '<=',  $modulo)
+                            ->where('modulo_fin', '>=',  $modulo);
                     });
             })
             ->exists();  // Verifica si existe alguna asignación con los parámetros dados
@@ -512,19 +508,80 @@ class DisponibilidadService implements DisponibilidadRepository
         // return 1;
 
     }
-    public function actualizarDisponibilidad($request, $id)
+    public function actualizarDisponibilidad($disponibilidades)
 
     {
+        DB::beginTransaction();
+        try {   
+            if (count($disponibilidades) !== 2) {
+                DB::rollBack();
+                return response()->json(['error' => 'Se requieren exactamente dos disponibilidades para el intercambio'], 400);
+            }
+            $disponibilidad1 = $disponibilidades[0];
+            $disponibilidad2 = $disponibilidades[1];
 
-        $disponibilidad = Disponibilidad::find($id);
-        if (!$disponibilidad) {
-            return response()->json(['error' => 'No existe la disponibilidad'], 404);
+            $id_disp_1 = $disponibilidad1['id_disp'];
+            $dia_1 = $disponibilidad1['dia'];
+            $modulo_1 = $disponibilidad1['modulo'];
+
+            $id_disp_2 = $disponibilidad2['id_disp'];
+            $dia_2 = $disponibilidad2['dia'];
+            $modulo_2 = $disponibilidad2['modulo'];
+
+            $disponibilidadActual1 = DB::table('disponibilidad')->where('id_disp', $id_disp_1)->first();
+            $disponibilidadActual2 = DB::table('disponibilidad')->where('id_disp', $id_disp_2)->first();
+    
+            $id_docente_1 = $disponibilidadActual1->id_docente;
+            $id_docente_2 = $disponibilidadActual2->id_docente;
+
+            $id_grado_1 = $disponibilidadActual1->id_grado;
+        $id_grado_2 = $disponibilidadActual2->id_grado;
+
+        $id_uc_1 = $disponibilidadActual1->id_uc;
+        $id_uc_2 = $disponibilidadActual2->id_uc;
+
+
+        $id_aula_1 = $disponibilidadActual1->id_aula;
+        $id_aula_2 = $disponibilidadActual2->id_aula;
+
+
+        $resultado1 = $this->verificarModulosActualizacion(
+            $dia_1,
+            $modulo_1,
+            $id_docente_1,
+            $id_grado_1,
+            $id_uc_1,
+            null, // No se usan $modulos_semanales
+            null, // No se usan $modulos_semanales_o
+            $id_aula_1,
+            $id_disp_1,
+            $id_disp_2
+        );
+
+
+        $resultado2 = $this->verificarModulosActualizacion(
+            $dia_2,
+            $modulo_2,
+            $id_docente_2,
+            $id_grado_2,
+            $id_uc_2,
+            null, // No se usan $modulos_semanales
+            null, // No se usan $modulos_semanales_o
+            $id_aula_2,
+            $id_disp_1,
+            $id_disp_2
+        );
+
+        if (!$resultado1 || !$resultado2) {
+            Log::info("Conflicto detectado durante la verificación de disponibilidades");
+            return response()->json(['error' => 'Conflicto detectado, no se puede realizar el intercambio'], 400);
         }
-        try {
-            $disponibilidad->update($request->all());
-            return response()->json($disponibilidad, 200);
+            // no se va a usar ni modulo fin ni modulo inicio
+
+            db::rollBack();
         } catch (Exception $e) {
             Log::error('Error al actualizar la disponibilidad: ' . $e->getMessage());
+            db::rollBack();
             return response()->json(['error' => 'Hubo un error al actualizar la disponibilidad'], 500);
         }
     }
@@ -570,9 +627,7 @@ class DisponibilidadService implements DisponibilidadRepository
                         }
                     }
 
-                    // Actualizar el registro actual
-                    $disponibilidadBD->modulo_fin = $disponibilidad['modulo'] - 1; // Ajustamos el modulo_fin
-                    $disponibilidadBD->save();
+
 
                     // Crear un nuevo registro con el módulo posterior
                     $nuevoRegistro = new Disponibilidad();
@@ -584,6 +639,15 @@ class DisponibilidadService implements DisponibilidadRepository
                     $nuevoRegistro->modulo_inicio = $disponibilidad['modulo'] + 1; // El módulo posterior
                     $nuevoRegistro->modulo_fin = $disponibilidadBD->modulo_fin;
                     $nuevoRegistro->id_carrera_grado = $disponibilidadBD->id_carrera_grado;
+                    
+                    // Actualizar el registro actual
+                    $disponibilidadBD->modulo_fin = $disponibilidad['modulo'] - 1; // Ajustamos el modulo_fin
+                    $disponibilidadBD->save();
+
+                    DB::table('horario')
+                    ->where('id_disp', $disponibilidadBD->id_disp)
+                    ->update(['modulo_fin' => $disponibilidadBD->modulo_fin]);
+
                     $nuevoRegistro->save();
                     $this->horarioService->guardarHorarios($nuevoRegistro->dia, $nuevoRegistro->modulo_inicio, $nuevoRegistro->modulo_fin,  $nuevoRegistro->id_disp);
 

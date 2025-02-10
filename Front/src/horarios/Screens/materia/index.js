@@ -56,7 +56,6 @@ const Materias = () => {
         setServerUp(true);
       } catch (error) {
         console.error('Error al obtener materias:', error);
-        alert('Servidor fuera de servicio...');
       } finally {
         setLoading(false);
       }

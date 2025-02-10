@@ -3,13 +3,12 @@ import TablaHorario from '../layouts/parcials/table';
 import FormularioHorario from '../layouts/parcials/formularioHorario';
 import { Spinner } from 'react-bootstrap';
 import '../../css/loading.css';
-
+import ErrorPage from '../layouts/parcials/errorPage';
 const Horario = () => {
   const [comisiones, setComisiones] = useState([]);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const [serverUp, setServerUp] = useState(false);
   const fetchHorarios = async (comisionSeleccionada) => {
     try {
       setLoading(true);
@@ -23,15 +22,14 @@ const Horario = () => {
         }
       );
       const data = await response.json();
-
-      if (!response.ok) {
+      if (data.error) {
         console.error('Error del backend:', data.error);
       } else {
         setHorarios(data);
-        setError('');
+        setServerUp(true);
       }
     } catch (error) {
-      setError('No se pudo cargar los horarios');
+      console.log('No se pudo cargar los horarios');
     } finally {
       setLoading(false);
     }
@@ -47,9 +45,8 @@ const Horario = () => {
         }
         const data = await response.json();
         setComisiones(data);
-        setError('');
       } catch (error) {
-        setError('No se pudo cargar las comisiones');
+        console.log('No se pudo cargar las comisiones');
       } finally {
         setLoading(false);
       }
@@ -62,29 +59,27 @@ const Horario = () => {
     fetchHorarios(comisionSeleccionada);
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <Spinner animation="border" role="status" className="spinner" variant="primary" />
-        <p className="text-center">Cargando...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="container text-center text-danger">{error}</div>;
-  }
-
   return (
-    <div className="container">
-      <FormularioHorario
-        comisiones={comisiones}
-        onComisionSeleccionada={handleComisionSeleccionada}
-      />
-      <div className="row">
-        <TablaHorario horarios={horarios} modo="alumno" />
-      </div>
-    </div>
+    <>
+      {loading ? (
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
+      ) : serverUp ? (
+        <div className="container">
+          <FormularioHorario
+            comisiones={comisiones}
+            onComisionSeleccionada={handleComisionSeleccionada}
+          />
+          <div className="row">
+            <TablaHorario horarios={horarios} modo="alumno" />
+          </div>
+        </div>
+      ) : (
+        <ErrorPage message="La seccion de horarios" statusCode={500} />
+      )}
+    </>
   );
 };
 

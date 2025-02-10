@@ -42,30 +42,40 @@ class DisponibilidadRequest extends FormRequest
             ];
         }
 
-        $esCreacion = $this->isMethod('post');
-        Log::info('Método POST detectado, generando reglas para la creación.');
 
-        $idUCRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $idDocenteRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $idHPD = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $idAulaRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $idGradoRules = $esCreacion ? ['required', 'integer'] : ['nullable', 'integer'];
-        $diaRules = $esCreacion ? ['required', 'string'] : ['nullable', 'string'];
-        $moduloInicioRules = $esCreacion ? ['required', 'date_format:H:i:s'] : ['nullable', 'date_format:H:i:s'];
-        $moduloFinRules = $esCreacion ? ['required', 'date_format:H:i:s'] : ['nullable', 'date_format:H:i:s'];
+        if ($this->isMethod('post')) {
+            $idUCRules =  ['required', 'integer'];
+            $idDocenteRules = ['required', 'integer'];
+            $idHPD = ['required', 'integer'];
+            $idAulaRules = ['required', 'integer'];
+            $idGradoRules = ['required', 'integer'];
+            $diaRules = ['required', 'string'];
+            $moduloInicioRules =  ['required', 'date_format:H:i:s'];
+            $moduloFinRules = ['required', 'date_format:H:i:s'];
 
-        return [
-            'id_uc' => $idUCRules,
-            'id_docente' => $idDocenteRules,
-            'id_h_p_d' => $idHPD,
-            'id_aula' => $idAulaRules,
-            'id_grado' => $idGradoRules,
-            'dia' => $diaRules,
-            'modulo_inicio' => $moduloInicioRules,
-            'modulo_fin' => $moduloFinRules
-        ];
+            return [
+                'id_uc' => $idUCRules,
+                'id_docente' => $idDocenteRules,
+                'id_h_p_d' => $idHPD,
+                'id_aula' => $idAulaRules,
+                'id_grado' => $idGradoRules,
+                'dia' => $diaRules,
+                'modulo_inicio' => $moduloInicioRules,
+                'modulo_fin' => $moduloFinRules
+            ];
+        }
+        if ($this->isMethod('put')) {
+            return [
+                'disponibilidades' => ['required', 'array', 'min:2', 'max:2'],
+                'disponibilidades.*.id_disp' => ['required', 'integer', function ($attribute, $value, $fail) {
+                    $this->validateDisponibilidad($attribute, $value, $fail);
+                }],
+                'disponibilidades.*.dia' => ['required', 'string'],
+                'disponibilidades.*.modulo' => ['required', 'integer'],
+            ];
+        }
     }
-
+  
     private function validateDisponibilidad($attribute, $value, $fail)
     {
 

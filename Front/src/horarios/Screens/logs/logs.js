@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import '../../css/loading.css';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const Logs = () => {
   const [logs, setLogs] = useState([]);
@@ -91,7 +92,7 @@ const Logs = () => {
           </div>
         </div>
       ) : (
-        <h1>Este módulo no está disponible en este momento</h1>
+        <ErrorPage message="La seccion de lohs" statusCode={500} />
       )}
     </>
   );
