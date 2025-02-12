@@ -116,7 +116,7 @@ class AulaService implements AulaRepository
     public function eliminarAulas($id)
     {
         try {
-            $aula = Aula::find(400);
+            $aula = Aula::find($id);
             if ($aula) {
                 $nombreAula = $aula->nombre;
                 $aula->delete();
