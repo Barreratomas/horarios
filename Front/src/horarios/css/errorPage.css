@@ -37,3 +37,12 @@
   background-color: #6387bf;
   color: #121212;
 }
+
+
+@media (max-width: 768px) {
+  .btn-home {
+    width: 50%;
+  }
+
+
+}

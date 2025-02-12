@@ -6,6 +6,8 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
+  const [actionType, setActionType] = useState(null); // 'delete' o 'update'
+  // console.log(horarios);
 
   const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
@@ -54,9 +56,29 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     if (isSelecting) {
       setSelectedIds((prev) => {
         const newSet = new Set(prev);
-        newSet.add(JSON.stringify({ dia, modulo, id_disp })); // Guarda día, módulo e ID como string
-        console.log('ids actualizados:', Array.from(newSet)); // Se loguea dentro de la actualización
-        return newSet;
+
+        if (actionType === 'update') {
+          // Añadir la nueva selección
+          newSet.add(JSON.stringify({ dia, modulo, id_disp }));
+
+          // Convertir el Set en un array para verificar el tamaño
+          const newArray = Array.from(newSet);
+
+          // Si ya hay más de dos elementos, eliminar el más antiguo
+          if (newArray.length > 2) {
+            newArray.shift();
+          }
+
+          // Actualizar estado con el nuevo conjunto
+          const updatedSet = new Set(newArray);
+          console.log('ids actualizados:', Array.from(updatedSet)); // Mostrar el valor actualizado
+          return updatedSet;
+        } else {
+          // Comportamiento por defecto para otros casos
+          newSet.add(JSON.stringify({ dia, modulo, id_disp }));
+          console.log('ids actualizados (default):', Array.from(newSet));
+          return newSet;
+        }
       });
     } else {
       setContextMenu({ visible: true, x, y, contenido });
@@ -73,7 +95,8 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     if (!isSelecting) setSelectedIds(new Set());
   };
 
-  const iniciarSeleccion = () => {
+  const iniciarSeleccion = (action) => {
+    setActionType(action);
     setSelectedIds(new Set()); // Limpiar selecciones anteriores
     setIsSelecting(true);
     setContextMenu({ visible: false, x: 0, y: 0, contenido: null });
@@ -83,6 +106,7 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     setIsSelecting(false);
     setSelectedIds(new Set());
     setSelectedModule(null); // Limpia el módulo seleccionado
+    setActionType(null);
   };
 
   // Función para eliminar el horario
@@ -109,6 +133,39 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
       }
     } catch (error) {
       console.error('Error al eliminar el horario:', error);
+    } finally {
+      setContextMenu({ ...contextMenu, visible: false });
+    }
+  };
+
+  // Función para actualizar los módulos seleccionados
+  const confirmarActualizacion = async () => {
+    if (selectedIds.size !== 2) {
+      console.log('la seleccion de modulos debe ser 2', selectedIds.size);
+      return;
+    }
+
+    try {
+      const disponibilidades = Array.from(selectedIds).map((item) => JSON.parse(item));
+      console.log(Array.from(disponibilidades));
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios/disponibilidad/actualizar`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ disponibilidades }) // Enviar el array de objetos en formato JSON
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        console.error('Error del servidor:', data.error);
+      } else {
+        console.log('Horario actualizado:', data.data);
+
+        // Actualizar el estado de horarios con los nuevos datos
+        setHorarios((prev) => prev.map((h) => (selectedIds.has(h.id_disp) ? data.data : h)));
+      }
+    } catch (error) {
+      console.error('Error al actualizar el horario:', error);
     } finally {
       setContextMenu({ ...contextMenu, visible: false });
     }
@@ -174,9 +231,14 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
       {isSelecting ? (
         <div className="seleccion-container">
           <div className="barra-opciones">
-            <p>Selecciona los módulos a eliminar</p>
+            <p>Selecciona los módulos a {actionType === 'delete' ? 'eliminar' : 'actualizar'}</p>
             <div className="buttons">
-              <button onClick={confirmarEliminacion}>Confirmar Eliminación</button>
+              <button
+                onClick={actionType === 'delete' ? confirmarEliminacion : confirmarActualizacion}
+              >
+                Confirmar {actionType === 'delete' ? 'Eliminación' : 'Actualización'}
+              </button>
+
               <button onClick={cancelarSeleccion}>Cancelar</button>
             </div>
           </div>
@@ -272,7 +334,8 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
           <p>Aula: {contextMenu.contenido.aula}</p>
           <p>Docente: {contextMenu.contenido.docenteNombre}</p>
           <p>ID: {contextMenu.contenido.id_disp}</p>
-          <button onClick={iniciarSeleccion}>Eliminar</button>
+          <button onClick={() => iniciarSeleccion('delete')}>Eliminar</button>
+          <button onClick={() => iniciarSeleccion('update')}>Actualizar</button>
         </div>
       )}
     </div>

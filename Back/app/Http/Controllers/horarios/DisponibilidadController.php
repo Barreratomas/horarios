@@ -58,7 +58,6 @@ class DisponibilidadController extends Controller
 
         try {
 
-            $grados = Grado::all();
             $carrerasGrados = CarreraGrado::all();
 
             // recorrer solo los grado en bucle
@@ -138,13 +137,15 @@ class DisponibilidadController extends Controller
                     }
                 }
             }
-            Log::info("Total asignados: $asignados");
-            Log::info("Total no asignados: $noAsignados");
+            // Log::info("Total asignados: $asignados");
+            // Log::info("Total no asignados: $noAsignados");
 
 
 
 
             DB::commit();
+            Log::info("TESTEOOOOOOOOOO");
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Horarios creados con éxito',
@@ -155,6 +156,7 @@ class DisponibilidadController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Se produjo un error al crear los horarios',
@@ -176,8 +178,15 @@ class DisponibilidadController extends Controller
 
 
 
-    public function actualizar(Request $request, $id_disponibilidad)
+    public function actualizar(DisponibilidadRequest $request)
     {
+        $disponibilidades = $request->input('disponibilidades');
+
+        return $this->disponibilidadService->actualizarDisponibilidad($disponibilidades);
+        // SE VA A PASAR EL ARRAY DE DISPONIBILIDADES Y EN EL SERVICE SE HACE LA VERIFICACION DE MODULOS Y DESPUES EL INTERCAMBIO
+
+
+
         // $id_dm = $dm->id_dm;
         // // Buscar registros en la tabla disponibilidades que tengan el mismo id_dm
         // $disponibilidad_vieja = Disponibilidad::where('id_dm', $id_dm)->get();

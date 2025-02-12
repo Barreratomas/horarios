@@ -3,13 +3,13 @@ import TablaHorario from '../layouts/parcials/tableDocente'; // El componente de
 import FormularioHorarioDocente from '../layouts/parcials/formularioHorarioDocente';
 import { Spinner } from 'react-bootstrap';
 import '../../css/loading.css';
+import ErrorPage from '../layouts/parcials/errorPage';
 
 const HorarioDocente = () => {
-  const [docentes, setDocentes] = useState([]); // Lista de docentes
-  const [horarios, setHorarios] = useState([]); // Horarios del docente seleccionado
-  const [loading, setLoading] = useState(true); // Para el estado de carga
-  const [error, setError] = useState(''); // Mensajes de error
-
+  const [docentes, setDocentes] = useState([]);
+  const [horarios, setHorarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [serverUp, setServerUp] = useState(false);
   // Función para obtener los horarios por docente
   const fetchHorariosDocente = async (idDocenteSeleccionado) => {
     try {
@@ -24,15 +24,14 @@ const HorarioDocente = () => {
         }
       );
       const data = await response.json();
-
-      if (!response.ok) {
+      if (data.error) {
         console.error('Error del backend:', data.error);
       } else {
         setHorarios(data);
-        setError('');
+        setServerUp(true);
       }
     } catch (error) {
-      setError('No se pudo cargar los horarios del docente');
+      console.log('No se pudo cargar los horarios del docente');
     } finally {
       setLoading(false);
     }
@@ -48,9 +47,8 @@ const HorarioDocente = () => {
         }
         const data = await response.json();
         setDocentes(data);
-        setError('');
       } catch (error) {
-        setError('No se pudo cargar los docentes');
+        console.log('No se pudo cargar los docentes');
       } finally {
         setLoading(false);
       }
@@ -64,30 +62,27 @@ const HorarioDocente = () => {
     fetchHorariosDocente(idDocente);
   };
 
-  // Condicionales de carga y error
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <Spinner animation="border" role="status" className="spinner" variant="primary" />
-        <p className="text-center">Cargando...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="container text-center text-danger">{error}</div>;
-  }
-
   return (
-    <div className="container">
-      <FormularioHorarioDocente
-        docentes={docentes}
-        onDocenteSeleccionado={handleDocenteSeleccionado}
-      />
-      <div className="row">
-        <TablaHorario horarios={horarios} modo="docente" />
-      </div>
-    </div>
+    <>
+      {loading ? (
+        <div className="loading-container">
+          <Spinner animation="border" role="status" className="spinner" variant="primary" />
+          <p className="text-center">Cargando...</p>
+        </div>
+      ) : serverUp ? (
+        <div className="container">
+          <FormularioHorarioDocente
+            docentes={docentes}
+            onDocenteSeleccionado={handleDocenteSeleccionado}
+          />
+          <div className="row">
+            <TablaHorario horarios={horarios} modo="docente" />
+          </div>
+        </div>
+      ) : (
+        <ErrorPage message="La seccion de horarios" statusCode={500} />
+      )}
+    </>
   );
 };
 
