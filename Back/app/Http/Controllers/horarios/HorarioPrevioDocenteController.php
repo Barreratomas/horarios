@@ -96,7 +96,7 @@ class HorarioPrevioDocenteController extends Controller
      *     tags={"HorarioPrevioDocente"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocenteRequest")
+     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocente")
      *     ),
      *     @OA\Response(
      *         response=201,
@@ -143,7 +143,7 @@ class HorarioPrevioDocenteController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocenteRequest")
+     *         @OA\JsonContent(ref="#/components/schemas/HorarioPrevioDocente")
      *     ),
      *     @OA\Response(
      *         response=200,
