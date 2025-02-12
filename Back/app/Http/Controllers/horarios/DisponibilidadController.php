@@ -144,7 +144,6 @@ class DisponibilidadController extends Controller
 
 
             DB::commit();
-            Log::info("TESTEOOOOOOOOOO");
 
             return response()->json([
                 'status' => 'success',
