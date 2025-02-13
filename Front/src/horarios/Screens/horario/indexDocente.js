@@ -10,6 +10,7 @@ const HorarioDocente = () => {
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serverUp, setServerUp] = useState(false);
+
   // Función para obtener los horarios por docente
   const fetchHorariosDocente = async (idDocenteSeleccionado) => {
     try {
@@ -26,12 +27,14 @@ const HorarioDocente = () => {
       const data = await response.json();
       if (data.error) {
         console.error('Error del backend:', data.error);
+        setServerUp(false);
       } else {
         setHorarios(data);
         setServerUp(true);
       }
     } catch (error) {
       console.log('No se pudo cargar los horarios del docente');
+      setServerUp(false);
     } finally {
       setLoading(false);
     }
@@ -42,13 +45,17 @@ const HorarioDocente = () => {
     const fetchDocentes = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/docentes');
-        if (!response.ok) {
-          throw new Error('Error al cargar los docentes');
-        }
         const data = await response.json();
-        setDocentes(data);
+        if (data.error) {
+          console.error('Error del backend:', data.error);
+          setServerUp(false);
+        } else {
+          setDocentes(data);
+          setServerUp(true);
+        }
       } catch (error) {
         console.log('No se pudo cargar los docentes');
+        setServerUp(false);
       } finally {
         setLoading(false);
       }

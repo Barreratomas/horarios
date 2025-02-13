@@ -24,12 +24,14 @@ const Horario = () => {
       const data = await response.json();
       if (data.error) {
         console.error('Error del backend:', data.error);
+        setServerUp(false);
       } else {
         setHorarios(data);
         setServerUp(true);
       }
     } catch (error) {
       console.log('No se pudo cargar los horarios');
+      setServerUp(false);
     } finally {
       setLoading(false);
     }
@@ -40,13 +42,17 @@ const Horario = () => {
     const fetchComisiones = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/horarios/carreraGrados');
-        if (!response.ok) {
-          throw new Error('Error al cargar las comisiones');
-        }
         const data = await response.json();
-        setComisiones(data);
+        if (data.error) {
+          console.error('Error del backend:', data.error);
+          setServerUp(false);
+        } else {
+          setComisiones(data);
+          setServerUp(true);
+        }
       } catch (error) {
         console.log('No se pudo cargar las comisiones');
+        setServerUp(false);
       } finally {
         setLoading(false);
       }
