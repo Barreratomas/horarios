@@ -41,7 +41,8 @@ class DocenteUCController extends Controller
      *     )
      * )
      */
-    public function index(){
+    public function index()
+    {
         return $this->docenteUCService->obtenerTodosDocentesUC();
     }
 
@@ -176,7 +177,7 @@ class DocenteUCController extends Controller
     {
         return $this->docenteUCService->actualizarDocenteUCPorIdDocente($request, $id);
     }
-    
+
     /**
      * @OA\Put(
      *     path="/api/horarios/docenteUC/actualizar/idUC/{id}",
@@ -210,7 +211,8 @@ class DocenteUCController extends Controller
      *     )
      * )
      */
-    public function actualizarDocenteUCPorIdUC(DocenteUCRequest $request, $id){
+    public function actualizarDocenteUCPorIdUC(DocenteUCRequest $request, $id)
+    {
         return $this->docenteUCService->actualizarDocenteUCPorIdUC($request, $id);
     }
 
@@ -283,16 +285,4 @@ class DocenteUCController extends Controller
     {
         return $this->docenteUCService->eliminarDocenteUCPorIdUC($id);
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-

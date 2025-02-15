@@ -44,26 +44,25 @@ class DisponibilidadRequest extends FormRequest
 
 
         if ($this->isMethod('post')) {
-            $idUCRules =  ['required', 'integer'];
+            $idUCRules = ['required', 'integer'];
             $idDocenteRules = ['required', 'integer'];
-            $idHPD = ['required', 'integer'];
             $idAulaRules = ['required', 'integer'];
-            $idGradoRules = ['required', 'integer'];
-            $diaRules = ['required', 'string'];
-            $moduloInicioRules =  ['required', 'date_format:H:i:s'];
-            $moduloFinRules = ['required', 'date_format:H:i:s'];
+            $idCarreraGradoRules = ['required', 'integer'];
+            $diaRules = ['required', 'string', 'in:lunes,martes,miercoles,jueves,viernes'];
+            $moduloRules = ['required', 'integer', 'between:1,6'];
+            $modalidadRules = ['required', 'string', 'in:p,v'];
 
             return [
                 'id_uc' => $idUCRules,
                 'id_docente' => $idDocenteRules,
-                'id_h_p_d' => $idHPD,
                 'id_aula' => $idAulaRules,
-                'id_grado' => $idGradoRules,
+                'id_carrera_grado' => $idCarreraGradoRules,
                 'dia' => $diaRules,
-                'modulo_inicio' => $moduloInicioRules,
-                'modulo_fin' => $moduloFinRules
+                'modulo' => $moduloRules,
+                'modalidad' => $modalidadRules,
             ];
         }
+
         if ($this->isMethod('put')) {
             return [
                 'disponibilidades' => ['required', 'array', 'min:2', 'max:2'],
@@ -75,7 +74,7 @@ class DisponibilidadRequest extends FormRequest
             ];
         }
     }
-  
+
     private function validateDisponibilidad($attribute, $value, $fail)
     {
 

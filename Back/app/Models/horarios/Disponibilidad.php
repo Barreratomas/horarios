@@ -106,6 +106,4 @@ class Disponibilidad extends Model
     {
         return $this->belongsTo(HorarioPrevioDocente::class, 'id_h_p_d', 'id_h_p_d');
     }
-
-
 }

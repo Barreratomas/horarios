@@ -112,7 +112,7 @@ class HorarioService implements HorarioRepository
     }
 
 
-    public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp)
+    public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp, $modalidad = "p")
     {
         try {
             // los datos para el mapper
@@ -120,7 +120,7 @@ class HorarioService implements HorarioRepository
                 'dia' => $dia,
                 'modulo_inicio' => $modulo_inicio,
                 'modulo_fin' => $modulo_fin,
-                'modalidad' => "p", // hay que hacer la modalidad dinamica
+                'modalidad' => $modalidad, // hay que hacer la modalidad dinamica
                 'id_disp' => $id_disp,
             ];
 

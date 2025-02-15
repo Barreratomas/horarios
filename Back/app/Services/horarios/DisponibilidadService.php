@@ -109,6 +109,61 @@ class DisponibilidadService implements DisponibilidadRepository
     }
 
 
+    public function guardarUnaDisponibilidad($id_uc, $id_docente, $id_aula, $id_carrera_grado, $dia, $modulo, $modalidad)
+    {
+        try {
+            Log::info("arrancando disponibilidad");
+
+            // Obtener la disponibilidad horaria del docente
+            $disponibilidadTotal = DB::table('docente')
+                ->where('id_docente', $id_docente)
+                ->value('DispHoraria');
+
+            // Contar la cantidad de módulos ya asignados en disponibilidad
+            $modulosAsignados = DB::table('disponibilidad')
+                ->where('id_docente', $id_docente)
+                ->sum(DB::raw('modulo_fin - modulo_inicio + 1')); // Contar los módulos ocupados
+
+
+
+            // Verificar si el total excede la disponibilidad horaria
+            if (($modulosAsignados + 1) > $disponibilidadTotal) {
+                Log::warning("El docente {$id_docente} no tiene suficiente disponibilidad horaria. Asignados: {$modulosAsignados}, Nuevos: 1, Límite: {$disponibilidadTotal}");
+                return response()->json(['error' => 'Se alcanzó la capacidad maxima del docente'], 400);
+            } else {
+                Log::info("Paso la validacion de modulos totales");
+            }
+
+            $verificacionRequest = $this->verificarModulosActualizacion(
+                $dia,
+                $modulo,
+                $id_docente,
+                $id_carrera_grado,
+                $id_uc,
+                $id_aula,
+            );
+
+            if (!$verificacionRequest) {
+                Log::info("Conflicto detectado durante la verificación de disponibilidades");
+                return response()->json(['error' => 'No hay mas disponibilidad'], 400);
+            }
+            $id_disp = DB::table('disponibilidad')->insertGetId([
+                'id_docente' => $id_docente,
+                'id_carrera_grado' => $id_carrera_grado,
+                'id_uc' => $id_uc,
+                'id_aula' => $id_aula,
+                'dia' => $dia,
+                'modulo_inicio' => $modulo,
+                'modulo_fin' => $modulo
+            ]);
+            $this->horarioService->guardarHorarios($dia, $modulo, $modulo, $id_disp, $modalidad);
+
+            return  $this->horarioService->obtenerTodosHorarios();
+        } catch (\Throwable $th) {
+            return response()->json(['error' => "Error al asignar el nuevo horario: {$th->getMessage()}"], 500);
+        }
+    }
+
     public function modulosRepartidos($modulos_semanales, $id_docente, $id_carrera_grado, $id_uc, $id_h_p_d = null, $moduloPrevio = null, $diaInstituto = null)
     {
         Log::info('Iniciando la asignación de módulos', [
@@ -260,8 +315,39 @@ class DisponibilidadService implements DisponibilidadRepository
 
         $modulosPorAsignar = range($modulo_inicio, $modulo_fin);
         // Consultar la base de datos para obtener todos los módulos ya asignados de lunes a viernes
-        Log::info("arracno dispo");
+        Log::info("arranco dispo");
 
+
+        // Obtener la disponibilidad horaria del docente
+        $disponibilidadTotal = DB::table('docente')
+            ->where('id_docente', $id_docente)
+            ->value('DispHoraria');
+
+        // Contar la cantidad de módulos ya asignados en disponibilidad
+        $modulosAsignados = DB::table('disponibilidad')
+            ->where('id_docente', $id_docente)
+            ->sum(DB::raw('modulo_fin - modulo_inicio + 1')); // Contar los módulos ocupados
+
+
+        // Calcular los nuevos módulos a asignar
+        $nuevosModulos = count($modulosPorAsignar);
+
+        // Verificar si el total excede la disponibilidad horaria
+        if (($modulosAsignados + $nuevosModulos) > $disponibilidadTotal) {
+
+            Log::warning("El docente {$id_docente} no tiene suficiente disponibilidad horaria. Asignados: {$modulosAsignados}, Nuevos: {$nuevosModulos}, Límite: {$disponibilidadTotal}");
+            return false; // No permitir la asignación
+        } else {
+            Log::info("docente {$id_docente}", [
+                'modulo_a_asignar' => $modulosPorAsignar,
+                'modulos_ya_asignados' => $modulosAsignados,
+                'disponibilidad_docente' => $disponibilidadTotal
+            ]);
+        }
+
+
+
+        // 
         $modulosAsignados = DB::table('disponibilidad')
             ->where('id_uc', $id_uc)
             ->where('id_carrera_grado', $id_carrera_grado)
@@ -281,7 +367,7 @@ class DisponibilidadService implements DisponibilidadRepository
         // Calcular los nuevos módulos que se sumarían
         $modulosNuevos = count($modulosPorAsignar);
 
-        // Verificar si el total excede los módulos semanales permitidos
+        // Verificar si el total excede los módulos semanales permitidos de la uc
         if ($totalModulosAsignados + $modulosNuevos > $modulos_semanales_o) {
             Log::info("modulo inico {$modulo_inicio} y modulo fin {$modulo_fin} total:{$modulosNuevos} sin espcio en modulos semanales");
             return false; // No es posible asignar más módulos
@@ -410,8 +496,6 @@ class DisponibilidadService implements DisponibilidadRepository
         $id_docente,
         $id_carrera_grado,
         $id_uc,
-        $modulos_semanales,
-        $modulos_semanales_o,
         $id_aula,
 
     ) {
@@ -421,8 +505,6 @@ class DisponibilidadService implements DisponibilidadRepository
             'id_docente' => $id_docente,
             'id_carrera_grado' => $id_carrera_grado,
             'id_uc' => $id_uc,
-            'modulos_semanales' => $modulos_semanales,
-            'modulos_semanales_o' => $modulos_semanales_o,
             'id_aula' => $id_aula,
         ]);
 
@@ -537,7 +619,7 @@ class DisponibilidadService implements DisponibilidadRepository
             $id_aula_2 = $disponibilidadActual2->id_aula;
 
             $DeleteRequest = $this->eliminarDisponibilidad([$disponibilidad1, $disponibilidad2]);
-            Log::info("abajo delete");
+
 
             if ($DeleteRequest->getStatusCode() != 200) {
                 Log::info("entra 200");
@@ -553,8 +635,6 @@ class DisponibilidadService implements DisponibilidadRepository
                 $id_docente_1,
                 $id_carrera_grado_2,
                 $id_uc_1,
-                null, // No se usan $modulos_semanales
-                null, // No se usan $modulos_semanales_o
                 $id_aula_2,
 
             );
@@ -566,9 +646,7 @@ class DisponibilidadService implements DisponibilidadRepository
                 $id_docente_2,
                 $id_carrera_grado_1,
                 $id_uc_2,
-                null, // No se usan $modulos_semanales
-                null, // No se usan $modulos_semanales_o
-                $id_aula_2,
+                $id_aula_1,
 
 
             );
@@ -582,23 +660,23 @@ class DisponibilidadService implements DisponibilidadRepository
 
 
             $id_disp_1 = DB::table('disponibilidad')->insertGetId([
-                'id_docente' => $id_docente_2,
-                'id_carrera_grado' => $id_carrera_grado_2,
-                'id_uc' => $id_uc_2,
-                'id_aula' => $id_aula_2,
-                'dia' => $dia_1,
-                'modulo_inicio' => $modulo_1,
-                'modulo_fin' => $modulo_1 // Ajusta según la duración del módulo
-            ]);
-
-            $id_disp_2 = DB::table('disponibilidad')->insertGetId([
                 'id_docente' => $id_docente_1,
-                'id_carrera_grado' => $id_carrera_grado_1,
+                'id_carrera_grado' => $id_carrera_grado_2,
                 'id_uc' => $id_uc_1,
-                'id_aula' => $id_aula_1,
+                'id_aula' => $id_aula_2,
                 'dia' => $dia_2,
                 'modulo_inicio' => $modulo_2,
                 'modulo_fin' => $modulo_2 // Ajusta según la duración del módulo
+            ]);
+
+            $id_disp_2 = DB::table('disponibilidad')->insertGetId([
+                'id_docente' => $id_docente_2,
+                'id_carrera_grado' => $id_carrera_grado_1,
+                'id_uc' => $id_uc_2,
+                'id_aula' => $id_aula_1,
+                'dia' => $dia_1,
+                'modulo_inicio' => $modulo_1,
+                'modulo_fin' => $modulo_1 // Ajusta según la duración del módulo
             ]);
 
             Log::info("Disponibilidades insertadas: ID1=$id_disp_1, ID2=$id_disp_2");
@@ -607,7 +685,7 @@ class DisponibilidadService implements DisponibilidadRepository
             $this->horarioService->guardarHorarios($dia_2, $modulo_2, $modulo_2, $id_disp_2);
 
             DB::commit();
-            return response()->json(['success' => 'Intercambio realizado correctamente'], 200);
+            return  $this->horarioService->obtenerTodosHorarios();
         } catch (Exception $e) {
             Log::error('Error al actualizar la disponibilidad: ' . $e->getMessage());
             db::rollBack();
@@ -692,14 +770,124 @@ class DisponibilidadService implements DisponibilidadRepository
                 }
             }
 
+
             // Si todo ha ido bien, retornamos una respuesta exitosa
-            return response()->json(['success' => true, 'message' => 'Disponibilidades eliminadas con éxito.'], 200);
+            return  $this->horarioService->obtenerTodosHorarios();
         } catch (\Exception $e) {
             // Si ocurre algún error, capturamos la excepción y devolvemos un mensaje de error
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
                 'message' => 'Ocurrió un error al intentar eliminar las disponibilidades.',
+            ], 500);
+        }
+    }
+
+    public function getDisponibles($id_carrera_grado, $modulo, $dia)
+    {
+        Log::info("carrera_g:{$id_carrera_grado}, modulo:{$modulo}, dia:{$dia}");
+
+        try {
+            //code...
+
+            // Subconsulta para encontrar todas las aulas ocupadas
+            $aulasOcupadas = DB::table('disponibilidad')
+
+                ->where('dia', $dia) // Filtra por el día
+                ->where(function ($query) use ($modulo) {
+                    $query->where(function ($q) use ($modulo) {
+                        $q->where('modulo_inicio', '<=', $modulo)
+                            ->where('modulo_fin', '>=', $modulo);
+                    })
+                        ->orWhere(function ($q) use ($modulo) {
+                            $q->where('modulo_inicio', '<=', $modulo)
+                                ->where('modulo_fin', '>=', $modulo);
+                        });
+                })
+                ->pluck('id_aula'); // Obtiene las aulas ocupadas
+
+            // Consulta  para encontrar las aulas disponibles
+            $aulasDisponibles = DB::table('aula')
+                ->whereNotIn('id_aula', $aulasOcupadas) // Excluye las aulas ocupadas
+                ->get();
+
+
+
+            // filtra las uc que son para el grado
+            $ucDisponibles = DB::table('grado_uc')
+                ->join('unidad_curricular', 'grado_uc.id_uc', '=', 'unidad_curricular.id_uc')
+                ->where('grado_uc.id_carrera_grado', $id_carrera_grado)
+                ->select('unidad_curricular.id_uc', 'unidad_curricular.unidad_curricular') // Seleccionar solo nombre y ID
+                ->get();
+
+
+
+
+
+
+            return response()->json([
+                'success' => true,
+                'ucDisponibles' => $ucDisponibles,
+                'aulasDisponibles' => $aulasDisponibles,
+            ], 200);
+        } catch (\Exception $e) {
+
+            Log::error("Error en getDisponibles: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al obtener las disponibilidades.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function getDocentesDisponibles($id_uc, $modulo, $dia)
+    {
+        Log::info("iduc:{$id_uc}, modulo:{$modulo}, dia:{$dia}");
+
+        try {
+
+            // Consulta para encontrar los docentes que las uc obtenidas anteriormente
+            $docentes = DB::table('docente_uc')
+                ->where('id_uc', $id_uc) // Filtra por las UC disponibles
+                ->pluck('id_docente'); // Extrae solo los IDs
+
+            // obtiene los docente ocupados
+            $docentesOcupados = DB::table("disponibilidad")
+                ->where('dia', $dia) // Filtra por el día
+                ->where(function ($query) use ($modulo) {
+                    $query->where(function ($q) use ($modulo) {
+                        $q->where('modulo_inicio', '<=', $modulo)
+                            ->where('modulo_fin', '>=', $modulo);
+                    })
+                        ->orWhere(function ($q) use ($modulo) {
+                            $q->where('modulo_inicio', '<=', $modulo)
+                                ->where('modulo_fin', '>=', $modulo);
+                        });
+                })
+                ->pluck('id_docente');
+
+            // obtiende los deocentes disponibles
+            $docentesDisponibles = DB::table('docente')
+                ->whereIn('id_docente', $docentes) // Filtra los docentes asociados a las UC disponibles
+                ->whereNotIn('id_docente', $docentesOcupados) // Excluye los docentes ocupados
+                ->get();
+
+
+
+            return response()->json([
+                'success' => true,
+                'docentesDisponibles' => $docentesDisponibles,
+
+            ], 200);
+        } catch (\Exception $e) {
+
+            Log::error("Error en getDisponibles: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al obtener las disponibilidades.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

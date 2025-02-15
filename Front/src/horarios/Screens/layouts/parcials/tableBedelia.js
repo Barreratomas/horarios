@@ -6,8 +6,22 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
-  const [actionType, setActionType] = useState(null); // 'delete' o 'update'
-  // console.log(horarios);
+  const [actionType, setActionType] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    aula: '',
+    docente: '',
+    materia: '',
+    modalidad: 'p' // Por defecto presencial
+  });
+  const [getAulas, SetGetAulas] = useState([]);
+  const [getDocentes, SetGetDocentes] = useState([]);
+  const [getUcs, SetGeUcs] = useState([]);
+  const [module, setModule] = useState('');
+  const [day, setDay] = useState('');
+  const [currentIDCarreraGrado, setCurrentIDCarreraGrado] = useState('');
+
+  console.log(horarios);
 
   const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
@@ -109,6 +123,124 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     setActionType(null);
   };
 
+  const enableModal = async (id_carrera_grado) => {
+    await getDisponibles(id_carrera_grado);
+    setCurrentIDCarreraGrado(id_carrera_grado);
+    setShowModal(true);
+  };
+
+  const disabledModal = () => {
+    SetGetAulas([]);
+    SetGetDocentes([]);
+    SetGeUcs([]);
+    setModule('');
+    setDay('');
+    setCurrentIDCarreraGrado('');
+    setShowModal(false);
+  };
+
+  const handleModalSubmit = async () => {
+    setShowModal(false);
+    await asignarHorario();
+  };
+
+  const getDisponibles = async (id_carrera_grado) => {
+    try {
+      const { dia, modulo } = selectedModule;
+      const body = {
+        dia,
+        modulo,
+        id_carrera_grado
+      };
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/disponibilidad/disponibles`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        console.log('error nas');
+      } else {
+        console.log(data);
+        SetGetAulas(data.aulasDisponibles || []);
+        SetGeUcs(data.ucDisponibles || []);
+        setModule(body.modulo);
+        setDay(body.dia);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getDocentesDisponibles = async (id_uc) => {
+    console.log(id_uc);
+    try {
+      const body = {
+        dia: day,
+        modulo: module,
+        id_uc
+      };
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/horarios/disponibilidad/disponiblesDocentes`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
+        console.log('error naaaaaaaaaaaaaaaas');
+      } else {
+        console.log(data);
+        SetGetDocentes(data.docentesDisponibles || []);
+      }
+    } catch (error) {
+      console.log('errorrrrrrrrrrrrrr');
+
+      console.log(error);
+    }
+  };
+
+  const asignarHorario = async () => {
+    try {
+      console.log(day);
+      const body = {
+        dia: day,
+        modulo: module,
+        id_uc: formData.materia,
+        id_docente: formData.docente,
+        id_aula: formData.aula,
+        id_carrera_grado: currentIDCarreraGrado,
+        modalidad: formData.modalidad
+      };
+
+      const response = await fetch(`http://127.0.0.1:8000/api/horarios/disponibilidad/asignar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        console.error('Error del servidor:', data.error);
+      } else {
+        setHorarios(data);
+      }
+    } catch (error) {
+      console.error('Error al asignar el horario:', error);
+    } finally {
+      setContextMenu({ ...contextMenu, visible: false });
+      setModule('');
+      setDay('');
+      setCurrentIDCarreraGrado('');
+    }
+  };
+
   // Función para eliminar el horario
   const confirmarEliminacion = async () => {
     try {
@@ -126,10 +258,10 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
       if (data.error) {
         console.error('Error del servidor:', data.error);
       } else {
-        console.log('Horario eliminado:', data.data);
+        console.log('Horario eliminadossssssss:', data);
 
         // Actualizar el estado de horarios eliminando el horario con el id_disp
-        setHorarios((prev) => prev.filter((h) => !selectedIds.has(h.id_disp)));
+        setHorarios(data);
       }
     } catch (error) {
       console.error('Error al eliminar el horario:', error);
@@ -159,10 +291,10 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
       if (data.error) {
         console.error('Error del servidor:', data.error);
       } else {
-        console.log('Horario actualizado:', data.data);
+        console.log('Horario actualizado:', data);
 
         // Actualizar el estado de horarios con los nuevos datos
-        setHorarios((prev) => prev.map((h) => (selectedIds.has(h.id_disp) ? data.data : h)));
+        setHorarios(data);
       }
     } catch (error) {
       console.error('Error al actualizar el horario:', error);
@@ -221,8 +353,35 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
         </div>
       );
     }
+    const idCarreraGrado =
+      horariosGrado?.[0]?.disponibilidad?.carrera_grado?.id_carrera_grado || 'N/A';
 
-    return '';
+    return (
+      <div
+        className="vacio"
+        onContextMenu={(e) => {
+          handleRightClick(
+            e,
+            {
+              unidadCurricular: 'Sin Unidad Curricular',
+              modalidad: 'N/A',
+              aula: 'Sin Aula',
+              docenteNombre: 'Sin Docente',
+              id_disp: null,
+              idCarreraGrado
+            },
+            dia,
+            modulo,
+            null // No hay id_disp en celdas vacías
+          );
+          console.log(
+            `Celda vacía seleccionada -> ID Carrera/Grado: ${horariosGrado?.[0]?.disponibilidad?.carrera_grado?.id_carrera_grado || 'N/A'}, Día: ${dia}, Módulo: ${modulo}`
+          );
+        }}
+      >
+        <div className="test-vacio">-</div>
+      </div>
+    );
   };
 
   return (
@@ -329,13 +488,116 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
       {/* Panel contextual */}
       {contextMenu.visible && !isSelecting && (
         <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
-          <h4>{contextMenu.contenido.unidadCurricular}</h4>
-          <p>Modalidad: {contextMenu.contenido.modalidad}</p>
-          <p>Aula: {contextMenu.contenido.aula}</p>
-          <p>Docente: {contextMenu.contenido.docenteNombre}</p>
-          <p>ID: {contextMenu.contenido.id_disp}</p>
-          <button onClick={() => iniciarSeleccion('delete')}>Eliminar</button>
-          <button onClick={() => iniciarSeleccion('update')}>Actualizar</button>
+          {contextMenu.contenido.id_disp ? (
+            <>
+              <h4>{contextMenu.contenido.unidadCurricular}</h4>
+              <p>Modalidad: {contextMenu.contenido.modalidad}</p>
+              <p>Aula: {contextMenu.contenido.aula}</p>
+              <p>Docente: {contextMenu.contenido.docenteNombre}</p>
+              <p>ID: {contextMenu.contenido.id_disp}</p>
+              <button onClick={() => iniciarSeleccion('delete')}>Eliminar</button>
+              <button onClick={() => iniciarSeleccion('update')}>Actualizar</button>
+            </>
+          ) : (
+            <>
+              <p>ID: {contextMenu.contenido.idCarreraGrado}</p>
+
+              <button onClick={() => iniciarSeleccion('update')}>Actualizar</button>
+              <button onClick={() => enableModal(contextMenu.contenido.idCarreraGrado)}>
+                Asignar
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Asignar Horario</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleModalSubmit();
+              }}
+            >
+              <label>
+                Aula:
+                <select
+                  value={formData.aula}
+                  onChange={(e) => setFormData({ ...formData, aula: e.target.value })}
+                  required
+                >
+                  <option value="" disabled>
+                    Selecciona un aula
+                  </option>
+                  {getAulas.map((aula) => (
+                    <option key={aula.id_aula} value={aula.id_aula}>
+                      {aula.nombre} {/* Reemplaza `nombre` por la propiedad correcta */}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Materia:
+                <select
+                  value={formData.materia}
+                  onChange={(e) => {
+                    const selectedUc = e.target.value;
+                    setFormData({ ...formData, materia: selectedUc });
+                    getDocentesDisponibles(selectedUc); // Llamada a la función al seleccionar la materia
+                  }}
+                  required
+                >
+                  <option value="" disabled>
+                    Selecciona una UC
+                  </option>
+                  {getUcs.map((uc) => (
+                    <option key={uc.id_uc} value={uc.id_uc}>
+                      {uc.unidad_curricular}
+                      {/* Aquí uc es solo un ID; ajusta si hay más datos */}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Docente:
+                <select
+                  value={formData.docente}
+                  onChange={(e) => setFormData({ ...formData, docente: e.target.value })}
+                  required
+                >
+                  <option value="" disabled>
+                    Selecciona un docente
+                  </option>
+                  {getDocentes.map((docente) => (
+                    <option key={docente.id_docente} value={docente.id_docente}>
+                      {docente.nombre} {docente.apellido}
+                      {/* Reemplaza `nombre` por la propiedad correcta */}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Modalidad:
+                <select
+                  value={formData.modalidad}
+                  onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
+                >
+                  <option value="p">Presencial</option>
+                  <option value="v">Virtual</option>
+                </select>
+              </label>
+
+              <button type="submit">Confirmar</button>
+              <button type="button" onClick={() => disabledModal()}>
+                Cancelar
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>

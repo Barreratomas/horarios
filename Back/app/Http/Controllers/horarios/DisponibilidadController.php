@@ -49,6 +49,31 @@ class DisponibilidadController extends Controller
         return view('disponibilidad.show', compact('disponibilidad'));
     }
 
+    public function asignar(DisponibilidadRequest $request)
+    {
+        $id_uc = $request->input('id_uc');
+        $id_docente = $request->input('id_docente');
+        $id_aula = $request->input('id_aula');
+        $id_carrera_grado = $request->input('id_carrera_grado');
+        $dia = $request->input('dia');
+        $modulo = $request->input('modulo');
+        $modalidad = strtolower($request->input('modalidad'));
+        try {
+            DB::beginTransaction();
+            $disponibilidadRequest = $this->disponibilidadService->guardarUnaDisponibilidad($id_uc, $id_docente, $id_aula, $id_carrera_grado, $dia, $modulo, $modalidad);
+
+            if ($disponibilidadRequest->getStatusCode() != 200) {
+                DB::rollBack();
+                return $disponibilidadRequest;
+            }
+            DB::commit();
+            return $disponibilidadRequest;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            return response()->json(['error' => "Error al asignar el nuevo horario: {$th->getMessage()}"], 500);
+        }
+    }
 
 
 
@@ -244,5 +269,23 @@ class DisponibilidadController extends Controller
         $disponibilidades = $request->input('disponibilidades');
 
         return $this->disponibilidadService->eliminarDisponibilidad($disponibilidades);
+    }
+
+    public function getDisponibles(Request $request)
+    {
+        $id_carrera_grado = $request->input('id_carrera_grado');
+        $modulo = $request->input('modulo');
+        $dia = $request->input('dia');
+
+
+        return $this->disponibilidadService->getDisponibles($id_carrera_grado, $modulo, $dia);
+    }
+
+    public function getDocentesDisponibles(Request $request)
+    {
+        $id_uc = $request->input('id_uc');
+        $modulo = $request->input('modulo');
+        $dia = $request->input('dia');
+        return $this->disponibilidadService->getDocentesDisponibles($id_uc, $modulo, $dia);
     }
 }

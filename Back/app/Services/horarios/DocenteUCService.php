@@ -29,7 +29,6 @@ class DocenteUCService implements DocenteUCRepository
             Log::error('Error al obtener los docentesUC: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener los docentesUC'], 500);
         }
-
     }
     public function obtenerDocenteUCPorIdDocente($id_docente)
     {
@@ -56,7 +55,6 @@ class DocenteUCService implements DocenteUCRepository
             Log::error('Error al obtener el docenteUC: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al obtener el docenteUC'], 500);
         }
-
     }
     public function guardarDocenteUC($request)
     {
@@ -70,7 +68,6 @@ class DocenteUCService implements DocenteUCRepository
             Log::error('Error al guardar la docenteUC: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al guardar la docenteUC'], 500);
         }
-
     }
     public function actualizarDocenteUCPorIdDocente($request, $id_docente)
     {
@@ -85,7 +82,6 @@ class DocenteUCService implements DocenteUCRepository
             Log::error('Error al actualizar la docenteUC: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al actualizar la docenteUC'], 500);
         }
-
     }
 
     public function actualizarDocenteUCPorIdUC($request, $id_uc)
@@ -101,9 +97,8 @@ class DocenteUCService implements DocenteUCRepository
             Log::error('Error al actualizar la docenteUC: ' . $e->getMessage());
             return response()->json(['error' => 'Hubo un error al actualizar la docenteUC'], 500);
         }
-
     }
-    
+
     public function eliminarDocenteUCPorIdDocente($id_docente)
     {
         $docenteUC = DocenteUC::where('id_docente', $id_docente)->first();
@@ -119,7 +114,8 @@ class DocenteUCService implements DocenteUCRepository
         }
     }
 
-    public function eliminarDocenteUCPorIdUC($id_uc){
+    public function eliminarDocenteUCPorIdUC($id_uc)
+    {
         $docenteUC = DocenteUC::where('id_uc', $id_uc)->first();
         if (!$docenteUC) {
             return response()->json(['error' => 'DocenteUC no encontrada'], 404);
