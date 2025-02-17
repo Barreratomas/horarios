@@ -120,7 +120,7 @@ class HorarioService implements HorarioRepository
                 'dia' => $dia,
                 'modulo_inicio' => $modulo_inicio,
                 'modulo_fin' => $modulo_fin,
-                'modalidad' => $modalidad, // hay que hacer la modalidad dinamica
+                'modalidad' => $modalidad,
                 'id_disp' => $id_disp,
             ];
 

@@ -82,6 +82,8 @@ class DisponibilidadController extends Controller
         DB::beginTransaction();
 
         try {
+            $docentes = DB::table('docente')->get();
+            [$primeraMitad, $segundaMitad] = $docentes->split(2);
 
             $carrerasGrados = CarreraGrado::all();
 
@@ -118,12 +120,27 @@ class DisponibilidadController extends Controller
 
                     // Log::info("- docentes: {$docentes} ");
 
-                    foreach ($docentes as $docente) {
+                    foreach ($docentes as  $docente) {
+
+                        // Verificar si el docente está en la primera mitad o en la segunda mitad
+                        if ($primeraMitad->contains('id_docente', $docente->id_docente)) {
+                            $diasPresenciales = ['lunes', 'miercoles', 'viernes'];
+
+                            Log::info("El docente {$docente->id_docente} está en la primera mitad.");
+                        } elseif ($segundaMitad->contains('id_docente', $docente->id_docente)) {
+                            $diasPresenciales = ['martes', 'jueves'];
+
+                            Log::info("El docente {$docente->id_docente} está en la segunda mitad.");
+                        } else {
+                            Log::info("El docente {$docente->id_docente} no está en ninguna mitad (esto no debería ocurrir).");
+                        }
                         // verificar si el docente tiene horarios previos
                         $horariosPrevios = DB::table('horario_previo_docente')
                             ->where('id_docente', $docente->id_docente)
                             ->get();  // Devuelve una colección con todos los campos
                         // Log::info("- entro horarios  $horariosPrevios");
+
+
 
                         if (is_array($horariosPrevios) && !empty($horariosPrevios)) {
                             //se asigna el modulo de inicio dependiendo la hora previa del docente 
@@ -133,13 +150,13 @@ class DisponibilidadController extends Controller
                                 // Log::info("- hora previa: {$horaPrevia} ");
 
                                 // llamar a modulosRepartidos
-                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $previo->id_h_p_d, $horaPrevia, $previo->dia);
+                                $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $diasPresenciales, $previo->id_h_p_d, $horaPrevia, $previo->dia);
                             }
                         } else {
 
 
                             // llamar a modulosRepartidos   
-                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc);
+                            $response = $this->disponibilidadService->modulosRepartidos($materia->horas_sem, $docente->id_docente, $carreraGrado->id_carrera_grado, $materia->id_uc, $diasPresenciales);
                         }
 
                         if ($response) {

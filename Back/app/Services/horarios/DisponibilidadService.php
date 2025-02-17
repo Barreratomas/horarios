@@ -164,7 +164,7 @@ class DisponibilidadService implements DisponibilidadRepository
         }
     }
 
-    public function modulosRepartidos($modulos_semanales, $id_docente, $id_carrera_grado, $id_uc, $id_h_p_d = null, $moduloPrevio = null, $diaInstituto = null)
+    public function modulosRepartidos($modulos_semanales, $id_docente, $id_carrera_grado, $id_uc,  $diasPresenciales, $id_h_p_d = null, $moduloPrevio = null, $diaInstituto = null)
     {
         Log::info('Iniciando la asignación de módulos', [
             'modulos_semanales' => $modulos_semanales,
@@ -204,6 +204,12 @@ class DisponibilidadService implements DisponibilidadRepository
             $dia = $diasSemana[$contadorDia];
             Log::info("Procesando día {$dia}");
 
+            if (!in_array($dia, $diasPresenciales)) {
+                $noAula = false;
+            } else {
+                $noAula = true;
+            }
+
             $asignado = false; // Variable para saber si se asignaron módulos este día
 
             // Calcular la cantidad de módulos a asignar según el número restante
@@ -220,8 +226,10 @@ class DisponibilidadService implements DisponibilidadRepository
                     continue;
                 }
 
+
                 // Verificar disponibilidad en la base de datos
-                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o);
+
+                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $noAula);
                 Log::info("Procesando dis");
 
                 // Si están disponibles, asignar los módulos y descontar los módulos semanales
@@ -236,11 +244,13 @@ class DisponibilidadService implements DisponibilidadRepository
                         'modulo_inicio' => $inicio,
                         'modulo_fin' => $fin,
                     ]);
+                    $id_aula = is_string($disponible) ? 0 : $disponible;
+
                     $params = [
                         'id_uc' => $id_uc,
                         'id_docente' => $id_docente,
                         'id_h_p_d' => $id_h_p_d,
-                        'id_aula' => $disponible,
+                        'id_aula' => $id_aula,
                         'id_carrera_grado' => $id_carrera_grado,
                         'dia' => $dia,
                         'modulo_inicio' => $inicio,
@@ -249,8 +259,11 @@ class DisponibilidadService implements DisponibilidadRepository
                     $response = $this->guardarDisponibilidad($params);
                     if ($response->getStatusCode() == 201) {
                         $id_disp = $response->getData()->id;
-
-                        $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp);
+                        if ($disponible == "v") {
+                            $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp, $disponible);
+                        } else {
+                            $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp);
+                        }
                     }
                     $responses[] = $response;
 
@@ -309,7 +322,7 @@ class DisponibilidadService implements DisponibilidadRepository
 
 
 
-    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o)
+    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $noAula)
     {
         // Calcular el rango de módulos que se intentan asignar
 
@@ -355,7 +368,6 @@ class DisponibilidadService implements DisponibilidadRepository
             ->get(['modulo_inicio', 'modulo_fin']);
 
         $totalModulosAsignados = 0;
-        Log::info("abajo modulo asig");
 
         // Calcular el número total de módulos asignados en la semana
         foreach ($modulosAsignados as $modulo) {
@@ -426,31 +438,36 @@ class DisponibilidadService implements DisponibilidadRepository
             Log::info("grado {$id_docente} está disponible para este rango de tiempo.");
         }
 
+        if ($noAula) {
+            return "v";
+        } else {
 
-        $aulas = Aula::all();
 
-        foreach ($aulas as $aula) {
-            // Verificar si el aula tiene asignaciones en el mismo día con los módulos solicitados
-            $disponibilidadAula = DB::table('disponibilidad')
-                ->where('id_aula', $aula->id_aula)
-                ->where('dia', $dia)
-                ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
-                    // Verificar si hay coincidencia de los módulos
-                    $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
-                        ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
-                        ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
-                            $query->where('modulo_inicio', '<=', $modulo_inicio)
-                                ->where('modulo_fin', '>=', $modulo_fin);
-                        });
-                })
-                ->exists();  // Verifica si existe alguna asignación con los parámetros dados
+            $aulas = Aula::all();
 
-            // retornar si no existe una disponibilidad (es decir, el aula está disponible)
-            if ($disponibilidadAula) {
-                Log::info("Aula {$aula->id_aula} ya está asignada en este rango de tiempo.");
-            } else {
-                Log::info("Aula {$aula->id_aula} está disponible para este rango de tiempo.");
-                return $aula->id_aula;
+            foreach ($aulas as $aula) {
+                // Verificar si el aula tiene asignaciones en el mismo día con los módulos solicitados
+                $disponibilidadAula = DB::table('disponibilidad')
+                    ->where('id_aula', $aula->id_aula)
+                    ->where('dia', $dia)
+                    ->where(function ($query) use ($modulo_inicio, $modulo_fin) {
+                        // Verificar si hay coincidencia de los módulos
+                        $query->whereBetween('modulo_inicio', [$modulo_inicio, $modulo_fin])
+                            ->orWhereBetween('modulo_fin', [$modulo_inicio, $modulo_fin])
+                            ->orWhere(function ($query) use ($modulo_inicio, $modulo_fin) {
+                                $query->where('modulo_inicio', '<=', $modulo_inicio)
+                                    ->where('modulo_fin', '>=', $modulo_fin);
+                            });
+                    })
+                    ->exists();  // Verifica si existe alguna asignación con los parámetros dados
+
+                // retornar si no existe una disponibilidad (es decir, el aula está disponible)
+                if ($disponibilidadAula) {
+                    Log::info("Aula {$aula->id_aula} ya está asignada en este rango de tiempo.");
+                } else {
+                    Log::info("Aula {$aula->id_aula} está disponible para este rango de tiempo.");
+                    return $aula->id_aula;
+                }
             }
         }
         return false;
