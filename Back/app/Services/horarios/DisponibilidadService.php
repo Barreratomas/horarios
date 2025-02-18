@@ -204,11 +204,53 @@ class DisponibilidadService implements DisponibilidadRepository
             $dia = $diasSemana[$contadorDia];
             Log::info("Procesando día {$dia}");
 
-            if (!in_array($dia, $diasPresenciales)) {
-                $noAula = false;
-            } else {
-                $noAula = true;
+            // Verificar si ya hay módulos asignados para el id_carrera_grado en este día
+            $moduloExistente  = DB::table('disponibilidad')
+                ->where('id_carrera_grado', $id_carrera_grado)
+                ->where('dia', $dia) // Solo el día actual en la iteración
+                ->select('id_aula')
+                ->first();
+
+
+            // Determinar la modalidad si ya hay un módulo asignado en este día
+            $modoDelDia = null;
+            if ($moduloExistente) {
+                if ($moduloExistente->id_aula === 'V') {
+                    $modoDelDia = 'V'; // Si encontramos un virtual, todo el día debe ser virtual
+                } elseif (is_numeric($moduloExistente->id_aula)) {
+                    $modoDelDia = 'P'; // Si es un número, es presencial
+                }
             }
+
+
+            $virtual = !in_array($dia, $diasPresenciales);
+
+            // Verificar si hay inconsistencia entre la modalidad del día y la modalidad esperada
+            if (!is_null($modoDelDia) && ($modoDelDia === 'V') !== $virtual) {
+                Log::warning("Día {$dia} no cumple con las condiciones, pasando al siguiente día.");
+
+                // Avanzar al siguiente día manteniendo la lógica de ciclos semanales
+                $contadorDia++;
+
+                if ($contadorDia >= count($diasSemana)) {
+                    $contadorDia = 0;
+                    $intentos++;
+                }
+
+                if ($intentos >= 2) {
+                    Log::warning("No se pudieron asignar más módulos después de 2 intentos.", [
+                        'modulos_restantes' => $modulos_semanales,
+                        'intentos' => $intentos,
+                    ]);
+                    break;
+                }
+
+                continue;
+            }
+
+
+
+
 
             $asignado = false; // Variable para saber si se asignaron módulos este día
 
@@ -229,7 +271,7 @@ class DisponibilidadService implements DisponibilidadRepository
 
                 // Verificar disponibilidad en la base de datos
 
-                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $noAula);
+                $disponible = $this->verificarModulosDia($dia, $inicio, $fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $virtual);
                 Log::info("Procesando dis");
 
                 // Si están disponibles, asignar los módulos y descontar los módulos semanales
@@ -244,13 +286,12 @@ class DisponibilidadService implements DisponibilidadRepository
                         'modulo_inicio' => $inicio,
                         'modulo_fin' => $fin,
                     ]);
-                    $id_aula = is_string($disponible) ? 0 : $disponible;
 
                     $params = [
                         'id_uc' => $id_uc,
                         'id_docente' => $id_docente,
                         'id_h_p_d' => $id_h_p_d,
-                        'id_aula' => $id_aula,
+                        'id_aula' => $disponible,
                         'id_carrera_grado' => $id_carrera_grado,
                         'dia' => $dia,
                         'modulo_inicio' => $inicio,
@@ -259,7 +300,7 @@ class DisponibilidadService implements DisponibilidadRepository
                     $response = $this->guardarDisponibilidad($params);
                     if ($response->getStatusCode() == 201) {
                         $id_disp = $response->getData()->id;
-                        if ($disponible == "v") {
+                        if ($disponible == "V") {
                             $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp, $disponible);
                         } else {
                             $this->horarioService->guardarHorarios($dia, $inicio, $fin,  $id_disp);
@@ -322,7 +363,7 @@ class DisponibilidadService implements DisponibilidadRepository
 
 
 
-    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $noAula)
+    public function verificarModulosDia($dia, $modulo_inicio, $modulo_fin, $id_docente, $id_carrera_grado, $id_uc, $modulos_semanales, $modulos_semanales_o, $virtual)
     {
         // Calcular el rango de módulos que se intentan asignar
 
@@ -438,8 +479,8 @@ class DisponibilidadService implements DisponibilidadRepository
             Log::info("grado {$id_docente} está disponible para este rango de tiempo.");
         }
 
-        if ($noAula) {
-            return "v";
+        if ($virtual) {
+            return "V";
         } else {
 
 

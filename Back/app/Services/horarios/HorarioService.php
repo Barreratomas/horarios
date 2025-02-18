@@ -112,7 +112,7 @@ class HorarioService implements HorarioRepository
     }
 
 
-    public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp, $modalidad = "p")
+    public function guardarHorarios($dia, $modulo_inicio, $modulo_fin, $id_disp, $modalidad = 'P')
     {
         try {
             // los datos para el mapper

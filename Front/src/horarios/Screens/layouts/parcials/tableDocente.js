@@ -55,8 +55,9 @@ const TablaHorario = ({ horarios }) => {
     if (horario) {
       const unidadCurricular =
         horario.disponibilidad.unidad_curricular?.unidad_curricular || 'Sin Unidad Curricular';
-      const modalidad = horario.modalidad.toUpperCase();
-      const aula = horario.disponibilidad.aula?.nombre || 'Sin Aula';
+      const modalidad = horario.disponibilidad.id_aula === 'V' ? 'V' : '';
+
+      const aula = modalidad === 'V' ? '' : horario.disponibilidad.aula?.nombre || 'Sin Aula';
       const docenteNombre = horario.disponibilidad.docente
         ? `${horario.disponibilidad.docente.nombre} ${horario.disponibilidad.docente.apellido}`
         : 'Sin Docente';
