@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../../css/tabla.css';
 
 const TablaHorario = ({ horarios }) => {
+  const [filtroGrado, setFiltroGrado] = useState('');
+  const [filtroDivision, setFiltroDivision] = useState('');
+
   const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
     1: '19:20',
@@ -43,6 +46,17 @@ const TablaHorario = ({ horarios }) => {
     return acc;
   }, {});
 
+  // Filtrar horarios por grado o división
+  const horariosFiltrados = Object.entries(horariosPorCarrera).filter(([, horariosGrado]) => {
+    const grado = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.grado || '';
+    const division = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.division || '';
+
+    return (
+      (filtroGrado === '' || grado.toString() === filtroGrado) &&
+      (filtroDivision === '' || division.toString() === filtroDivision)
+    );
+  });
+
   const obtenerContenidoCelda = (dia, modulo, horariosGrado) => {
     const horario = horariosGrado.find((h) => {
       return (
@@ -77,7 +91,39 @@ const TablaHorario = ({ horarios }) => {
 
   return (
     <div>
-      {Object.entries(horariosPorCarrera).map(([idCarreraGrado, horariosGrado]) => {
+      <div className="filtros">
+        <label>
+          Grado:
+          <select value={filtroGrado} onChange={(e) => setFiltroGrado(e.target.value)}>
+            <option value="">Todos</option>
+            {[
+              ...new Set(horarios.map((h) => h.disponibilidad?.carrera_grado?.grado?.grado || ''))
+            ].map((grado, index) => (
+              <option key={index} value={grado}>
+                {grado}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          División:
+          <select value={filtroDivision} onChange={(e) => setFiltroDivision(e.target.value)}>
+            <option value="">Todas</option>
+            {[
+              ...new Set(
+                horarios.map((h) => h.disponibilidad?.carrera_grado?.grado?.division || '')
+              )
+            ].map((division, index) => (
+              <option key={index} value={division}>
+                {division}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {horariosFiltrados.map(([idCarreraGrado, horariosGrado]) => {
         const grado =
           horariosGrado?.[0]?.disponibilidad?.carrera_grado?.grado?.grado || 'Sin Grado';
         const division =

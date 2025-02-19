@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 const TablaHorario = ({ horarios: initialHorarios }) => {
   const [horarios, setHorarios] = useState(initialHorarios);
+
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
