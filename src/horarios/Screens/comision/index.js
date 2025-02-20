@@ -2,24 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap'; // Importamos el modal y el botón
 import '../../css/acordeon.css';
+import DataTable from 'react-data-table-component';
 
-const Accordion = ({ title, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-  };
-
+// Componente para mostrar la información expandida de cada fila (materias)
+const ExpandedComponent = ({ data }) => {
   return (
-    <div className="accordion">
-      <div className="accordion-header" onClick={toggleAccordion}>
-        <h3>{title}</h3>
-      </div>
-      <div className={`accordion-body ${isOpen ? 'open' : ''}`}>{children}</div>
+    <div style={{ padding: '10px 20px', backgroundColor: '#f8f9fa' }}>
+      <h5>Materias</h5>
+      {data.grado.grado_uc && data.grado.grado_uc.length > 0 ? (
+        <ul>
+          {data.grado.grado_uc.map((uc, index) => (
+            <li key={index}>{uc.unidad_curricular.unidad_curricular}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No hay materias asignadas</p>
+      )}
     </div>
   );
 };
-
 const Comisiones = () => {
   const usuario = sessionStorage.getItem('userType');
   const navigate = useNavigate();
@@ -158,6 +159,68 @@ const Comisiones = () => {
     setFilteredComisiones(grados);
   };
 
+  // Definición de columnas para el DataTable
+  const columns = [
+    {
+      name: 'Carrera',
+      selector: (row) => row.carrera.carrera,
+      sortable: true
+    },
+    {
+      name: 'Cupo',
+      selector: (row) => row.carrera.cupo,
+      sortable: true
+    },
+    {
+      name: 'Grado',
+      selector: (row) => row.grado.grado,
+      sortable: true
+    },
+    {
+      name: 'División',
+      selector: (row) => row.grado.division,
+      sortable: true
+    },
+    {
+      name: 'Detalle',
+      selector: (row) => row.grado.detalle,
+      sortable: true
+    },
+    {
+      name: 'Capacidad',
+      selector: (row) => row.grado.capacidad,
+      sortable: true
+    },
+
+    {
+      name: 'Acciones',
+      cell: (row) => (
+        <div style={{ display: 'flex', gap: '0.25rem' }}>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            style={{ fontSize: '0.90rem', padding: '0.45rem 0.5rem' }}
+            onClick={() =>
+              navigate(`${routes.base}/${routes.comisiones.actualizar(row.grado.id_grado)}`)
+            }
+          >
+            Actualiza
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger btn-sm"
+            style={{ fontSize: '0.90rem', padding: '0.45rem 0.5rem' }}
+            onClick={() => {
+              setGradoToDelete(row.grado.id_grado);
+              setShowModal(true);
+            }}
+          >
+            Elimina
+          </button>
+        </div>
+      )
+    }
+  ];
   return (
     <>
       {loading ? (
@@ -210,68 +273,29 @@ const Comisiones = () => {
               </button>
             </div>
           </div>
-
-          <div className="container">
-            {filteredComisiones.length > 0 ? (
-              filteredComisiones.map(({ id_grado, id_carrera, carrera, grado }) => (
-                <div
-                  key={`${id_grado}-${id_carrera}`}
-                  style={{
-                    border: '1px solid #ccc',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    marginBottom: '10px',
-                    width: '30vw'
-                  }}
-                >
-                  <h5>Carrera: {carrera.carrera}</h5>
-                  <p>Cupo: {carrera.cupo}</p>
-                  <p>Grado: {grado.grado}</p>
-                  <p>División: {grado.division}</p>
-                  <p>Detalle: {grado.detalle}</p>
-                  <p>Capacidad: {grado.capacidad}</p>
-
-                  <div>
-                    <Accordion title="Ver materias">
-                      <ul>
-                        {grado.grado_uc && grado.grado_uc.length > 0 ? (
-                          grado.grado_uc.map((uc, index) => (
-                            <li key={index}>{uc.unidad_curricular.unidad_curricular}</li>
-                          ))
-                        ) : (
-                          <p>No hay materias asignadas</p>
-                        )}
-                      </ul>
-                    </Accordion>
-                  </div>
-
-                  <div className="botones">
-                    <button
-                      type="button"
-                      className="btn btn-primary me-2"
-                      onClick={() =>
-                        navigate(`${routes.base}/${routes.comisiones.actualizar(id_grado)}`)
-                      }
-                    >
-                      Actualizar
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => {
-                        setGradoToDelete(grado.id_grado);
-                        setShowModal(true);
-                      }}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No se encontraron comisiones que coincidan con la búsqueda.</p>
-            )}
-          </div>
-
+          <h1 className="titulo">Grados</h1>
+          <DataTable
+            columns={columns}
+            data={filteredComisiones}
+            pagination
+            responsive
+            highlightOnHover
+            expandableRows
+            expandableRowsComponent={ExpandedComponent}
+            customStyles={{
+              rows: {
+                style: {
+                  transition: 'all 0.3s ease'
+                }
+              },
+              headCells: {
+                style: {
+                  fontSize: '1.1rem',
+                  letterSpacing: '0.5px'
+                }
+              }
+            }}
+          />
           {/* Modal de confirmación */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
@@ -299,7 +323,6 @@ const Comisiones = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
           <div
             id="messages-container"
             className={`container ${hideMessage ? 'hide-messages' : ''}`}

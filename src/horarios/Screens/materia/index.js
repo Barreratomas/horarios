@@ -241,9 +241,9 @@ const Materias = () => {
               </button>
             </div>
           </div>
-
+          <h1 className="titulo">Materias</h1>
           <DataTable
-            title="Materias"
+            //title="Materias"
             columns={columns}
             data={filteredMaterias} /* Usar datos filtrados */
             pagination

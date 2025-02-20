@@ -217,18 +217,16 @@ const Aulas = () => {
               </button>
             </div>
           </div>
-
           {/* DataTable to display aulas */}
-
+          <h1 className="titulo">Aulas</h1>
           <DataTable
-            title="Aulas"
+            //title="Aulas"
             columns={columns}
             data={filteredAulas}
             pagination
             highlightOnHover
             responsive
           />
-
           {/* Modal for confirmation */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
@@ -256,7 +254,6 @@ const Aulas = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
           <div
             id="messages-container"
             className={`container ${hideMessage ? 'hide-messages' : ''}`}
