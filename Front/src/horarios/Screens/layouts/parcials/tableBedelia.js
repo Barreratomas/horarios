@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 const TablaHorario = ({ horarios: initialHorarios }) => {
   const [horarios, setHorarios] = useState(initialHorarios);
 
+  const [filtroGrado, setFiltroGrado] = useState('');
+  const [filtroDivision, setFiltroDivision] = useState('');
+  const [filtroCarrera, setFiltroCarrera] = useState('');
+
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
@@ -315,6 +319,18 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
     return acc;
   }, {});
 
+  const horariosFiltrados = Object.entries(horariosPorCarrera).filter(([, horariosGrado]) => {
+    const carrera = horariosGrado[0]?.disponibilidad?.carrera_grado?.carrera?.carrera || '';
+    const grado = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.grado || '';
+    const division = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.division || '';
+
+    return (
+      (filtroCarrera === '' || carrera.toString() === filtroCarrera) &&
+      (filtroGrado === '' || grado.toString() === filtroGrado) &&
+      (filtroDivision === '' || division.toString() === filtroDivision)
+    );
+  });
+
   const obtenerContenidoCelda = (dia, modulo, horariosGrado) => {
     const horario = horariosGrado.find((h) => {
       return (
@@ -389,6 +405,55 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
   return (
     <div onClick={handleClickOutside}>
       <h3>Horarios Bedelia</h3>
+      <div className="filtros">
+        <label>
+          Grado:
+          <select value={filtroGrado} onChange={(e) => setFiltroGrado(e.target.value)}>
+            <option value="">Todos</option>
+            {[
+              ...new Set(horarios.map((h) => h.disponibilidad?.carrera_grado?.grado?.grado || ''))
+            ].map((grado, index) => (
+              <option key={index} value={grado}>
+                {grado}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          División:
+          <select value={filtroDivision} onChange={(e) => setFiltroDivision(e.target.value)}>
+            <option value="">Todas</option>
+            {[
+              ...new Set(
+                horarios.map((h) => h.disponibilidad?.carrera_grado?.grado?.division || '')
+              )
+            ].map((division, index) => (
+              <option key={index} value={division}>
+                {division}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Carrera:
+          <select value={filtroCarrera} onChange={(e) => setFiltroCarrera(e.target.value)}>
+            <option value="">Todas</option>
+            {[
+              ...new Set(
+                horarios.map((h) => h.disponibilidad?.carrera_grado?.carrera?.carrera || '')
+              )
+            ]
+              .filter(Boolean)
+              .map((carrera, index) => (
+                <option key={index} value={carrera}>
+                  {carrera}
+                </option>
+              ))}
+          </select>
+        </label>
+      </div>
+
       {isSelecting ? (
         <div className="seleccion-container">
           <div className="barra-opciones">
@@ -406,7 +471,7 @@ const TablaHorario = ({ horarios: initialHorarios }) => {
         </div>
       ) : null}
 
-      {Object.entries(horariosPorCarrera).map(([idCarreraGrado, horariosGrado]) => {
+      {horariosFiltrados.map(([idCarreraGrado, horariosGrado]) => {
         const grado =
           horariosGrado?.[0]?.disponibilidad?.carrera_grado?.grado?.grado || 'Sin Grado';
         const division =

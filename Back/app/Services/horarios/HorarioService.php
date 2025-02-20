@@ -31,7 +31,8 @@ class HorarioService implements HorarioRepository
                 'disponibilidad.docente',
                 'disponibilidad.aula',
                 'disponibilidad.carreraGrado.grado',
-                'disponibilidad.carreraGrado.carrera'
+                'disponibilidad.carreraGrado.carrera',
+
 
             ])->get();
 
@@ -96,7 +97,9 @@ class HorarioService implements HorarioRepository
                     'disponibilidad.unidadCurricular',
                     'disponibilidad.docente',
                     'disponibilidad.aula',
-                    'disponibilidad.carreraGrado.grado'
+                    'disponibilidad.carreraGrado.grado',
+                    'disponibilidad.carreraGrado.carrera'
+
                 ])
                 ->get();
 

@@ -4,7 +4,9 @@ import '../../../css/tabla.css';
 const TablaHorario = ({ horarios }) => {
   const [filtroGrado, setFiltroGrado] = useState('');
   const [filtroDivision, setFiltroDivision] = useState('');
+  const [filtroCarrera, setFiltroCarrera] = useState('');
 
+  console.log(horarios);
   const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   const inicio = {
     1: '19:20',
@@ -48,10 +50,12 @@ const TablaHorario = ({ horarios }) => {
 
   // Filtrar horarios por grado o división
   const horariosFiltrados = Object.entries(horariosPorCarrera).filter(([, horariosGrado]) => {
+    const carrera = horariosGrado[0]?.disponibilidad?.carrera_grado?.carrera?.carrera || '';
     const grado = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.grado || '';
     const division = horariosGrado[0]?.disponibilidad?.carrera_grado?.grado?.division || '';
 
     return (
+      (filtroCarrera === '' || carrera.toString() === filtroCarrera) &&
       (filtroGrado === '' || grado.toString() === filtroGrado) &&
       (filtroDivision === '' || division.toString() === filtroDivision)
     );
@@ -121,6 +125,23 @@ const TablaHorario = ({ horarios }) => {
             ))}
           </select>
         </label>
+        <label>
+          Carrera:
+          <select value={filtroCarrera} onChange={(e) => setFiltroCarrera(e.target.value)}>
+            <option value="">Todas</option>
+            {[
+              ...new Set(
+                horarios.map((h) => h.disponibilidad?.carrera_grado?.carrera?.carrera || '')
+              )
+            ]
+              .filter(Boolean)
+              .map((carrera, index) => (
+                <option key={index} value={carrera}>
+                  {carrera}
+                </option>
+              ))}
+          </select>
+        </label>
       </div>
 
       {horariosFiltrados.map(([idCarreraGrado, horariosGrado]) => {
@@ -128,12 +149,15 @@ const TablaHorario = ({ horarios }) => {
           horariosGrado?.[0]?.disponibilidad?.carrera_grado?.grado?.grado || 'Sin Grado';
         const division =
           horariosGrado?.[0]?.disponibilidad?.carrera_grado?.grado?.division || 'Sin División';
+        const carrera =
+          horariosGrado?.[0]?.disponibilidad?.carrera_grado?.carrera?.carrera || 'Sin Carrera';
 
         return (
           <div key={idCarreraGrado}>
             <div className="comision">
               <h4>Grado: {grado}</h4>
               <h4>División: {division}</h4>
+              <h4>Carrera: {carrera}</h4>
             </div>
 
             <div className="bedelia-horario">
